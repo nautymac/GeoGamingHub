@@ -1,0 +1,9 @@
+# package folders (third-party fixes, our wrappers' release builds, DXVK): release assets / local junctions
+Packages/
+# per-user state next to the exe
+games.list
+settings.ini
+compat.json
+# test harness and its output
+HubTest.exe
+dist/
