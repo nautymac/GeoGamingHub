@@ -1,7 +1,7 @@
 // Self-tests of Geo Gaming Hub (OpenGL kind here, Vulkan kind in VkTests.cs).
-//   HubTest.exe <GeoGamingHub.exe> <out dir> [unit|gui|survey|pkg|vkunit|vkgui]
+//   HubTest.exe <GeoGamingHub.exe> <out dir> [unit|gui|survey|pkg|vkunit|vkgui|cand]
 // build (tests folder): csc /target:exe /win32manifest:..\src\app.manifest /out:..\HubTest.exe /r:System.Windows.Forms.dll
-//                      /r:System.Drawing.dll /r:System.Core.dll HubTest.cs VkTests.cs
+//                      /r:System.Drawing.dll /r:System.Core.dll HubTest.cs VkTests.cs CandTests.cs
 // HubTest.exe must sit in the project root (next to Packages\) for gui / vkgui / pkg.
 // unit:   GlOps on temp folders + detection on the installed games (read-only)
 // gui:    MainForm in-process (it finds Packages\ next to Application.ExecutablePath); wizard flows on copies of game exes; message boxes are answered
@@ -70,6 +70,7 @@ static partial class HubTest
             else if (mode == "pkg") Pkg();
             else if (mode == "vkunit") VkUnit(args[0]);
             else if (mode == "vkgui") VkGui();
+            else if (mode == "cand") Cands();
         }
         catch (Exception e) { fail++; Console.WriteLine("FAIL exception: " + e); }
         Console.WriteLine("== " + mode + ": " + pass + " passed, " + fail + " failed (" + sw.ElapsedMilliseconds + " ms)");
@@ -417,7 +418,7 @@ static partial class HubTest
         Ok(cb("chkAutoConv").Checked && !numConv.Enabled && numSep.Value == 50m && !cb("chkUpscale").Checked, "package defaults: auto convergence (value locked), separation 50, upscale off");
         Ok(ctl("lblDetect").Text.Contains("OpenGL") && ctl("lblKindDetect").Text.Contains("OGL3D"), "detect notes: " + ctl("lblDetect").Text + " / " + ctl("lblKindDetect").Text);
         Ok(!ctl("lblDetect").Text.Contains("Unity 아님") && !ctl("lblDetect").Text.Contains("2GB"), "detect notes: no geo-11 / 4GB-patch hints for an OpenGL game");
-        for (int i = 1; i <= 4; i++) { tabs.SelectedIndex = i; Shot(form, "ko_gl_step" + i); }
+        for (int i = 2; i <= 5; i++) { tabs.SelectedIndex = i; Shot(form, "ko_gl_step" + (i - 1)); }
         Ok(TakeDialogs().Count == 0, "no message box so far");
 
         // ---- 2. finish with SR off / tab / swap / upscale / manual convergence
@@ -429,7 +430,7 @@ static partial class HubTest
         cb("chkAutoConv").Checked = false; Pump();
         Ok(numConv.Enabled, "auto off: convergence editable");
         numConv.Value = 123.45m;
-        tabs.SelectedIndex = 4;
+        tabs.SelectedIndex = 5;
         Call(form, "Apply");
         Pump();
         var dl = TakeDialogs();
@@ -536,9 +537,9 @@ static partial class HubTest
         Eq(ctl("lblSrHead").Text, "SR weaving (OGL3D)", "English: SR heading");
         Eq(cb("chkAutoConv").Text, "Auto-convergence (convergence = auto) - OGL3D follows the scene (recommended)", "English: auto convergence label");
         Ok(!cb("chkSr").Checked && (string)cbGlMode.SelectedItem == "sbs" && cbGlMode.Enabled, "English re-edit: output = sbs (after removing SR weaving) shows as SR off / sbs");
-        for (int i = 1; i <= 4; i++) { tabs.SelectedIndex = i; Shot(form, "en_gl_step" + i); }
+        for (int i = 2; i <= 5; i++) { tabs.SelectedIndex = i; Shot(form, "en_gl_step" + (i - 1)); }
         tabs.SelectedIndex = 0; Shot(form, "en_list");
-        tabs.SelectedIndex = 6; Shot(form, "en_help");
+        tabs.SelectedIndex = 7; Shot(form, "en_help");
         Ok(TakeDialogs().Count == 0, "no message boxes in English pass");
         form.Close();
         Pump();

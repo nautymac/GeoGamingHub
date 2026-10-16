@@ -164,7 +164,7 @@ static partial class HubTest
         var numConv = C<NumericUpDown>(form, "numConv");
         var cbMode = C<ComboBox>(form, "cbGlMode");
         Eq(form.Text, "Geo Gaming Hub", "window title");
-        Eq(tabs.TabPages[1].Text, "3D 방식", "step 1 is called 3D 방식");
+        Eq(tabs.TabPages[2].Text, "3D 방식", "step 1 is called 3D 방식");
         Eq(rb("rbCatGeo").Text + " / " + rb("rbCatWrap").Text, "geo-11 - DirectX 9 / 11 게임 / 자체 래퍼 - Vulkan / OpenGL 게임", "two categories");
 
         // ---- Quake II RTX: Vulkan kind, fix preset
@@ -186,7 +186,7 @@ static partial class HubTest
         Ok(Shown(ctl("lblStereoVk")) && !Shown(ctl("lblStereoGl")), "stereo step: VK3D note");
         Ok(!cb("chkAutoConv").Checked && numConv.Value == 60m && numConv.Enabled && numSep.Value == 25m, "Q2RTX preset: convergence 60 manual, separation 25");
         Ok(ctl("lblDetect").Text.Contains("Vulkan") && ctl("lblDetect").Text.Contains("VK3D_fix") && ctl("lblKindDetect").Text.Contains("VK3D"), "detect notes: " + ctl("lblDetect").Text);
-        for (int i = 0; i <= 4; i++) { tabs.SelectedIndex = i; Shot(form, "ko_vk_step" + i); }
+        for (int i = 0; i <= 5; i++) { tabs.SelectedIndex = i; Shot(form, "ko_vk_tab" + i); }
         Ok(TakeDialogs().Count == 0, "no message box so far");
         cb("chkSr").Checked = false; Pump();
         cbMode.SelectedItem = "tab";
@@ -251,8 +251,8 @@ static partial class HubTest
         Pump();
         Eq(ctl("lblSrHead").Text, "SR weaving (VK3D)", "English: SR heading");
         Eq(rb("rbCatWrap").Text, "Own wrappers - Vulkan / OpenGL games", "English: category");
-        Eq(tabs.TabPages[1].Text, "3D Method", "English: step 1 is called 3D Method");
-        for (int i = 0; i <= 4; i++) { tabs.SelectedIndex = i; Shot(form, "en_vk_step" + i); }
+        Eq(tabs.TabPages[2].Text, "3D Method", "English: step 1 is called 3D Method");
+        for (int i = 0; i <= 5; i++) { tabs.SelectedIndex = i; Shot(form, "en_vk_tab" + i); }
         Ok(TakeDialogs().Count == 0, "no message boxes in English pass");
         form.Close();
         Pump();

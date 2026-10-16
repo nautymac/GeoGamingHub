@@ -700,7 +700,10 @@ namespace GeoGamingHub
         Label lblStereoHead, lblStereoGl; readonly List<Control> geoStereoNotes = new List<Control>();
         RadioButton rbCatGeo, rbCatWrap; FlowLayoutPanel pnlKindGeo, pnlKindWrap;   // 3D method step: category, then the game types in it
         RadioButton lastGeoKind, lastWrapKind; bool syncingCategory;
-        RadioButton rbKindVk; CheckBox chkVkDxvk; Label lblVkDxvk;   // Vulkan games: VK3D (vulkan-1.dll proxy), optionally DX9/11 through DXVK
+        RadioButton rbKindVk; CheckBox chkVkDxvk; Label lblVkDxvk;
+        // candidate list tab: data\game_candidates.json + the installed games of this PC
+        ListView lvCands; TextBox tbCandSearch; ComboBox cbCandMethod, cbCandProduct; CheckBox chkCandInstalled; Label lblCandInfo;
+        List<Candidate> candidates = new List<Candidate>(); bool candScanned, candScanning;   // Vulkan games: VK3D (vulkan-1.dll proxy), optionally DX9/11 through DXVK
         Label lblVkInstall, lblGlModeHead, lblUpHead, lblStereoVk;
         bool vkDxvkPossible;   // the selected exe is a 64-bit DX9 / DX11 game (the DXVK route of the Vulkan kind)
         CheckBox chkLaa; Label lblLaa;   // 4GB patch for 32-bit exes without LARGE_ADDRESS_AWARE (DX9 kind, optional)
@@ -721,7 +724,7 @@ namespace GeoGamingHub
         bool wizardActive;           // 종류 -> 설치 -> 디스플레이 -> 입체 값 -> 완료 in progress
         static string[] WizardTitles { get { return new[] { Lang.T("3D 방식"), Lang.T("설치"), Lang.T("디스플레이"), Lang.T("입체 값") }; } }
         const int WizardSteps = 4;
-        const int TabList = 0, TabKind = 1, TabInstall = 2, TabDisplay = 3, TabStereo = 4, TabKeys = 5;
+        const int TabList = 0, TabCands = 1, TabKind = 2, TabInstall = 3, TabDisplay = 4, TabStereo = 5, TabKeys = 6;
 
         public MainForm()
         {
@@ -823,6 +826,7 @@ namespace GeoGamingHub
             tabs = new TabControl { Dock = DockStyle.Fill, Padding = new Point(S(16), S(7)), Margin = P(0, 0, 0, 10) };
             outer.Controls.Add(tabs, 0, 1);
             tabs.TabPages.Add(BuildGamesTab());
+            tabs.TabPages.Add(BuildCandidatesTab());
             tabs.TabPages.Add(BuildKindTab());
             tabs.TabPages.Add(BuildGameTab());
             tabs.TabPages.Add(BuildSrTab());
@@ -925,6 +929,7 @@ namespace GeoGamingHub
 
         void UpdateWizardStatus()
         {
+            if (tabs.SelectedIndex == TabCands && !candScanned) ScanCandidates();
             int i = tabs.SelectedIndex;
             if (i >= TabKind && i <= TabStereo)
             {
@@ -1072,6 +1077,197 @@ namespace GeoGamingHub
             bars.Controls.Add(row1); bars.Controls.Add(row2);
             layout.Controls.Add(bars, 0, 2);
             return t;
+        }
+
+        // ---- candidate list tab -------------------------------------------------------------------------
+        // Which 3D method fits a game: the author's owned library classified from PCGamingWiki (data\game_candidates.json,
+        // tools\library_survey) plus the games installed on this PC (method read from the exe when the data has no entry).
+        TabPage BuildCandidatesTab()
+        {
+            var t = NewTab(Lang.T("후보 목록"));
+            var layout = new TableLayoutPanel { Dock = DockStyle.Fill, ColumnCount = 1, RowCount = 4, Margin = new Padding(0) };
+            layout.RowStyles.Add(new RowStyle(SizeType.AutoSize));
+            layout.RowStyles.Add(new RowStyle(SizeType.AutoSize));
+            layout.RowStyles.Add(new RowStyle(SizeType.Percent, 100));
+            layout.RowStyles.Add(new RowStyle(SizeType.AutoSize));
+            t.Controls.Add(layout);
+
+            var note = Note(Lang.T("게임마다 맞는 3D 방식입니다. 소장 게임 목록을 PCGamingWiki의 엔진·그래픽 API로 분류했고, 이 PC에 설치된 게임은 실행 파일로도 확인합니다. 검증됨 = 직접 시험한 게임, 그 밖에는 시험이 필요합니다. 설치된 게임을 두 번 클릭하면 설정을 시작합니다.") + "\n" +
+                Lang.T("담당: Geo Gaming Hub = 게임에 실제 깊이가 있는 게임(지오메트리 입체). Flato3D = 평면 2D 레이어 게임(Flato3D-SR이 레이어마다 깊이를 줌). AI 2D→3D만 = 완성 화면 한 장만 나오는 게임(에뮬레이터 등)."));
+            note.Margin = P(0, 4, 0, 6);
+            layout.Controls.Add(note, 0, 0);
+
+            var filters = new FlowLayoutPanel { AutoSize = true, WrapContents = true, Margin = P(0, 0, 0, 6), Padding = new Padding(0) };
+            filters.Controls.Add(Lbl(Lang.T("검색:")));
+            tbCandSearch = new TextBox { Width = S(240), Margin = P(0, 3, 16, 3), BorderStyle = BorderStyle.FixedSingle };
+            tbCandSearch.TextChanged += (s, e) => FillCandidates();
+            filters.Controls.Add(tbCandSearch);
+            filters.Controls.Add(Lbl(Lang.T("담당:")));
+            var prods = new List<object> { Lang.T("전체") };
+            foreach (var pr in Library.Products) prods.Add(Library.ProductLabel(pr));
+            cbCandProduct = Combo(170, prods.ToArray(), 0);
+            cbCandProduct.SelectedIndexChanged += (s, e) => FillCandidates();
+            cbCandProduct.Margin = P(0, 3, 16, 3);
+            filters.Controls.Add(cbCandProduct);
+            filters.Controls.Add(Lbl(Lang.T("3D 방식:")));
+            var items = new List<object> { Lang.T("전체") };
+            foreach (var m in Library.Methods) items.Add(Library.MethodLabel(m));
+            cbCandMethod = Combo(230, items.ToArray(), 0);
+            cbCandMethod.SelectedIndexChanged += (s, e) => FillCandidates();
+            filters.Controls.Add(cbCandMethod);
+            chkCandInstalled = Check(Lang.T("이 PC에 설치된 게임만"), true, 16);
+            chkCandInstalled.CheckedChanged += (s, e) => FillCandidates();
+            filters.Controls.Add(chkCandInstalled);
+            layout.Controls.Add(filters, 0, 1);
+
+            lvCands = new ListView
+            {
+                Dock = DockStyle.Fill, View = View.Details, FullRowSelect = true, MultiSelect = false, HideSelection = false,
+                BorderStyle = BorderStyle.FixedSingle, HeaderStyle = ColumnHeaderStyle.Nonclickable, Margin = new Padding(0)
+            };
+            lvCands.Columns.Add(Lang.T("게임"), S(280));
+            lvCands.Columns.Add(Lang.T("담당"), S(120));
+            lvCands.Columns.Add(Lang.T("추천 3D 방식"), S(200));
+            lvCands.Columns.Add(Lang.T("다른 방법"), S(150));
+            lvCands.Columns.Add(Lang.T("상태"), S(75));
+            lvCands.Columns.Add(Lang.T("설치"), S(60));
+            lvCands.Columns.Add(Lang.T("엔진"), S(140));
+            lvCands.Columns.Add("API", S(150));
+            lvCands.Columns.Add(Lang.English ? "Bits" : "비트", S(65));
+            lvCands.Columns.Add(Lang.T("메모"), S(520));
+            lvCands.DoubleClick += (s, e) => StartFromCandidate();
+            layout.Controls.Add(lvCands, 0, 2);
+
+            var bar = new FlowLayoutPanel { AutoSize = true, WrapContents = true, Margin = P(0, 10, 0, 0), Padding = new Padding(0) };
+            var bStart = MakeButton(Lang.T("이 게임 설정 시작"), 150, true); bStart.Click += (s, e) => StartFromCandidate();
+            var bScan = MakeButton(Lang.T("새로 고침"), 100, false); bScan.Click += (s, e) => ScanCandidates();
+            foreach (var b in new[] { bStart, bScan }) { b.Height = S(32); bar.Controls.Add(b); }
+            lblCandInfo = new Label { AutoSize = true, ForeColor = TextMuted, Margin = P(8, 9, 0, 0) };
+            bar.Controls.Add(lblCandInfo);
+            layout.Controls.Add(bar, 0, 3);
+            return t;
+        }
+
+        string CandidatesFile()
+        {
+            string exeDir = Path.GetDirectoryName(Application.ExecutablePath);
+            foreach (var d in new[] { exeDir, Path.GetDirectoryName(exeDir) })
+            {
+                string f = d == null ? null : Path.Combine(d, "data", "game_candidates.json");
+                if (f != null && File.Exists(f)) return f;
+            }
+            return null;
+        }
+
+        // data + installed games now; the exes of installed games without a data entry are read in the background
+        void ScanCandidates()
+        {
+            if (candScanning) return;
+            candScanned = candScanning = true;
+            List<Candidate> data;
+            try { data = Library.Load(CandidatesFile()); }
+            catch (Exception ex) { data = new List<Candidate>(); Log(Lang.T("후보 목록을 읽지 못했습니다: ") + ex.Message); }
+            candidates = Library.Merge(data, Library.ScanInstalled());
+            FillCandidates();
+            var todo = candidates.Where(c => c.Installed != null).ToList();
+            if (todo.Count == 0) { candScanning = false; return; }
+            System.Threading.ThreadPool.QueueUserWorkItem(_ =>
+            {
+                foreach (var c in todo)
+                {
+                    try { c.AntiCheat = Library.AntiCheat(c.Installed.Dir); } catch { }
+                    if (!c.FromExe || c.Method != null) continue;
+                    try { c.Exe = Library.FindExe(c.Installed); c.Method = Library.MethodOfExe(c.Exe); }
+                    catch { c.Method = "unknown"; }
+                }
+                try { BeginInvoke((Action)(() => { candScanning = false; FillCandidates(); })); } catch { candScanning = false; }
+            });
+        }
+
+        void FillCandidates()
+        {
+            if (lvCands == null) return;
+            string f = Library.Norm(tbCandSearch.Text);
+            string m = cbCandMethod.SelectedIndex > 0 ? Library.Methods[cbCandMethod.SelectedIndex - 1] : null;
+            string pf = cbCandProduct.SelectedIndex > 0 ? Library.Products[cbCandProduct.SelectedIndex - 1] : null;
+            bool onlyInstalled = chkCandInstalled.Checked;
+            lvCands.BeginUpdate();
+            lvCands.Items.Clear();
+            int shown = 0;
+            foreach (var c in candidates.OrderBy(x => x.Installed == null).ThenBy(x => x.Title, StringComparer.CurrentCultureIgnoreCase))
+            {
+                if (onlyInstalled && c.Installed == null) continue;
+                if (f.Length > 0 && !Library.Norm(c.Title).Contains(f)) continue;
+                if (m != null && c.Method != m && !c.Alts.Contains(m)) continue;
+                if (pf != null && c.Product != pf) continue;
+                bool flato = c.Product == "flato3d";
+                // a flat 2D game: Flato3D-SR's route first; the hub's methods would give it next to no depth
+                string method = c.Method == null ? Lang.T("확인 중...") : flato ? Library.FlatoRouteLabel(c.FlatoRoute) : Library.MethodLabel(c.Method);
+                string alts = flato ? Lang.T("(Hub: ") + Library.MethodLabel(c.Method) + Lang.T(", 깊이 거의 없음)") : string.Join(", ", c.Alts.Select(Library.MethodLabel));
+                string status = c.AntiCheat != null ? Lang.T("안티치트") : Library.StatusLabel(c);
+                string memo = c.AntiCheat != null ? Lang.T("안티치트(") + c.AntiCheat + Lang.T(") - 계정 정지 위험이 있어 설정하지 않습니다") + (string.IsNullOrEmpty(c.Note) ? "" : "; " + c.Note) : c.Note ?? "";
+                var it = new ListViewItem(new[] { c.Title, Library.ProductLabel(c.Product), method, alts, status, c.Installed != null ? c.Installed.Store : "", c.Engine ?? "", c.Api ?? "", c.Bits ?? "", memo }) { Tag = c };
+                bool verified = !c.FromExe && (flato ? c.FlatoStatus == "verified" || c.FlatoStatus == "working" : c.Status == "verified");
+                if (c.AntiCheat != null) it.ForeColor = Color.FromArgb(196, 43, 28);
+                else if (verified) it.ForeColor = Color.FromArgb(16, 124, 16);
+                else if (flato) it.ForeColor = Color.FromArgb(120, 60, 160);
+                else if (c.Product == "none" || c.Method == "dx12" || c.Method == "old" || c.Method == "none" || c.Method == "unknown") it.ForeColor = TextMuted;
+                lvCands.Items.Add(it);
+                shown++;
+            }
+            lvCands.EndUpdate();
+            int inst = candidates.Count(c => c.Installed != null);
+            lblCandInfo.Text = string.Format(Lang.T("{0}개 표시 (전체 {1}, 이 PC에 설치 {2})"), shown, candidates.Count, inst) +
+                (CandidatesFile() == null ? Lang.T(" - data\\game_candidates.json 없음: 설치된 게임만") : "");
+        }
+
+        // set up the selected candidate: its exe goes to the game list and the 3D method step starts; for a game this
+        // project tested, the tested method is chosen even where the exe points elsewhere (Lara Croft GO: Unity -> VK3D + DXVK)
+        void StartFromCandidate()
+        {
+            if (lvCands.SelectedItems.Count == 0) { Status(Lang.T("후보 목록에서 게임을 먼저 고르세요.")); return; }
+            var c = (Candidate)lvCands.SelectedItems[0].Tag;
+            if (c.Installed == null) { Status(Lang.T("이 PC에 설치되지 않은 게임입니다: ") + c.Title); return; }
+            if (c.AntiCheat != null || (c.AntiCheat = Library.AntiCheat(c.Installed.Dir)) != null)
+            {
+                Status(Lang.T("안티치트가 있는 게임은 설정하지 않습니다(계정 정지 위험): ") + c.Title + " (" + c.AntiCheat + ")");
+                return;
+            }
+            if (c.Product == "flato3d")
+            {
+                Status(Lang.T("평면 2D 게임입니다. Flato3D-SR 설치기로 설정하세요(https://github.com/nautymac/Flato3D-SR): ") + c.Title);
+                Log(Lang.T("평면 2D 게임입니다. Flato3D-SR 설치기로 설정하세요(https://github.com/nautymac/Flato3D-SR): ") + c.Title + " - " + Library.FlatoRouteLabel(c.FlatoRoute));
+                return;
+            }
+            string exe = c.Exe ?? (c.Exe = Library.FindExe(c.Installed));
+            if (exe == null || !File.Exists(exe))
+                using (var dlg = new OpenFileDialog { Filter = Lang.T("실행 파일 (*.exe)|*.exe"), Title = Lang.T("설정할 게임의 실행 파일"), InitialDirectory = c.Installed.Dir })
+                {
+                    if (dlg.ShowDialog(this) != DialogResult.OK) return;
+                    exe = c.Exe = dlg.FileName;
+                }
+            AddGameToList(exe, false);
+            RefreshGameList();
+            StartWizard(exe);
+            if (!c.FromExe && (c.Status == "verified" || c.Status == "checked")) ApplyMethodHint(c.Method);
+        }
+
+        void ApplyMethodHint(string method)
+        {
+            switch (method)
+            {
+                case "unity": case "dx11": rbKindGeo.Checked = true; break;
+                case "ue4": rbKindUe4.Checked = true; break;
+                case "dx9": rbKindDx9.Checked = true; break;
+                case "opengl": rbKindGl.Checked = true; break;
+                case "vulkan":
+                    rbKindVk.Checked = true;
+                    if (chkVkDxvk.Enabled) chkVkDxvk.Checked = true;   // a DirectX exe: the DXVK route
+                    break;
+                default: return;
+            }
+            Log(Lang.T("  후보 목록의 시험 결과대로 3D 방식 선택: ") + Library.MethodLabel(method));
+            UpdateEnabled();
         }
 
         // make the selected list entry the current game for the remove/uninstall/log actions
@@ -1966,6 +2162,8 @@ namespace GeoGamingHub
             // OpenGL (imports opengl32.dll) or an existing OGL3D install -> the OpenGL kind. Checked before DX9: an
             // OpenGL exe can still name d3d9.dll (Broken Age), which the DLL-name fallback below would take for DX9.
             lastGeoKind = lastWrapKind = null;
+            string anti = Library.AntiCheat(gameDir);
+            if (anti != null) notes.Add(Lang.T("안티치트 있음(") + anti + Lang.T(") - 설치하지 않습니다"));
             bool gl = GlOps.Installed(gameDir) || (uv == null && !rbUe4.Checked && GlOps.IsOpenGL(exePath));   // an existing install wins
             // Vulkan (imports vulkan-1.dll and no Direct3D) or an existing VK3D install (also DX games run through DXVK) -> the Vulkan kind
             bool vk = !gl && (VkOps.Installed(gameDir) || (uv == null && !rbUe4.Checked && VkOps.ImportsVulkan(exePath) && !VkOps.ImportsDirect3D(exePath)));
@@ -2174,6 +2372,13 @@ namespace GeoGamingHub
         void Apply()
         {
             if (!RequireGame()) return;
+            string ac = Library.AntiCheat(gameDir);
+            if (ac != null)
+            {
+                Log(Lang.T("적용 안 함: 안티치트가 있는 게임입니다 - ") + ac);
+                MessageBox.Show(this, Lang.T("이 게임 폴더에 안티치트가 있습니다: ") + ac + Lang.T("\n\n게임 폴더에 DLL을 넣으면 계정이 정지될 수 있어 설치하지 않습니다."), AppName, MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
             if (IsGlSelected || IsVkSelected) { ApplyWrapper(); return; }
             try
             {

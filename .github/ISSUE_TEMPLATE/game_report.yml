@@ -1,0 +1,62 @@
+name: 3D report / 3D 동작 보고
+description: Tell others how a game works in 3D with Geo Gaming Hub or Flato3D / 게임이 3D로 어떻게 되는지 알려 주세요
+title: "[3D] "
+labels: ["community", "report"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        The app's **[Report 3D...]** button fills in the game, the PCGamingWiki link, the method and the setup. Pick the result and submit. The engine and graphics API are read from the PCGamingWiki page, the same way as the app's candidate list, and the report shows in the [community list](https://github.com/nautymac/GeoGamingHub/blob/main/COMMUNITY.md) within a minute or two.
+
+        앱의 **[3D 동작 보고...]** 버튼을 누르면 게임, PCGamingWiki 링크, 3D 방식, 설정이 채워집니다. 결과를 고르고 제출하세요. 엔진과 그래픽 API는 앱의 후보 목록과 같은 방식으로 PCGamingWiki 문서에서 읽고, 1~2분 안에 [커뮤니티 목록](https://github.com/nautymac/GeoGamingHub/blob/main/COMMUNITY.ko.md)에 들어갑니다.
+  - type: input
+    id: game
+    attributes:
+      label: Game / 게임
+      description: Steam name if possible / 가능하면 Steam에 표시되는 이름
+    validations:
+      required: true
+  - type: input
+    id: pcgw
+    attributes:
+      label: PCGamingWiki link / PCGamingWiki 링크
+      description: "Copy the game's page address from pcgamingwiki.com (a Steam store link works too) / pcgamingwiki.com에서 게임 문서 주소를 복사해 넣으세요 (Steam 상점 주소도 됩니다)"
+      placeholder: https://www.pcgamingwiki.com/wiki/Quake_II_RTX
+    validations:
+      required: true
+  - type: dropdown
+    id: program
+    attributes:
+      label: Program / 담당
+      options:
+        - Geo Gaming Hub (geo-11, OGL3D, VK3D)
+        - Flato3D (flat 2D games / 평면 2D 게임)
+      default: 0
+    validations:
+      required: true
+  - type: input
+    id: used
+    attributes:
+      label: 3D method used / 사용한 3D 방식
+      description: "Filled in by the app, e.g. geo-11 Unity, geo-11 UE4, geo-11 DX11, DX9 dgVoodoo, OGL3D, VK3D, VK3D + DXVK, Flato3D"
+  - type: dropdown
+    id: result
+    attributes:
+      label: Result / 결과
+      options:
+        - Works well / 잘 됨
+        - Works with issues / 문제 있음
+        - Does not work / 안 됨
+    validations:
+      required: true
+  - type: textarea
+    id: details
+    attributes:
+      label: Setup / 설정 정보
+      description: Filled in by the app. Without it, write 32/64-bit and versions. / 앱이 채웁니다. 직접 쓸 때는 32/64비트와 버전을 적어 주세요.
+      render: text
+  - type: textarea
+    id: notes
+    attributes:
+      label: Notes / 메모
+      description: Settings that worked, known problems, GPU, display. / 잘 맞은 설정값, 알려진 문제, GPU, 디스플레이 등.

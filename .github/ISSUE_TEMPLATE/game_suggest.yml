@@ -1,0 +1,43 @@
+name: Suggest a game / 후보 제안
+description: Add a game you have not tried yet to the candidate list / 아직 시험하지 않은 게임을 후보 목록에 넣어 주세요
+title: "[Candidate] "
+labels: ["community", "suggestion"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Only the PCGamingWiki link is needed: the engine, graphics API and the 3D method are read from that page, the same way as the app's candidate list. Tried it already? Use the 3D report form instead.
+
+        PCGamingWiki 링크만 있으면 됩니다. 엔진, 그래픽 API, 3D 방식은 앱의 후보 목록과 같은 방식으로 그 문서에서 읽습니다. 이미 해 보셨으면 3D 동작 보고 양식을 써 주세요.
+  - type: input
+    id: game
+    attributes:
+      label: Game / 게임
+      description: Steam name if possible / 가능하면 Steam에 표시되는 이름
+    validations:
+      required: true
+  - type: input
+    id: pcgw
+    attributes:
+      label: PCGamingWiki link / PCGamingWiki 링크
+      description: "Copy the game's page address from pcgamingwiki.com (a Steam store link works too) / pcgamingwiki.com에서 게임 문서 주소를 복사해 넣으세요 (Steam 상점 주소도 됩니다)"
+      placeholder: https://www.pcgamingwiki.com/wiki/Quake_II_RTX
+    validations:
+      required: true
+  - type: dropdown
+    id: program
+    attributes:
+      label: Program / 담당
+      description: Flat 2D games (pixel art, hand-drawn layers) belong to Flato3D / 평면 2D 게임(픽셀 아트, 손그림 레이어)은 Flato3D입니다
+      options:
+        - Geo Gaming Hub (geo-11, OGL3D, VK3D)
+        - Flato3D (flat 2D games / 평면 2D 게임)
+        - Not sure / 모름
+      default: 2
+    validations:
+      required: true
+  - type: textarea
+    id: notes
+    attributes:
+      label: Notes / 메모
+      description: Why it looks promising, links to existing fixes, anything else. / 기대하는 이유, 기존 픽스 링크 등.

@@ -7,3 +7,8 @@ compat.json
 # test harness and its output
 HubTest.exe
 dist/
+build/
+tools/library_survey/cache_*.json
+tools/library_survey/library.json
+tools/library_survey/classify.log
+data/private/
