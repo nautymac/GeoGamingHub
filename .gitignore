@@ -12,3 +12,6 @@ tools/library_survey/cache_*.json
 tools/library_survey/library.json
 tools/library_survey/classify.log
 data/private/
+__pycache__/
+# a locked exe replaced by the build leaves <guid>_GeoGamingHub.exe behind
+*_GeoGamingHub.exe
