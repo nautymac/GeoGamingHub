@@ -1,7 +1,7 @@
 // Self-tests of Geo Gaming Hub (OpenGL kind here, Vulkan kind in VkTests.cs).
-//   HubTest.exe <GeoGamingHub.exe> <out dir> [unit|gui|survey|pkg|vkunit|vkgui|cand]
+//   HubTest.exe <GeoGamingHub.exe> <out dir> [unit|gui|survey|pkg|vkunit|vkgui|cand|dx12unit|dx12gui]
 // build (tests folder): csc /target:exe /win32manifest:..\src\app.manifest /out:..\HubTest.exe /r:System.Windows.Forms.dll
-//                      /r:System.Drawing.dll /r:System.Core.dll HubTest.cs VkTests.cs CandTests.cs
+//                      /r:System.Drawing.dll /r:System.Core.dll HubTest.cs VkTests.cs CandTests.cs Dx12Tests.cs
 // HubTest.exe must sit in the project root (next to Packages\) for gui / vkgui / pkg.
 // unit:   GlOps on temp folders + detection on the installed games (read-only)
 // gui:    MainForm in-process (it finds Packages\ next to Application.ExecutablePath); wizard flows on copies of game exes; message boxes are answered
@@ -71,6 +71,8 @@ static partial class HubTest
             else if (mode == "vkunit") VkUnit(args[0]);
             else if (mode == "vkgui") VkGui();
             else if (mode == "cand") Cands();
+            else if (mode == "dx12unit") Dx12Unit(args[0]);
+            else if (mode == "dx12gui") Dx12Gui();
         }
         catch (Exception e) { fail++; Console.WriteLine("FAIL exception: " + e); }
         Console.WriteLine("== " + mode + ": " + pass + " passed, " + fail + " failed (" + sw.ElapsedMilliseconds + " ms)");

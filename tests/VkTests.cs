@@ -165,7 +165,7 @@ static partial class HubTest
         var cbMode = C<ComboBox>(form, "cbGlMode");
         Eq(form.Text, "Geo Gaming Hub", "window title");
         Eq(tabs.TabPages[2].Text, "3D 방식", "step 1 is called 3D 방식");
-        Eq(rb("rbCatGeo").Text + " / " + rb("rbCatWrap").Text, "geo-11 - DirectX 9 / 11 게임 / 자체 래퍼 - Vulkan / OpenGL 게임", "two categories");
+        Eq(rb("rbCatGeo").Text + " / " + rb("rbCatWrap").Text, "geo-11 - DirectX 9 / 11 게임 / 자체 래퍼 - Vulkan / OpenGL / DirectX 12 게임", "two categories");
 
         // ---- Quake II RTX: Vulkan kind, fix preset
         Call(form, "StartWizard", q);
@@ -250,7 +250,7 @@ static partial class HubTest
         Call(form, "StartWizard", q);
         Pump();
         Eq(ctl("lblSrHead").Text, "SR weaving (VK3D)", "English: SR heading");
-        Eq(rb("rbCatWrap").Text, "Own wrappers - Vulkan / OpenGL games", "English: category");
+        Eq(rb("rbCatWrap").Text, "Own wrappers - Vulkan / OpenGL / DirectX 12 games", "English: category");
         Eq(tabs.TabPages[2].Text, "3D Method", "English: step 1 is called 3D Method");
         for (int i = 0; i <= 5; i++) { tabs.SelectedIndex = i; Shot(form, "en_vk_tab" + i); }
         Ok(TakeDialogs().Count == 0, "no message boxes in English pass");

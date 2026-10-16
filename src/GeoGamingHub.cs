@@ -701,6 +701,7 @@ namespace GeoGamingHub
         RadioButton rbCatGeo, rbCatWrap; FlowLayoutPanel pnlKindGeo, pnlKindWrap;   // 3D method step: category, then the game types in it
         RadioButton lastGeoKind, lastWrapKind; bool syncingCategory;
         RadioButton rbKindVk; CheckBox chkVkDxvk; Label lblVkDxvk;
+        RadioButton rbKindDx12; Label lblDx12Install, lblStereoDx12;   // DirectX 12 games: DX12_3D (d3d12.dll proxy)
         // candidate list tab: data\game_candidates.json + the installed games of this PC
         ListView lvCands; TextBox tbCandSearch; ComboBox cbCandMethod, cbCandProduct; CheckBox chkCandInstalled; Label lblCandInfo;
         List<Candidate> candidates = new List<Candidate>(); bool candScanned, candScanning;   // Vulkan games: VK3D (vulkan-1.dll proxy), optionally DX9/11 through DXVK
@@ -740,6 +741,7 @@ namespace GeoGamingHub
                 { "ogl3d", FindPkg(root, "OGL3D") },        // OpenGL games: OGL3D x64|x86\opengl32.dll + OGL3D.ini
                 { "vk3d",  FindPkg(root, "VK3D") },         // Vulkan games: VK3D x64\vulkan-1.dll + VK3D.ini + profiles\<exe>
                 { "dxvk",  FindPkg(root, "DXVK") },         // DirectX 9 / 11 -> Vulkan (experimental route to VK3D)
+                { "dx12",  FindPkg(root, "DX12_3D") },      // DirectX 12 games: DX12_3D x64\d3d12.dll + DX12_3D.ini + DX12_3D\(DXC) + profiles\<exe>
             };
             gamesFile = Path.Combine(exeDir, "games.list");
             Lang.Load(exeDir);   // settings.ini "lang=ko|en", else the Windows display language
@@ -978,7 +980,7 @@ namespace GeoGamingHub
             if (syncingCategory) return;
             syncingCategory = true;
             if (wrapper) { rbKindGeo.Checked = rbKindUe4.Checked = rbKindDx9.Checked = false; rbCatWrap.Checked = true; }
-            else { rbKindGl.Checked = rbKindVk.Checked = false; rbCatGeo.Checked = true; }
+            else { rbKindGl.Checked = rbKindVk.Checked = rbKindDx12.Checked = false; rbCatGeo.Checked = true; }
             pnlKindGeo.Visible = !wrapper; pnlKindWrap.Visible = wrapper;
             syncingCategory = false;
         }
@@ -988,8 +990,9 @@ namespace GeoGamingHub
         {
             if (syncingCategory) return;
             pnlKindGeo.Visible = !wrapper; pnlKindWrap.Visible = wrapper;
-            if (wrapper && !rbKindGl.Checked && !rbKindVk.Checked)
-                (lastWrapKind ?? (gameExe != null && !vkDxvkPossible && !VkOps.ImportsVulkan(gameExe) && GlOps.IsOpenGL(gameExe) ? rbKindGl : rbKindVk)).Checked = true;   // a DirectX game (Unity players import opengl32 too) -> Vulkan through DXVK
+            if (wrapper && !rbKindGl.Checked && !rbKindVk.Checked && !rbKindDx12.Checked)
+                (lastWrapKind ?? (gameExe != null && Dx12Ops.IsDx12Game(gameExe) ? rbKindDx12
+                                  : gameExe != null && !vkDxvkPossible && !VkOps.ImportsVulkan(gameExe) && GlOps.IsOpenGL(gameExe) ? rbKindGl : rbKindVk)).Checked = true;   // a DirectX 9/11 game (Unity players import opengl32 too) -> Vulkan through DXVK
             else if (!wrapper && !rbKindGeo.Checked && !rbKindUe4.Checked && !rbKindDx9.Checked)
                 (lastGeoKind ?? (gameExe != null && Util.IsUe4(gameExe) ? rbKindUe4 : rbKindGeo)).Checked = true;
         }
@@ -1053,7 +1056,7 @@ namespace GeoGamingHub
                 UpdateReportButton();
                 if (bLogGame == null || lvGames.SelectedItems.Count == 0) return;
                 string sd = Path.GetDirectoryName((string)lvGames.SelectedItems[0].Tag);
-                bLogGame.Text = GlOps.Installed(sd) ? "OGL3D.log" : VkOps.Installed(sd) ? "VK3D.log" : "SRWeave.log";
+                bLogGame.Text = GlOps.Installed(sd) ? "OGL3D.log" : VkOps.Installed(sd) ? "VK3D.log" : Dx12Ops.Installed(sd) ? "DX12_3D.log" : "SRWeave.log";
             };
             layout.Controls.Add(lvGames, 0, 1);
 
@@ -1211,7 +1214,7 @@ namespace GeoGamingHub
                 if (c.AntiCheat != null) it.ForeColor = Color.FromArgb(196, 43, 28);
                 else if (verified) it.ForeColor = Color.FromArgb(16, 124, 16);
                 else if (flato) it.ForeColor = Color.FromArgb(120, 60, 160);
-                else if (c.Product == "none" || c.Method == "dx12" || c.Method == "old" || c.Method == "none" || c.Method == "unknown") it.ForeColor = TextMuted;
+                else if (c.Product == "none" || c.Method == "old" || c.Method == "none" || c.Method == "unknown") it.ForeColor = TextMuted;
                 lvCands.Items.Add(it);
                 shown++;
             }
@@ -1260,6 +1263,7 @@ namespace GeoGamingHub
                 case "ue4": rbKindUe4.Checked = true; break;
                 case "dx9": rbKindDx9.Checked = true; break;
                 case "opengl": rbKindGl.Checked = true; break;
+                case "dx12": rbKindDx12.Checked = true; break;
                 case "vulkan":
                     rbKindVk.Checked = true;
                     if (chkVkDxvk.Enabled) chkVkDxvk.Checked = true;   // a DirectX exe: the DXVK route
@@ -1338,11 +1342,14 @@ namespace GeoGamingHub
                 GlOps.Options glo = hasGl ? GlOps.Read(Path.Combine(dir, GlOps.IniName)) : null;
                 bool hasVk = exists && !hasGl && VkOps.Installed(dir);   // Vulkan kind: VK3D, settings in VK3D.ini
                 VkOps.Options vko = hasVk ? VkOps.Read(Path.Combine(dir, VkOps.IniName)) : null;
-                string engine = !exists ? "-" : hasGl ? "OpenGL" : hasVk ? (VkOps.DxvkInstalled(dir) ? "Vulkan (DXVK)" : "Vulkan") : (Util.UnityVersion(dir, exe) != null ? "Unity" : Util.IsUe4(exe) ? "UE4" : Dx9Ops.Installed(dir) ? "DX9" : Lang.T("일반"));
+                bool hasDx12 = exists && !hasGl && !hasVk && Dx12Ops.Installed(dir);   // DirectX 12 kind: DX12_3D, settings in DX12_3D.ini
+                Dx12Ops.Options d12o = hasDx12 ? Dx12Ops.Read(Path.Combine(dir, Dx12Ops.IniName)) : null;
+                string engine = !exists ? "-" : hasGl ? "OpenGL" : hasVk ? (VkOps.DxvkInstalled(dir) ? "Vulkan (DXVK)" : "Vulkan") : hasDx12 ? "DX12" : (Util.UnityVersion(dir, exe) != null ? "Unity" : Util.IsUe4(exe) ? "UE4" : Dx9Ops.Installed(dir) ? "DX9" : Lang.T("일반"));
                 var bits = exists ? Util.ExeBits(exe) : null;
                 string sr = "-";
                 if (hasGl) sr = glo.Sr ? Lang.T("켬") : Lang.T("끔");
                 else if (hasVk) sr = vko.Sr ? Lang.T("켬") : Lang.T("끔");
+                else if (hasDx12) sr = d12o.Sr ? Lang.T("켬") : Lang.T("끔");
                 else if (exists)
                 {
                     string srIni = Path.Combine(dir, "SRWeave.ini");
@@ -1380,9 +1387,15 @@ namespace GeoGamingHub
                     sep = vko.Separation.ToString(CultureInfo.InvariantCulture);
                     conv = vko.Auto ? "auto" : vko.Convergence.ToString(CultureInfo.InvariantCulture);
                 }
+                if (hasDx12)
+                {
+                    up = "-";   // DX12_3D: the game's own render scale
+                    sep = d12o.Separation.ToString(CultureInfo.InvariantCulture);
+                    conv = d12o.Convergence.ToString(CultureInfo.InvariantCulture);
+                }
                 sep = Trim1(sep); conv = Trim1(conv);
                 string launch = exists ? Launchers.LaunchLabel(exe, Util.IsUe4(exe)) : "-";
-                bool installed = hasGeo || hasGl || hasVk;
+                bool installed = hasGeo || hasGl || hasVk || hasDx12;
                 bool complete = rec.Done && installed;
                 string state = !exists ? Lang.T("파일 없음") : complete ? Lang.T("설정 완료") : Lang.T("재설정 필요");
                 it.SubItems.Add(state).ForeColor = complete ? Color.FromArgb(16, 124, 16) : Color.FromArgb(200, 90, 0);
@@ -1541,10 +1554,10 @@ namespace GeoGamingHub
             p.Controls.Add(Head(Lang.T("카테고리")));
             var catCol = new FlowLayoutPanel { AutoSize = true, FlowDirection = FlowDirection.TopDown, WrapContents = false, Margin = new Padding(0) };
             rbCatGeo = Radio(Lang.T("geo-11 - DirectX 9 / 11 게임"), true);
-            rbCatWrap = Radio(Lang.T("자체 래퍼 - Vulkan / OpenGL 게임"), false);
+            rbCatWrap = Radio(Lang.T("자체 래퍼 - Vulkan / OpenGL / DirectX 12 게임"), false);
             foreach (var r in new[] { rbCatGeo, rbCatWrap }) { r.Font = new Font(Font, FontStyle.Bold); catCol.Controls.Add(r); }
             p.Controls.Add(catCol);
-            p.Controls.Add(Note(Lang.T("geo-11은 커뮤니티 픽스(3DMigoto 계열)로 DirectX 게임을 입체로 만들고, 자체 래퍼(OGL3D / VK3D)는 OpenGL·Vulkan 게임의 양쪽 눈을 직접 그려 위빙합니다. 지원하지 않는 API의 게임은 DXVK로 Vulkan으로 바꿔 자체 래퍼를 쓸 수도 있습니다(실험적).")));
+            p.Controls.Add(Note(Lang.T("geo-11은 커뮤니티 픽스(3DMigoto 계열)로 DirectX 9 / 11 게임을 입체로 만들고, 자체 래퍼(OGL3D / VK3D / DX12_3D)는 OpenGL·Vulkan·DirectX 12 게임의 양쪽 눈을 직접 그려 위빙합니다. 지원하지 않는 API의 게임은 DXVK로 Vulkan으로 바꿔 자체 래퍼를 쓸 수도 있습니다(실험적).")));
 
             p.Controls.Add(Head(Lang.T("게임 유형")));
             var kindCol = pnlKindGeo = new FlowLayoutPanel { AutoSize = true, FlowDirection = FlowDirection.TopDown, WrapContents = false, Margin = new Padding(0) };
@@ -1607,6 +1620,11 @@ namespace GeoGamingHub
             lblVkDxvk = Note(Lang.T("geo-11이 안 되는 64비트 DX9/DX11 게임용입니다(예: Lara Croft GO). DXVK의 d3d9 / d3d11 / dxgi / d3d10core.dll을 함께 넣습니다. geo-11이 되는 게임은 geo-11 쪽이 더 낫습니다(예: Unreal Engine 4 게임은 화면 효과가 어긋날 수 있음). 게임 폴더에 geo-11·SR 위빙·dgVoodoo·ReShade가 있으면 먼저 제거해야 합니다."));
             lblVkDxvk.Margin = P(24, 0, 0, 6);
             kindCol.Controls.Add(lblVkDxvk);
+            rbKindDx12 = Radio(Lang.T("DirectX 12 게임 - DX12_3D (d3d12.dll, 64비트)"), false);
+            rbKindDx12.Font = new Font(Font, FontStyle.Bold);
+            rbKindDx12.Margin = P(0, 10, 0, 2);
+            kindCol.Controls.Add(rbKindDx12);
+            kindCol.Controls.Add(Note(Lang.T("DirectX 12 게임은 DX12_3D가 맡습니다. 게임 폴더에 d3d12.dll, DX12_3D.ini, DX12_3D 폴더(셰이더 패치용 DXC)를 넣으면 DX12_3D가 양쪽 눈을 그려 SR SDK로 직접 위빙합니다. 64비트 게임만 됩니다. 자동 수렴은 아직 없어 Convergence는 고정 값입니다. DLSS는 오른쪽 눈에 적용되지 않으므로 게임의 렌더 스케일이나 FSR / XeSS를 쓰세요. 언리얼 엔진 게임은 UU3D / UEVR 쪽이 더 낫습니다.")));
             p.Controls.Add(kindCol);
             p.Controls.Add(Note(Lang.T("3D 방식에 따라 다음 단계의 항목이 달라집니다. 방식마다 다른 패키지이므로 한 게임에 두 가지를 같이 설치하지 마세요.")));
             rbCatGeo.CheckedChanged += (s, e) => { if (rbCatGeo.Checked) CategoryPicked(false); };
@@ -1616,6 +1634,7 @@ namespace GeoGamingHub
             rbKindDx9.CheckedChanged += (s, e) => { if (rbKindDx9.Checked) { KindPicked(rbKindDx9, false); if (rbPlain != null) rbPlain.Checked = true; } UpdateEnabled(); };
             rbKindGl.CheckedChanged += (s, e) => { if (rbKindGl.Checked) { KindPicked(rbKindGl, true); if (gameDir != null && chkSr != null) LoadWrapper(); } UpdateEnabled(); };
             rbKindVk.CheckedChanged += (s, e) => { if (rbKindVk.Checked) { KindPicked(rbKindVk, true); if (gameDir != null && chkSr != null) LoadWrapper(); } UpdateEnabled(); };
+            rbKindDx12.CheckedChanged += (s, e) => { if (rbKindDx12.Checked) { KindPicked(rbKindDx12, true); if (gameDir != null && chkSr != null) LoadWrapper(); } UpdateEnabled(); };
             return t;
         }
 
@@ -1669,6 +1688,9 @@ namespace GeoGamingHub
             lblVkInstall = Note(Lang.T("Vulkan (VK3D): 64비트 vulkan-1.dll과 VK3D.ini를 게임 폴더에 넣습니다. 게임 전용 픽스가 있는 게임(Quake II RTX)은 VK3D_fix 폴더와 권장 값도 넣습니다. VK3D.ini가 이미 있으면 게임 안에서 저장한 값을 지키고, 다음 단계의 항목만 바꿉니다. 다른 vulkan-1.dll이 있으면 vulkan-1.dll.geo11sr_bak으로 보관합니다."));
             lblVkInstall.Visible = false;
             p.Controls.Add(lblVkInstall);
+            lblDx12Install = Note(Lang.T("DirectX 12 (DX12_3D): 64비트 d3d12.dll, DX12_3D.ini, DX12_3D 폴더(dxcompiler.dll, dxil.dll)를 게임 폴더에 넣습니다. 권장 값이 있는 게임(Helldivers 2)은 그 값으로 시작합니다. DX12_3D.ini가 이미 있으면 게임 안에서 저장한 값을 지키고, 다음 단계의 항목만 바꿉니다. 다른 d3d12.dll이 있으면 d3d12.dll.geo11sr_bak으로 보관합니다."));
+            lblDx12Install.Visible = false;
+            p.Controls.Add(lblDx12Install);
             pnlScope = new FlowLayoutPanel { AutoSize = true, FlowDirection = FlowDirection.TopDown, WrapContents = false, Margin = new Padding(0), Padding = new Padding(0) };
             pnlScope.Controls.Add(Head(Lang.T("설치 범위")));
             var scopeCol = new FlowLayoutPanel { AutoSize = true, FlowDirection = FlowDirection.TopDown, WrapContents = false, Margin = new Padding(0) };
@@ -1715,6 +1737,7 @@ namespace GeoGamingHub
         bool IsDx9Selected { get { return rbKindDx9 != null && rbKindDx9.Checked; } }
         bool IsGlSelected { get { return rbKindGl != null && rbKindGl.Checked; } }
         bool IsVkSelected { get { return rbKindVk != null && rbKindVk.Checked; } }
+        bool IsDx12Selected { get { return rbKindDx12 != null && rbKindDx12.Checked; } }
 
         // what 0000_Start_GEO11.cmd does after the package is copied, minus the interactive parts
         void Ue4PostInstall(string dir)
@@ -1872,6 +1895,9 @@ namespace GeoGamingHub
             lblStereoVk = Note(Lang.T("VK3D.ini separation / convergence. Separation은 깊이 세기(%, 기본 25)입니다. Convergence는 화면 면에 놓일 깊이(게임 단위)로 게임마다 크게 달라 자동 수렴을 권합니다. 게임 안에서 Ctrl+F3~F6으로 바꾸고 Ctrl+F7로 저장하며, 수동 조절(Ctrl+F5/F6)은 자동 수렴을 끕니다. Ctrl+F2가 자동 수렴을 켜고 끕니다."));
             lblStereoVk.Visible = false;
             p.Controls.Add(lblStereoVk);
+            lblStereoDx12 = Note(Lang.T("DX12_3D.ini separation / convergence. Separation은 깊이 세기(%, 기본 25)입니다. Convergence는 화면 면에 놓일 깊이(게임 단위)로 게임마다 크게 다릅니다(Helldivers 2는 미터 단위라 2 - 5). DX12_3D는 아직 자동 수렴이 없습니다. 게임 안에서 Ctrl+F3~F6으로 바꾸고 Ctrl+F7로 저장합니다."));
+            lblStereoDx12.Visible = false;
+            p.Controls.Add(lblStereoDx12);
             chkAutoConv = Check(Lang.T("자동 수렴 (dm_auto_convergence) - 장면에 따라 geo-11이 수렴을 자동으로 맞춤"), false, 0);
             chkAutoConv.CheckedChanged += (s, e) => UpdateEnabled();
             p.Controls.Add(chkAutoConv);
@@ -1952,7 +1978,7 @@ namespace GeoGamingHub
             tb.Text = string.Join(Environment.NewLine, new[] {
                 Lang.T("■ 사용 순서"),
                 Lang.T("  1. [게임 목록] 탭에서 [게임 추가 (설정 시작)]을 누르고 게임 실행 파일을 고릅니다. 목록에 '재설정 필요'로 올라가고 1단계로 넘어갑니다."),
-                Lang.T("  2. 1단계 [3D 방식]: 카테고리(geo-11 / 자체 래퍼)를 고르고 그 안의 게임 유형(geo-11: Unity / 일반, Unreal Engine 4, DirectX 9 - 자체 래퍼: OpenGL = OGL3D, Vulkan = VK3D)을 고릅니다. 실행 파일로 자동으로 골라 주며, 다르면 바꿉니다. [다음]."),
+                Lang.T("  2. 1단계 [3D 방식]: 카테고리(geo-11 / 자체 래퍼)를 고르고 그 안의 게임 유형(geo-11: Unity / 일반, Unreal Engine 4, DirectX 9 - 자체 래퍼: OpenGL = OGL3D, Vulkan = VK3D, DirectX 12 = DX12_3D)을 고릅니다. 실행 파일로 자동으로 골라 주며, 다르면 바꿉니다. [다음]."),
                 Lang.T("  3. 2단계 [설치]: 고른 게임이 위에 표시되고 비트, 엔진(Unity / 일반), 기존 픽스가 자동으로 잡힙니다. 확인하고 [다음]."),
                 Lang.T("     UE4 게임은 Universal Fix 2 패키지를 Binaries\\Win64에 설치합니다. AA/AO 개선·전체화면·VSync·HUD 프로필 같은 게임별 설정은 설치 뒤 [UE4 설정...] 창에서 바꿉니다."),
                 Lang.T("     UF2는 게임을 -dx11 인자로 실행해야 합니다. [완료] 때 Steam 시작 옵션(Steam을 잠시 종료했다가 다시 시작) 또는 Heroic(Epic/GOG)의 게임 설정에 -dx11을 넣고, 설치기의 [실행]도 -dx11을 붙입니다."),
@@ -1990,6 +2016,7 @@ namespace GeoGamingHub
                 Lang.T("  OpenGL (OGL3D)   [전체 제거]는 opengl32.dll, OGL3D.ini, OGL3D.log를 지우고, [SR 위빙만 제거]는 OGL3D.ini의 output을 sbs로 바꿉니다."),
                 Lang.T("                   OGL3D 단축키: Ctrl+F3/F4 Separation, Ctrl+F5/F6 Convergence, Ctrl+F2 자동 수렴, Ctrl+F7 저장, Ctrl+F1 값 표시, Ctrl+T 3D, Ctrl+Alt+W 위빙"),
                 Lang.T("  Vulkan (VK3D)    [전체 제거]는 vulkan-1.dll, VK3D.ini, VK3D.log, VK3D_fix(와 DXVK 파일)를 지우고, [SR 위빙만 제거]는 VK3D.ini의 output을 sbs로 바꿉니다. 단축키는 OGL3D와 같습니다."),
+                Lang.T("  DirectX 12 (DX12_3D)  [전체 제거]는 d3d12.dll, DX12_3D.ini, DX12_3D.log, DX12_3D 폴더, 덤프를 지우고, [SR 위빙만 제거]는 DX12_3D.ini의 output을 sbs로 바꿉니다. 단축키는 OGL3D와 같습니다(자동 수렴 Ctrl+F2 제외)."),
             });
             t.Controls.Add(tb);
             return t;
@@ -2010,14 +2037,14 @@ namespace GeoGamingHub
         void UpdateEnabled()
         {
             cbUnityVer.Enabled = rbUnity.Checked;
-            bool gl = IsGlSelected, vk = IsVkSelected, w = gl || vk;   // w: one of our own wrappers (OGL3D / VK3D)
+            bool gl = IsGlSelected, vk = IsVkSelected, dx12 = IsDx12Selected, w = gl || vk || dx12;   // w: one of our own wrappers (OGL3D / VK3D / DX12_3D)
             if (IsUe4Selected) { rb64.Checked = true; rb32.Enabled = false; rb64.Enabled = true; }   // UF2 is 64-bit only
             else if (w) { rb32.Enabled = rb64.Enabled = false; }   // OGL3D / VK3D: the DLL must match the exe's bitness (read from the exe)
             else { rb32.Enabled = rb64.Enabled = true; }
             if (pnlUe4 != null) pnlUe4.Visible = IsUe4Selected && !w;
             // the engine / Unity-version rows belong to the geo-11 group only (DX9 = dgVoodoo2 + plain geo-11, engine fixed)
             if (rowEngine != null) lblEngine.Visible = rowEngine.Visible = lblUnityVer.Visible = rowUnityVer.Visible = !IsUe4Selected && !IsDx9Selected && !w;
-            if (pnlScope != null) { pnlScope.Visible = !w; lblGlInstall.Visible = gl; lblVkInstall.Visible = vk; }
+            if (pnlScope != null) { pnlScope.Visible = !w; lblGlInstall.Visible = gl; lblVkInstall.Visible = vk; lblDx12Install.Visible = dx12; }
             if (chkVkDxvk != null) { chkVkDxvk.Enabled = lblVkDxvk.Enabled = vk && vkDxvkPossible; if (!chkVkDxvk.Enabled) chkVkDxvk.Checked = false; }
             if (IsDx9Selected && rbPlain != null && !rbPlain.Checked) rbPlain.Checked = true;
             if (rowDx9 != null) { rowDx9.Enabled = IsDx9Selected; rowDx9Vram.Enabled = IsDx9Selected; chkDx9Desktop.Enabled = IsDx9Selected; lblLaa.Enabled = IsDx9Selected; if (!IsDx9Selected) chkLaa.Checked = false; }
@@ -2029,26 +2056,29 @@ namespace GeoGamingHub
             {
                 // OpenGL / Vulkan kinds: OGL3D.ini / VK3D.ini output, swap_eyes (and upscale for OGL3D); the wrappers switch the lens themselves
                 pnlGeoMode.Visible = !w; pnlGlMode.Visible = w;
-                if (w) SetWrapperModes(vk ? VkOps.Modes : GlOps.Modes);
-                lblGlModeHead.Text = vk ? Lang.T("3D 출력 모드 (VK3D.ini output)") : Lang.T("3D 출력 모드 (OGL3D.ini output)");
-                lblGlModeNote.Text = vk ? Lang.T("SR 위빙을 켜면 output = auto (SR 런타임이 없으면 sbs)입니다. 끄면 sbs(좌우) 또는 tab(상하)을 고릅니다.")
+                if (w) SetWrapperModes(vk ? VkOps.Modes : dx12 ? Dx12Ops.Modes : GlOps.Modes);
+                lblGlModeHead.Text = vk ? Lang.T("3D 출력 모드 (VK3D.ini output)") : dx12 ? Lang.T("3D 출력 모드 (DX12_3D.ini output)") : Lang.T("3D 출력 모드 (OGL3D.ini output)");
+                lblGlModeNote.Text = vk || dx12 ? Lang.T("SR 위빙을 켜면 output = auto (SR 런타임이 없으면 sbs)입니다. 끄면 sbs(좌우) 또는 tab(상하)을 고릅니다.")
                                         : Lang.T("SR 위빙을 켜면 output = auto (SR 런타임이 없으면 sbs)입니다. 끄면 sbs(좌우), tab(상하), left / right(한쪽 눈)를 고릅니다.");
                 cbGlMode.Enabled = !chkSr.Checked;
                 if (w) chkSwap.Enabled = true;
                 chkLens.Visible = !w;
-                lblSrHead.Text = gl ? Lang.T("SR 위빙 (OGL3D)") : vk ? Lang.T("SR 위빙 (VK3D)") : Lang.T("SR 위빙 (SRWeave dxgi.dll)");
+                lblSrHead.Text = gl ? Lang.T("SR 위빙 (OGL3D)") : vk ? Lang.T("SR 위빙 (VK3D)") : dx12 ? Lang.T("SR 위빙 (DX12_3D)") : Lang.T("SR 위빙 (SRWeave dxgi.dll)");
                 foreach (var c in geoUpscaleControls) c.Visible = !w;
                 gridUpAdv.Visible = !w && chkUpAdv.Checked;
                 lblUpNoteGl.Visible = gl;
-                lblUpHead.Visible = chkUpscale.Visible = !vk;   // VK3D has no upscaling
-                if (vk) chkUpscale.Checked = false;
+                lblUpHead.Visible = chkUpscale.Visible = !vk && !dx12;   // VK3D / DX12_3D have no upscaling of their own
+                if (vk || dx12) chkUpscale.Checked = false;
             }
             if (lblStereoGl != null)
             {
                 foreach (var c in geoStereoNotes) c.Visible = !w;
                 lblStereoGl.Visible = gl;
                 lblStereoVk.Visible = vk;
-                lblStereoHead.Text = gl ? Lang.T("기본 입체 값 (OGL3D.ini [Stereo])") : vk ? Lang.T("기본 입체 값 (VK3D.ini [Stereo])") : Lang.T("기본 입체 값 (d3dxdm.ini [Stereo])");
+                lblStereoDx12.Visible = dx12;
+                lblStereoHead.Text = gl ? Lang.T("기본 입체 값 (OGL3D.ini [Stereo])") : vk ? Lang.T("기본 입체 값 (VK3D.ini [Stereo])") : dx12 ? Lang.T("기본 입체 값 (DX12_3D.ini [Stereo])") : Lang.T("기본 입체 값 (d3dxdm.ini [Stereo])");
+                chkAutoConv.Visible = !dx12;   // DX12_3D has no automatic convergence yet
+                if (dx12) chkAutoConv.Checked = false;
                 chkAutoConv.Text = gl ? Lang.T("자동 수렴 (convergence = auto) - 장면에 따라 OGL3D가 수렴을 맞춤 (권장)")
                                  : vk ? Lang.T("자동 수렴 (convergence = auto) - 장면에 따라 VK3D가 수렴을 맞춤 (권장)")
                                  : Lang.T("자동 수렴 (dm_auto_convergence) - 장면에 따라 geo-11이 수렴을 자동으로 맞춤");
@@ -2169,18 +2199,21 @@ namespace GeoGamingHub
             bool vk = !gl && (VkOps.Installed(gameDir) || (uv == null && !rbUe4.Checked && VkOps.ImportsVulkan(exePath) && !VkOps.ImportsDirect3D(exePath)));
             // DirectX 9 (static import or DLL name in the exe) or an existing dgVoodoo2 install -> the DX9 kind
             string api = Util.DirectXOf(exePath);
-            bool dx9 = !gl && !vk && uv == null && !rbUe4.Checked && (api == "DX9" || Dx9Ops.Installed(gameDir));
+            // DirectX 12 only (no DX11 renderer) or an existing DX12_3D install -> the DirectX 12 kind
+            bool dx12 = !gl && !vk && (Dx12Ops.Installed(gameDir) || (uv == null && !rbUe4.Checked && Dx12Ops.IsDx12Game(exePath)));
+            bool dx9 = !gl && !vk && !dx12 && uv == null && !rbUe4.Checked && (api == "DX9" || Dx9Ops.Installed(gameDir));
             if (gl) { notes.Remove(Lang.T("Unity 아님 (일반 geo-11)")); notes.Add("OpenGL"); }
             else if (vk) { notes.Remove(Lang.T("Unity 아님 (일반 geo-11)")); notes.Add(VkOps.DxvkInstalled(gameDir) ? "Vulkan (DXVK, " + (api ?? "?") + ")" : "Vulkan"); }
+            else if (dx12) { notes.Remove(Lang.T("Unity 아님 (일반 geo-11)")); notes.Add("DirectX 12"); }
             else if (api != null) notes.Add(api);
-            vkDxvkPossible = bits == 64 && api != null && !VkOps.ImportsVulkan(exePath);
-            rbKindUe4.Checked = rbUe4.Checked; rbKindDx9.Checked = dx9; rbKindGl.Checked = gl; rbKindVk.Checked = vk; rbKindGeo.Checked = !rbUe4.Checked && !dx9 && !gl && !vk;
+            vkDxvkPossible = bits == 64 && api != null && !Dx12Ops.IsDx12Game(exePath) && !VkOps.ImportsVulkan(exePath);   // DXVK has no D3D12
+            rbKindUe4.Checked = rbUe4.Checked; rbKindDx9.Checked = dx9; rbKindGl.Checked = gl; rbKindVk.Checked = vk; rbKindDx12.Checked = dx12; rbKindGeo.Checked = !rbUe4.Checked && !dx9 && !gl && !vk && !dx12;
             // 4GB patch: only meaningful for a 32-bit exe without the flag; off unless the user wants it
             bool? laa = bits == 32 ? Util.IsLargeAddressAware(exePath) : null;
             chkLaa.Enabled = laa == false;
             chkLaa.Checked = false;
             chkLaa.Text = laa == true ? Lang.T("4GB 패치 - 이미 적용되어 있음") : bits == 64 ? Lang.T("4GB 패치 - 64비트 게임에는 필요 없음") : Lang.T("4GB 패치 (실행 파일에 LARGE_ADDRESS_AWARE 플래그) - 원하면 켜세요");
-            if (laa == false && !gl && !vk) notes.Add(Lang.T("2GB 주소 공간 (LAA 없음)"));   // the 4GB patch is offered with the DX9 kind
+            if (laa == false && !gl && !vk && !dx12) notes.Add(Lang.T("2GB 주소 공간 (LAA 없음)"));   // the 4GB patch is offered with the DX9 kind
             if (dx9)
             {
                 string iv = Dx9Ops.InstalledVersion(gameDir, pkgDirs["dx9"], bits ?? 32);
@@ -2190,7 +2223,7 @@ namespace GeoGamingHub
                 string vr = Dx9Ops.Vram(gameDir);
                 if (vr != null && cbDx9Vram.Items.Contains(vr)) cbDx9Vram.SelectedItem = vr;
             }
-            lblKindDetect.Text = Lang.T("자동 감지: ") + (gl ? Lang.T("OpenGL (opengl32.dll) → OGL3D") : vk ? Lang.T("Vulkan (vulkan-1.dll) → VK3D") : rbUe4.Checked ? Lang.T("Unreal Engine 4 (Binaries\\Win64\\*-Win64-Shipping.exe 구조)") : uv != null ? "Unity " + uv : dx9 ? Lang.T("DirectX 9 (d3d9.dll) → dgVoodoo2 + 일반 geo-11") : Lang.T("Unity 아님 (일반 geo-11)") + (api != null ? " / " + api : "")) + Lang.T(" - 다르면 아래에서 바꾸세요.");
+            lblKindDetect.Text = Lang.T("자동 감지: ") + (gl ? Lang.T("OpenGL (opengl32.dll) → OGL3D") : vk ? Lang.T("Vulkan (vulkan-1.dll) → VK3D") : dx12 ? Lang.T("DirectX 12 (d3d12.dll) → DX12_3D") : rbUe4.Checked ? Lang.T("Unreal Engine 4 (Binaries\\Win64\\*-Win64-Shipping.exe 구조)") : uv != null ? "Unity " + uv : dx9 ? Lang.T("DirectX 9 (d3d9.dll) → dgVoodoo2 + 일반 geo-11") : Lang.T("Unity 아님 (일반 geo-11)") + (api != null ? " / " + api : "")) + Lang.T(" - 다르면 아래에서 바꾸세요.");
             bool hasFix = File.Exists(Path.Combine(gameDir, "d3d11.dll"));
             if (hasFix) { notes.Add(Lang.T("기존 d3d11.dll(geo-11/3DMigoto) 있음 → 'SR 위빙만 추가' 권장")); rbSrOnly.Checked = true; LoadExisting(gameDir); }
             else
@@ -2203,6 +2236,15 @@ namespace GeoGamingHub
             string dx = Path.Combine(gameDir, "dxgi.dll");
             if (File.Exists(dx))
                 notes.Add(Util.SameFile(dx, Path.Combine(SrcDir(), "dxgi.dll")) ? Lang.T("SRWeave dxgi.dll 이미 설치됨") : Lang.T("다른 dxgi.dll(ReShade?) 있음 → 설치 시 dxgi.dll.reshade_bak으로 백업"));
+            if (dx12)
+            {
+                LoadWrapper();
+                string v = Dx12Ops.Version(Path.Combine(gameDir, Dx12Ops.Dll));
+                if (v != null) notes.Add(Lang.T("DX12_3D 설치됨 ") + v);
+                else if (File.Exists(Path.Combine(gameDir, Dx12Ops.Dll))) notes.Add(Lang.T("다른 d3d12.dll 있음 → 설치 시 d3d12.dll.geo11sr_bak으로 보관"));
+                if (Dx12Ops.Profile(pkgDirs["dx12"], exePath) != null) notes.Add(Lang.T("게임 전용 권장 값 있음"));
+                if (bits == 32) notes.Add(Lang.T("32비트 - DX12_3D는 64비트 게임만 지원"));
+            }
             if (vk)
             {
                 LoadWrapper();
@@ -2241,6 +2283,22 @@ namespace GeoGamingHub
         // OpenGL / Vulkan kinds: show the game's OGL3D.ini / VK3D.ini (or the package's defaults) in the display / stereo steps
         void LoadWrapper()
         {
+            if (IsDx12Selected)
+            {
+                string dini = Path.Combine(gameDir, Dx12Ops.IniName), profile = null;
+                if (!File.Exists(dini)) { dini = Path.Combine(pkgDirs["dx12"], Dx12Ops.IniName); profile = Dx12Ops.Profile(pkgDirs["dx12"], gameExe); }
+                var d = Dx12Ops.Read(dini, profile);
+                chkSr.Checked = d.Sr;
+                SetWrapperModes(Dx12Ops.Modes);
+                cbGlMode.SelectedItem = d.Mode;
+                chkSwap.Checked = d.Swap;
+                chkUpscale.Checked = false;
+                numSep.Value = Math.Min(numSep.Maximum, Math.Max(numSep.Minimum, d.Separation));
+                numConv.Value = Math.Min(numConv.Maximum, Math.Max(numConv.Minimum, d.Convergence));
+                chkAutoConv.Checked = false;
+                rb64.Checked = true;
+                return;
+            }
             if (IsVkSelected)
             {
                 string vini = Path.Combine(gameDir, VkOps.IniName), profile = null;
@@ -2277,6 +2335,7 @@ namespace GeoGamingHub
         void ApplyWrapper()
         {
             if (IsVkSelected) { ApplyVk(); return; }
+            if (IsDx12Selected) { ApplyDx12(); return; }
             try
             {
                 string dir = gameDir;
@@ -2340,6 +2399,38 @@ namespace GeoGamingHub
             }
         }
 
+        void ApplyDx12()
+        {
+            try
+            {
+                string dir = gameDir;
+                var o = new Dx12Ops.Options
+                {
+                    Sr = chkSr.Checked, Mode = (string)cbGlMode.SelectedItem ?? "sbs", Swap = chkSwap.Checked,
+                    Separation = numSep.Value, Convergence = numConv.Value
+                };
+                Log("----------------------------------------");
+                Log(Lang.T("적용: ") + "DirectX 12 (DX12_3D) / x64 / SR " + (o.Sr ? Lang.T("사용") : Lang.T("사용 안 함")));
+                Log(Lang.T("  원본: ") + pkgDirs["dx12"]);
+                foreach (var l in Dx12Ops.Install(pkgDirs["dx12"], gameExe, dir, o)) Log(l);
+                if (File.Exists(Path.Combine(dir, "d3d11.dll")) || File.Exists(Path.Combine(dir, "dxgi.dll")) || VkOps.Installed(dir) || GlOps.Installed(dir))
+                    Log(Lang.T("  참고: 게임 폴더에 다른 3D 방식(geo-11 / SRWeave / OGL3D / VK3D)의 파일이 있습니다. 같이 쓰지 말고 필요 없으면 지우세요."));
+                AddGameToList(gameExe, true);
+                wizardActive = false;
+                RefreshGameList();
+                tabs.SelectedIndex = TabList;
+                Log(Lang.T("완료."));
+                Status(Lang.T("설정 완료: ") + Path.GetFileName(gameExe) + "  (" + dir + ")");
+                MessageBox.Show(this, Lang.T("DX12_3D를 설치했습니다.\n\n게임을 SR 패널에서 패널 해상도로 전체화면 또는 테두리 없는 창으로 실행하세요. DLSS 대신 게임의 렌더 스케일이나 FSR / XeSS를 쓰세요. 게임 폴더의 DX12_3D.log에 동작 기록이 남습니다.\n자세한 내용은 [로그] 탭에 있습니다."), AppName, MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+            catch (Exception ex)
+            {
+                Log(Lang.T("오류: ") + ex.Message);
+                Status(Lang.T("오류: ") + ex.Message);
+                MessageBox.Show(this, ex.Message, Lang.T("오류"), MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
         bool RequireGame()
         {
             if (gameDir != null) return true;
@@ -2379,7 +2470,7 @@ namespace GeoGamingHub
                 MessageBox.Show(this, Lang.T("이 게임 폴더에 안티치트가 있습니다: ") + ac + Lang.T("\n\n게임 폴더에 DLL을 넣으면 계정이 정지될 수 있어 설치하지 않습니다."), AppName, MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
-            if (IsGlSelected || IsVkSelected) { ApplyWrapper(); return; }
+            if (IsGlSelected || IsVkSelected || IsDx12Selected) { ApplyWrapper(); return; }
             try
             {
                 string dir = gameDir, src = SrcDir(), ourDll = Path.Combine(src, "dxgi.dll");
@@ -2646,6 +2737,12 @@ namespace GeoGamingHub
             {
                 Log("----------------------------------------");
                 Log(Lang.T("단축키만 적용: ") + gameDir);
+                if (Dx12Ops.Installed(gameDir) || IsDx12Selected)
+                {
+                    Log(Lang.T("  DirectX 12 (DX12_3D) 게임의 단축키는 DX12_3D.ini의 [Keys]에서 바꿉니다. 이 탭의 키(geo-11 / SRWeave)는 쓰지 않습니다."));
+                    Status(Lang.T("DirectX 12 (DX12_3D) 게임의 단축키는 DX12_3D.ini [Keys]에서 바꿉니다."));
+                    return;
+                }
                 if (VkOps.Installed(gameDir) || IsVkSelected)
                 {
                     Log(Lang.T("  Vulkan (VK3D) 게임의 단축키는 VK3D.ini의 [Keys]에서 바꿉니다. 이 탭의 키(geo-11 / SRWeave)는 쓰지 않습니다."));
@@ -2671,6 +2768,15 @@ namespace GeoGamingHub
             {
                 Log("----------------------------------------");
                 Log(Lang.T("SR 위빙 제거"));
+                if (Dx12Ops.Installed(gameDir))
+                {
+                    // DX12_3D weaves by itself: switch its output to side-by-side
+                    GlOps.Set(Path.Combine(gameDir, Dx12Ops.IniName), "Stereo", "output", "sbs");
+                    Log(Lang.T("  DX12_3D.ini: output = sbs (SR 위빙 끔, 3D는 좌우 SBS로 유지)"));
+                    Status(Lang.T("SR 위빙 제거 완료"));
+                    RefreshGameList();
+                    return;
+                }
                 if (VkOps.Installed(gameDir))
                 {
                     // VK3D weaves by itself: switch its output to side-by-side
@@ -2699,6 +2805,20 @@ namespace GeoGamingHub
         void UninstallAll()
         {
             if (!RequireGame()) return;
+            if (Dx12Ops.Installed(gameDir))
+            {
+                if (MessageBox.Show(this, Lang.T("DX12_3D(DirectX 12)를 제거합니다: d3d12.dll, DX12_3D.ini(저장한 값 포함), DX12_3D.log, DX12_3D 폴더(DXC), 덤프를 지우고 보관해 둔 다른 d3d12.dll이 있으면 되돌립니다.\n\n") + gameDir + Lang.T("\n\n계속할까요?"), Lang.T("전체 제거"), MessageBoxButtons.YesNo, MessageBoxIcon.Warning) != DialogResult.Yes) return;
+                try
+                {
+                    Log("----------------------------------------");
+                    Log(Lang.T("DX12_3D 제거: ") + gameDir);
+                    foreach (var l in Dx12Ops.Remove(gameDir)) Log(l);
+                    Status(Lang.T("전체 제거 완료"));
+                    RefreshGameList();
+                }
+                catch (Exception ex) { Log(Lang.T("오류: ") + ex.Message); MessageBox.Show(this, ex.Message, Lang.T("오류"), MessageBoxButtons.OK, MessageBoxIcon.Error); }
+                if (!File.Exists(Path.Combine(gameDir, "Uninstall.bat"))) return;   // a geo-11 install as well: remove that too
+            }
             if (VkOps.Installed(gameDir))
             {
                 if (MessageBox.Show(this, Lang.T("VK3D(Vulkan)를 제거합니다: vulkan-1.dll, VK3D.ini(저장한 값 포함), VK3D.log, VK3D_fix, 프레임 덤프, 그리고 DXVK 파일(d3d9/d3d11/dxgi/d3d10core.dll, 있으면)을 지우고 보관해 둔 원래 DLL이 있으면 되돌립니다.\n\n") + gameDir + Lang.T("\n\n계속할까요?"), Lang.T("전체 제거"), MessageBoxButtons.YesNo, MessageBoxIcon.Warning) != DialogResult.Yes) return;
@@ -2749,7 +2869,7 @@ namespace GeoGamingHub
         void OpenSrLog()
         {
             if (!RequireGame()) return;
-            string l = Path.Combine(gameDir, GlOps.Installed(gameDir) ? "OGL3D.log" : VkOps.Installed(gameDir) ? "VK3D.log" : "SRWeave.log");
+            string l = Path.Combine(gameDir, GlOps.Installed(gameDir) ? "OGL3D.log" : VkOps.Installed(gameDir) ? "VK3D.log" : Dx12Ops.Installed(gameDir) ? "DX12_3D.log" : "SRWeave.log");
             if (File.Exists(l)) Process.Start("notepad.exe", "\"" + l + "\"");
             else { Log(Path.GetFileName(l) + Lang.T("가 아직 없습니다 (게임을 한 번 실행하면 생깁니다).")); Status(Path.GetFileName(l) + Lang.T("가 아직 없습니다.")); }
         }

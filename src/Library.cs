@@ -45,7 +45,7 @@ namespace GeoGamingHub
                 case "dx9": return Lang.T("DX9 → dgVoodoo2 + geo-11");
                 case "opengl": return Lang.T("OpenGL → OGL3D");
                 case "vulkan": return Lang.T("Vulkan → VK3D");
-                case "dx12": return Lang.T("DX12 (아직 미지원)");
+                case "dx12": return Lang.T("DX12 → DX12_3D");
                 case "old": return Lang.T("DX8 이하 (미지원)");
                 case "none": return Lang.T("불가");
                 default: return Lang.T("미확인");
@@ -290,6 +290,7 @@ namespace GeoGamingHub
             if (exe == null || !File.Exists(exe)) return "unknown";
             string dir = Path.GetDirectoryName(exe);
             if (VkOps.Installed(dir)) return "vulkan";
+            if (Dx12Ops.Installed(dir)) return "dx12";
             if (GlOps.Installed(dir)) return "opengl";
             if (Util.UnityVersion(dir, exe) != null) return "unity";
             if (Util.IsUe4(exe)) return "ue4";
