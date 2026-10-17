@@ -1,7 +1,7 @@
 {
  "schema": 1,
- "generated": "2026-10-16",
- "source": "소장 Steam·Epic·GOG·Amazon 라이브러리 2014개(2026-10-16). 엔진·그래픽 API: PCGamingWiki (CC BY-NC-SA 3.0). 평면 2D 판정: Flato3D-SR 조사. 시험 결과: 이 프로젝트, geo-11 SR, Flato3D-SR.",
+ "generated": "2026-10-18",
+ "source": "소장 Steam·Epic·GOG·Amazon 라이브러리 2014개(2026-10-18). 엔진·그래픽 API: PCGamingWiki (CC BY-NC-SA 3.0). 평면 2D 판정: Flato3D-SR 조사. 시험 결과: 이 프로젝트, geo-11 SR, Flato3D-SR.",
  "games": [
   {
    "title": "데스티니 가디언즈",
@@ -385,15 +385,17 @@
    "title": "A Hat in Time",
    "steam_appid": 253230,
    "product": "hub",
-   "method": "dx9",
-   "alts": [],
+   "method": "tridef",
+   "alts": [
+    "dx9"
+   ],
    "engine": [
     "Unreal Engine 3"
    ],
    "api": "D3D 9",
    "bits": "x64",
    "status": "untested",
-   "note": "",
+   "note": "TriDef 3D 프로필 있음(TriDef 3D 설치 필수)",
    "flat2d": false,
    "flato_route": "",
    "flato_status": "",
@@ -953,15 +955,17 @@
    "title": "Age of Wonders III",
    "steam_appid": 226840,
    "product": "hub",
-   "method": "dx9",
-   "alts": [],
+   "method": "tridef",
+   "alts": [
+    "dx9"
+   ],
    "engine": [
     "Creator"
    ],
    "api": "D3D 9",
    "bits": "x86",
    "status": "untested",
-   "note": "",
+   "note": "TriDef 3D 프로필 있음(TriDef 3D 설치 필수)",
    "flat2d": false,
    "flato_route": "",
    "flato_status": "",
@@ -1035,15 +1039,17 @@
    "title": "Alan Wake",
    "steam_appid": 108710,
    "product": "hub",
-   "method": "dx9",
-   "alts": [],
+   "method": "tridef",
+   "alts": [
+    "dx9"
+   ],
    "engine": [
     "MAX-FX"
    ],
    "api": "D3D 9",
    "bits": "x86",
    "status": "untested",
-   "note": "",
+   "note": "TriDef 3D 프로필 있음(TriDef 3D 설치 필수)",
    "flat2d": false,
    "flato_route": "",
    "flato_status": "",
@@ -1107,15 +1113,17 @@
    "title": "Alien Breed 2: Assault",
    "steam_appid": 22650,
    "product": "hub",
-   "method": "dx9",
-   "alts": [],
+   "method": "tridef",
+   "alts": [
+    "dx9"
+   ],
    "engine": [
     "Unreal Engine 3"
    ],
    "api": "D3D 9",
    "bits": "x86",
    "status": "untested",
-   "note": "",
+   "note": "TriDef 3D 프로필 있음(TriDef 3D 설치 필수)",
    "flat2d": false,
    "flato_route": "",
    "flato_status": "",
@@ -1125,15 +1133,17 @@
    "title": "Alien Breed 3: Descent",
    "steam_appid": 22670,
    "product": "hub",
-   "method": "dx9",
-   "alts": [],
+   "method": "tridef",
+   "alts": [
+    "dx9"
+   ],
    "engine": [
     "Unreal Engine 3"
    ],
    "api": "D3D 9",
    "bits": "x86",
    "status": "untested",
-   "note": "2.5D / 3D 렌더링: 일반 입체로 됨",
+   "note": "TriDef 3D 프로필 있음(TriDef 3D 설치 필수); 2.5D / 3D 렌더링: 일반 입체로 됨",
    "flat2d": false,
    "flato_route": "",
    "flato_status": "",
@@ -1143,15 +1153,17 @@
    "title": "Alien Breed: Impact",
    "steam_appid": 22610,
    "product": "hub",
-   "method": "dx9",
-   "alts": [],
+   "method": "tridef",
+   "alts": [
+    "dx9"
+   ],
    "engine": [
     "Unreal Engine 3"
    ],
    "api": "D3D 9",
    "bits": "x86",
    "status": "untested",
-   "note": "2.5D / 3D 렌더링: 일반 입체로 됨",
+   "note": "TriDef 3D 프로필 있음(TriDef 3D 설치 필수); 2.5D / 3D 렌더링: 일반 입체로 됨",
    "flat2d": false,
    "flato_route": "",
    "flato_status": "",
@@ -1161,8 +1173,9 @@
    "title": "Alien: Isolation",
    "steam_appid": 214490,
    "product": "hub",
-   "method": "dx11",
+   "method": "tridef",
    "alts": [
+    "dx11",
     "opengl"
    ],
    "engine": [
@@ -1171,7 +1184,7 @@
    "api": "D3D 11, OpenGL",
    "bits": "x86",
    "status": "untested",
-   "note": "OpenGL 렌더러로 바꾸면 OGL3D도 가능",
+   "note": "TriDef 3D 프로필 있음(TriDef 3D 설치 필수); OpenGL 렌더러로 바꾸면 OGL3D도 가능",
    "flat2d": false,
    "flato_route": "",
    "flato_status": "",
@@ -1358,15 +1371,17 @@
    "title": "Alpha Prime",
    "steam_appid": 2590,
    "product": "hub",
-   "method": "dx9",
-   "alts": [],
+   "method": "tridef",
+   "alts": [
+    "dx9"
+   ],
    "engine": [
     "Enforce"
    ],
    "api": "D3D 9",
    "bits": "x86",
    "status": "untested",
-   "note": "",
+   "note": "TriDef 3D 프로필 있음(TriDef 3D 설치 필수)",
    "flat2d": false,
    "flato_route": "",
    "flato_status": "",
@@ -1376,15 +1391,17 @@
    "title": "Alpha Protocol",
    "steam_appid": 34019,
    "product": "hub",
-   "method": "dx9",
-   "alts": [],
+   "method": "tridef",
+   "alts": [
+    "dx9"
+   ],
    "engine": [
     "Unreal Engine 3"
    ],
    "api": "D3D 9",
    "bits": "x86",
    "status": "untested",
-   "note": "",
+   "note": "TriDef 3D 프로필 있음(TriDef 3D 설치 필수)",
    "flat2d": false,
    "flato_route": "",
    "flato_status": "",
@@ -1732,15 +1749,17 @@
    "title": "Anomaly 2",
    "steam_appid": 236730,
    "product": "hub",
-   "method": "dx9",
-   "alts": [],
+   "method": "tridef",
+   "alts": [
+    "dx9"
+   ],
    "engine": [
     "Liquid"
    ],
    "api": "D3D 9",
    "bits": "x86",
    "status": "untested",
-   "note": "",
+   "note": "TriDef 3D 프로필 있음(TriDef 3D 설치 필수)",
    "flat2d": false,
    "flato_route": "",
    "flato_status": "",
@@ -2039,15 +2058,17 @@
    "title": "ARK: Survival Evolved",
    "steam_appid": 346110,
    "product": "hub",
-   "method": "ue4",
-   "alts": [],
+   "method": "tridef",
+   "alts": [
+    "ue4"
+   ],
    "engine": [
     "Unreal Engine 4"
    ],
    "api": "D3D 11",
    "bits": "x64",
    "status": "untested",
-   "note": "",
+   "note": "TriDef 3D 프로필 있음(TriDef 3D 설치 필수)",
    "flat2d": false,
    "flato_route": "",
    "flato_status": "",
@@ -2075,15 +2096,17 @@
    "title": "Arma 2",
    "steam_appid": 33910,
    "product": "hub",
-   "method": "dx9",
-   "alts": [],
+   "method": "tridef",
+   "alts": [
+    "dx9"
+   ],
    "engine": [
     "Real Virtuality 3"
    ],
    "api": "D3D 9",
    "bits": "x86",
    "status": "untested",
-   "note": "",
+   "note": "TriDef 3D 프로필 있음(TriDef 3D 설치 필수)",
    "flat2d": false,
    "flato_route": "",
    "flato_status": "",
@@ -2093,15 +2116,17 @@
    "title": "Arma 2: Operation Arrowhead",
    "steam_appid": 33930,
    "product": "hub",
-   "method": "dx9",
-   "alts": [],
+   "method": "tridef",
+   "alts": [
+    "dx9"
+   ],
    "engine": [
     "Real Virtuality 3"
    ],
    "api": "D3D 9",
    "bits": "x86",
    "status": "untested",
-   "note": "",
+   "note": "TriDef 3D 프로필 있음(TriDef 3D 설치 필수)",
    "flat2d": false,
    "flato_route": "",
    "flato_status": "",
@@ -2217,15 +2242,17 @@
    "title": "Assassin's Creed® III",
    "steam_appid": 208480,
    "product": "hub",
-   "method": "dx11",
-   "alts": [],
+   "method": "tridef",
+   "alts": [
+    "dx11"
+   ],
    "engine": [
     "AnvilNext"
    ],
    "api": "D3D 11",
    "bits": "x86",
    "status": "untested",
-   "note": "",
+   "note": "TriDef 3D 프로필 있음(TriDef 3D 설치 필수)",
    "flat2d": false,
    "flato_route": "",
    "flato_status": "",
@@ -2235,15 +2262,17 @@
    "title": "Assassin's Creed IV Black Flag",
    "steam_appid": 242050,
    "product": "hub",
-   "method": "dx11",
-   "alts": [],
+   "method": "tridef",
+   "alts": [
+    "dx11"
+   ],
    "engine": [
     "AnvilNext"
    ],
    "api": "D3D 11",
    "bits": "x86",
    "status": "untested",
-   "note": "",
+   "note": "TriDef 3D 프로필 있음(TriDef 3D 설치 필수)",
    "flat2d": false,
    "flato_route": "",
    "flato_status": "",
@@ -2828,15 +2857,17 @@
    "title": "Batman: Arkham Asylum GOTY Edition",
    "steam_appid": 35140,
    "product": "hub",
-   "method": "dx9",
-   "alts": [],
+   "method": "tridef",
+   "alts": [
+    "dx9"
+   ],
    "engine": [
     "Unreal Engine 3"
    ],
    "api": "D3D 9",
    "bits": "x86",
    "status": "untested",
-   "note": "",
+   "note": "TriDef 3D 프로필 있음(TriDef 3D 설치 필수)",
    "flat2d": false,
    "flato_route": "",
    "flato_status": "",
@@ -2846,8 +2877,9 @@
    "title": "Batman: Arkham City™",
    "steam_appid": 57400,
    "product": "hub",
-   "method": "dx11",
+   "method": "tridef",
    "alts": [
+    "dx11",
     "dx9"
    ],
    "engine": [
@@ -2856,7 +2888,7 @@
    "api": "D3D 9/11",
    "bits": "x86",
    "status": "untested",
-   "note": "",
+   "note": "TriDef 3D 프로필 있음(TriDef 3D 설치 필수)",
    "flat2d": false,
    "flato_route": "",
    "flato_status": "",
@@ -2866,8 +2898,9 @@
    "title": "Batman: Arkham City GOTY",
    "steam_appid": 200260,
    "product": "hub",
-   "method": "dx11",
+   "method": "tridef",
    "alts": [
+    "dx11",
     "dx9"
    ],
    "engine": [
@@ -2876,7 +2909,7 @@
    "api": "D3D 9/11",
    "bits": "x86",
    "status": "untested",
-   "note": "",
+   "note": "TriDef 3D 프로필 있음(TriDef 3D 설치 필수)",
    "flat2d": false,
    "flato_route": "",
    "flato_status": "",
@@ -2886,15 +2919,17 @@
    "title": "Batman™: Arkham Knight",
    "steam_appid": 208650,
    "product": "hub",
-   "method": "dx11",
-   "alts": [],
+   "method": "tridef",
+   "alts": [
+    "dx11"
+   ],
    "engine": [
     "Unreal Engine 3"
    ],
    "api": "D3D 11",
    "bits": "x64",
    "status": "untested",
-   "note": "",
+   "note": "TriDef 3D 프로필 있음(TriDef 3D 설치 필수)",
    "flat2d": false,
    "flato_route": "",
    "flato_status": "",
@@ -2904,8 +2939,9 @@
    "title": "Batman™: Arkham Origins",
    "steam_appid": 209000,
    "product": "hub",
-   "method": "dx11",
+   "method": "tridef",
    "alts": [
+    "dx11",
     "dx9"
    ],
    "engine": [
@@ -2914,7 +2950,7 @@
    "api": "D3D 9/11",
    "bits": "x86",
    "status": "untested",
-   "note": "",
+   "note": "TriDef 3D 프로필 있음(TriDef 3D 설치 필수)",
    "flat2d": false,
    "flato_route": "",
    "flato_status": "",
@@ -3339,15 +3375,17 @@
    "title": "Betrayer",
    "steam_appid": 243120,
    "product": "hub",
-   "method": "dx9",
-   "alts": [],
+   "method": "tridef",
+   "alts": [
+    "dx9"
+   ],
    "engine": [
     "Unreal Engine 3"
    ],
    "api": "D3D 9",
    "bits": "x86",
    "status": "untested",
-   "note": "",
+   "note": "TriDef 3D 프로필 있음(TriDef 3D 설치 필수)",
    "flat2d": false,
    "flato_route": "",
    "flato_status": "",
@@ -3501,13 +3539,15 @@
    "title": "Binary Domain",
    "steam_appid": 203750,
    "product": "hub",
-   "method": "dx9",
-   "alts": [],
+   "method": "tridef",
+   "alts": [
+    "dx9"
+   ],
    "engine": [],
    "api": "D3D 9",
    "bits": "x86",
    "status": "untested",
-   "note": "",
+   "note": "TriDef 3D 프로필 있음(TriDef 3D 설치 필수)",
    "flat2d": false,
    "flato_route": "",
    "flato_status": "",
@@ -3551,13 +3591,15 @@
    "title": "Bionic Commando",
    "steam_appid": 21670,
    "product": "hub",
-   "method": "unknown",
-   "alts": [],
+   "method": "tridef",
+   "alts": [
+    "unknown"
+   ],
    "engine": [],
    "api": "",
    "bits": "",
    "status": "untested",
-   "note": "",
+   "note": "TriDef 3D 프로필 있음(TriDef 3D 설치 필수)",
    "flat2d": false,
    "flato_route": "",
    "flato_status": "",
@@ -3585,8 +3627,9 @@
    "title": "BioShock",
    "steam_appid": 7670,
    "product": "hub",
-   "method": "dx11",
+   "method": "tridef",
    "alts": [
+    "dx11",
     "dx9"
    ],
    "engine": [
@@ -3595,7 +3638,7 @@
    "api": "D3D 9/10",
    "bits": "x86",
    "status": "untested",
-   "note": "",
+   "note": "TriDef 3D 프로필 있음(TriDef 3D 설치 필수)",
    "flat2d": false,
    "flato_route": "",
    "flato_status": "",
@@ -3605,8 +3648,9 @@
    "title": "BioShock 2",
    "steam_appid": 8850,
    "product": "hub",
-   "method": "dx11",
+   "method": "tridef",
    "alts": [
+    "dx11",
     "dx9"
    ],
    "engine": [
@@ -3615,7 +3659,7 @@
    "api": "D3D 9/10",
    "bits": "x86",
    "status": "untested",
-   "note": "",
+   "note": "TriDef 3D 프로필 있음(TriDef 3D 설치 필수)",
    "flat2d": false,
    "flato_route": "",
    "flato_status": "",
@@ -3625,15 +3669,17 @@
    "title": "BioShock 2 Remastered",
    "steam_appid": 409720,
    "product": "hub",
-   "method": "dx11",
-   "alts": [],
+   "method": "tridef",
+   "alts": [
+    "dx11"
+   ],
    "engine": [
     "Unreal Engine 2.5"
    ],
    "api": "D3D 11",
    "bits": "x86",
    "status": "untested",
-   "note": "",
+   "note": "TriDef 3D 프로필 있음(TriDef 3D 설치 필수)",
    "flat2d": false,
    "flato_route": "",
    "flato_status": "",
@@ -3643,15 +3689,17 @@
    "title": "BioShock Infinite",
    "steam_appid": 8870,
    "product": "hub",
-   "method": "dx11",
-   "alts": [],
+   "method": "tridef",
+   "alts": [
+    "dx11"
+   ],
    "engine": [
     "Unreal Engine 3"
    ],
    "api": "D3D 11",
    "bits": "x86",
    "status": "untested",
-   "note": "",
+   "note": "TriDef 3D 프로필 있음(TriDef 3D 설치 필수)",
    "flat2d": false,
    "flato_route": "",
    "flato_status": "",
@@ -3661,15 +3709,17 @@
    "title": "BioShock Remastered",
    "steam_appid": 409710,
    "product": "hub",
-   "method": "dx11",
-   "alts": [],
+   "method": "tridef",
+   "alts": [
+    "dx11"
+   ],
    "engine": [
     "Unreal Engine 2.5"
    ],
    "api": "D3D 11",
    "bits": "x86",
    "status": "untested",
-   "note": "",
+   "note": "TriDef 3D 프로필 있음(TriDef 3D 설치 필수)",
    "flat2d": false,
    "flato_route": "",
    "flato_status": "",
@@ -3733,15 +3783,17 @@
    "title": "Black Mesa",
    "steam_appid": 362890,
    "product": "hub",
-   "method": "dx9",
-   "alts": [],
+   "method": "tridef",
+   "alts": [
+    "dx9"
+   ],
    "engine": [
     "XenEngine"
    ],
    "api": "D3D 9, Vulkan",
    "bits": "x86",
    "status": "untested",
-   "note": "Vulkan 32비트: VK3D는 64비트만",
+   "note": "TriDef 3D 프로필 있음(TriDef 3D 설치 필수); Vulkan 32비트: VK3D는 64비트만",
    "flat2d": false,
    "flato_route": "",
    "flato_status": "",
@@ -4064,15 +4116,17 @@
    "title": "Blades of Time",
    "steam_appid": 208670,
    "product": "hub",
-   "method": "dx9",
-   "alts": [],
+   "method": "tridef",
+   "alts": [
+    "dx9"
+   ],
    "engine": [
     "Dagor Engine"
    ],
    "api": "D3D 9",
    "bits": "x86",
    "status": "untested",
-   "note": "",
+   "note": "TriDef 3D 프로필 있음(TriDef 3D 설치 필수)",
    "flat2d": false,
    "flato_route": "",
    "flato_status": "",
@@ -4312,8 +4366,10 @@
    "title": "Borderlands 2",
    "steam_appid": 49520,
    "product": "hub",
-   "method": "dx9",
-   "alts": [],
+   "method": "tridef",
+   "alts": [
+    "dx9"
+   ],
    "engine": [
     "Unreal Engine 3",
     "XNA"
@@ -4321,7 +4377,7 @@
    "api": "D3D 9",
    "bits": "x86",
    "status": "untested",
-   "note": "",
+   "note": "TriDef 3D 프로필 있음(TriDef 3D 설치 필수)",
    "flat2d": false,
    "flato_route": "",
    "flato_status": "",
@@ -4367,15 +4423,17 @@
    "title": "Borderlands GOTY",
    "steam_appid": 8980,
    "product": "hub",
-   "method": "dx9",
-   "alts": [],
+   "method": "tridef",
+   "alts": [
+    "dx9"
+   ],
    "engine": [
     "Unreal Engine 3"
    ],
    "api": "D3D 9",
    "bits": "x86",
    "status": "untested",
-   "note": "",
+   "note": "TriDef 3D 프로필 있음(TriDef 3D 설치 필수)",
    "flat2d": false,
    "flato_route": "",
    "flato_status": "",
@@ -4748,15 +4806,17 @@
    "title": "Brothers - A Tale of Two Sons",
    "steam_appid": 225080,
    "product": "hub",
-   "method": "dx9",
-   "alts": [],
+   "method": "tridef",
+   "alts": [
+    "dx9"
+   ],
    "engine": [
     "Unreal Engine 3"
    ],
    "api": "D3D 9",
    "bits": "x86",
    "status": "untested",
-   "note": "",
+   "note": "TriDef 3D 프로필 있음(TriDef 3D 설치 필수)",
    "flat2d": false,
    "flato_route": "",
    "flato_status": "",
@@ -4834,8 +4894,9 @@
    "title": "The Bureau: XCOM Declassified",
    "steam_appid": 65930,
    "product": "hub",
-   "method": "dx11",
+   "method": "tridef",
    "alts": [
+    "dx11",
     "dx9"
    ],
    "engine": [
@@ -4844,7 +4905,7 @@
    "api": "D3D 9/11",
    "bits": "x86",
    "status": "untested",
-   "note": "",
+   "note": "TriDef 3D 프로필 있음(TriDef 3D 설치 필수)",
    "flat2d": false,
    "flato_route": "",
    "flato_status": "",
@@ -4992,15 +5053,17 @@
    "title": "Call of Duty: Black Ops",
    "steam_appid": 42700,
    "product": "hub",
-   "method": "dx9",
-   "alts": [],
+   "method": "tridef",
+   "alts": [
+    "dx9"
+   ],
    "engine": [
     "IW 3.0"
    ],
    "api": "D3D 9",
    "bits": "x86",
    "status": "untested",
-   "note": "",
+   "note": "TriDef 3D 프로필 있음(TriDef 3D 설치 필수)",
    "flat2d": false,
    "flato_route": "",
    "flato_status": "",
@@ -5010,15 +5073,17 @@
    "title": "Call of Duty: Black Ops II",
    "steam_appid": 202970,
    "product": "hub",
-   "method": "dx11",
-   "alts": [],
+   "method": "tridef",
+   "alts": [
+    "dx11"
+   ],
    "engine": [
     "IW engine"
    ],
    "api": "D3D 11",
    "bits": "x86",
    "status": "untested",
-   "note": "",
+   "note": "TriDef 3D 프로필 있음(TriDef 3D 설치 필수)",
    "flat2d": false,
    "flato_route": "",
    "flato_status": "",
@@ -5028,15 +5093,17 @@
    "title": "Call of Duty: Black Ops II - Multiplayer",
    "steam_appid": 202990,
    "product": "hub",
-   "method": "dx11",
-   "alts": [],
+   "method": "tridef",
+   "alts": [
+    "dx11"
+   ],
    "engine": [
     "IW engine"
    ],
    "api": "D3D 11",
    "bits": "x86",
    "status": "untested",
-   "note": "",
+   "note": "TriDef 3D 프로필 있음(TriDef 3D 설치 필수)",
    "flat2d": false,
    "flato_route": "",
    "flato_status": "",
@@ -5046,13 +5113,15 @@
    "title": "Call of Duty: Black Ops II - Zombies",
    "steam_appid": 212910,
    "product": "hub",
-   "method": "unknown",
-   "alts": [],
+   "method": "tridef",
+   "alts": [
+    "unknown"
+   ],
    "engine": [],
    "api": "",
    "bits": "",
    "status": "untested",
-   "note": "PCGamingWiki 정보 없음",
+   "note": "TriDef 3D 프로필 있음(TriDef 3D 설치 필수); PCGamingWiki 정보 없음",
    "flat2d": false,
    "flato_route": "",
    "flato_status": "",
@@ -5062,15 +5131,17 @@
    "title": "Call of Duty: Black Ops - Multiplayer",
    "steam_appid": 42710,
    "product": "hub",
-   "method": "dx9",
-   "alts": [],
+   "method": "tridef",
+   "alts": [
+    "dx9"
+   ],
    "engine": [
     "IW 3.0"
    ],
    "api": "D3D 9",
    "bits": "x86",
    "status": "untested",
-   "note": "",
+   "note": "TriDef 3D 프로필 있음(TriDef 3D 설치 필수)",
    "flat2d": false,
    "flato_route": "",
    "flato_status": "",
@@ -5170,15 +5241,17 @@
    "title": "Call of Duty: World at War",
    "steam_appid": 10090,
    "product": "hub",
-   "method": "dx9",
-   "alts": [],
+   "method": "tridef",
+   "alts": [
+    "dx9"
+   ],
    "engine": [
     "IW 3.0"
    ],
    "api": "D3D 9",
    "bits": "x86",
    "status": "untested",
-   "note": "",
+   "note": "TriDef 3D 프로필 있음(TriDef 3D 설치 필수)",
    "flat2d": false,
    "flato_route": "",
    "flato_status": "",
@@ -5206,15 +5279,17 @@
    "title": "Call of Juarez Gunslinger",
    "steam_appid": 204450,
    "product": "hub",
-   "method": "dx9",
-   "alts": [],
+   "method": "tridef",
+   "alts": [
+    "dx9"
+   ],
    "engine": [
     "Chrome Engine 5"
    ],
    "api": "D3D 9",
    "bits": "x86",
    "status": "untested",
-   "note": "",
+   "note": "TriDef 3D 프로필 있음(TriDef 3D 설치 필수)",
    "flat2d": false,
    "flato_route": "",
    "flato_status": "",
@@ -5462,7 +5537,9 @@
    "steam_appid": 221810,
    "product": "flato3d",
    "method": "unknown",
-   "alts": [],
+   "alts": [
+    "tridef"
+   ],
    "engine": [
     "Buddha"
    ],
@@ -5677,8 +5754,9 @@
    "title": "Chivalry: Medieval Warfare",
    "steam_appid": 219640,
    "product": "hub",
-   "method": "dx11",
+   "method": "tridef",
    "alts": [
+    "dx11",
     "dx9"
    ],
    "engine": [
@@ -5687,7 +5765,7 @@
    "api": "D3D 9/11",
    "bits": "x86/x64",
    "status": "untested",
-   "note": "",
+   "note": "TriDef 3D 프로필 있음(TriDef 3D 설치 필수)",
    "flat2d": false,
    "flato_route": "",
    "flato_status": "",
@@ -5697,15 +5775,17 @@
    "title": "Choplifter HD",
    "steam_appid": 202070,
    "product": "hub",
-   "method": "dx11",
-   "alts": [],
+   "method": "tridef",
+   "alts": [
+    "dx11"
+   ],
    "engine": [
     "Unreal Engine 3"
    ],
    "api": "D3D 11 (엔진 기본값 추정)",
    "bits": "x86",
    "status": "untested",
-   "note": "",
+   "note": "TriDef 3D 프로필 있음(TriDef 3D 설치 필수)",
    "flat2d": false,
    "flato_route": "",
    "flato_status": "",
@@ -5769,8 +5849,9 @@
    "title": "Cities Skylines",
    "steam_appid": 255710,
    "product": "hub",
-   "method": "unity",
+   "method": "tridef",
    "alts": [
+    "unity",
     "dx9",
     "opengl"
    ],
@@ -5780,7 +5861,7 @@
    "api": "D3D 9/11, OpenGL",
    "bits": "x64",
    "status": "untested",
-   "note": "OpenGL 렌더러로 바꾸면 OGL3D도 가능",
+   "note": "TriDef 3D 프로필 있음(TriDef 3D 설치 필수); OpenGL 렌더러로 바꾸면 OGL3D도 가능",
    "flat2d": false,
    "flato_route": "",
    "flato_status": "",
@@ -6120,8 +6201,9 @@
    "title": "Company of Heroes ",
    "steam_appid": 228200,
    "product": "hub",
-   "method": "dx11",
+   "method": "tridef",
    "alts": [
+    "dx11",
     "dx9"
    ],
    "engine": [
@@ -6130,7 +6212,7 @@
    "api": "D3D 9/10",
    "bits": "x86",
    "status": "untested",
-   "note": "",
+   "note": "TriDef 3D 프로필 있음(TriDef 3D 설치 필수)",
    "flat2d": false,
    "flato_route": "",
    "flato_status": "",
@@ -6140,15 +6222,17 @@
    "title": "Company of Heroes 2",
    "steam_appid": 231430,
    "product": "hub",
-   "method": "dx11",
-   "alts": [],
+   "method": "tridef",
+   "alts": [
+    "dx11"
+   ],
    "engine": [
     "Essence Engine 3.0"
    ],
    "api": "D3D 11",
    "bits": "x64",
    "status": "untested",
-   "note": "",
+   "note": "TriDef 3D 프로필 있음(TriDef 3D 설치 필수)",
    "flat2d": false,
    "flato_route": "",
    "flato_status": "",
@@ -6427,15 +6511,17 @@
    "title": "Costume Quest",
    "steam_appid": 115100,
    "product": "hub",
-   "method": "dx9",
-   "alts": [],
+   "method": "tridef",
+   "alts": [
+    "dx9"
+   ],
    "engine": [
     "Buddha"
    ],
    "api": "D3D 9",
    "bits": "x86",
    "status": "untested",
-   "note": "",
+   "note": "TriDef 3D 프로필 있음(TriDef 3D 설치 필수)",
    "flat2d": false,
    "flato_route": "",
    "flato_status": "",
@@ -6521,8 +6607,9 @@
    "title": "Counter-Strike: Source",
    "steam_appid": 240,
    "product": "hub",
-   "method": "dx9",
+   "method": "tridef",
    "alts": [
+    "dx9",
     "vulkan"
    ],
    "engine": [
@@ -6532,7 +6619,7 @@
    "api": "D3D 9, Vulkan",
    "bits": "x86/x64",
    "status": "untested",
-   "note": "Vulkan 렌더러로 바꾸면 VK3D도 가능",
+   "note": "TriDef 3D 프로필 있음(TriDef 3D 설치 필수); Vulkan 렌더러로 바꾸면 VK3D도 가능",
    "flat2d": false,
    "flato_route": "",
    "flato_status": "",
@@ -6790,8 +6877,9 @@
    "title": "Cryostasis",
    "steam_appid": 7850,
    "product": "hub",
-   "method": "dx11",
+   "method": "tridef",
    "alts": [
+    "dx11",
     "dx9"
    ],
    "engine": [
@@ -6800,7 +6888,7 @@
    "api": "D3D 9/10",
    "bits": "x86",
    "status": "untested",
-   "note": "",
+   "note": "TriDef 3D 프로필 있음(TriDef 3D 설치 필수)",
    "flat2d": false,
    "flato_route": "",
    "flato_status": "",
@@ -6865,8 +6953,9 @@
    "title": "Crysis",
    "steam_appid": 17300,
    "product": "hub",
-   "method": "dx11",
+   "method": "tridef",
    "alts": [
+    "dx11",
     "dx9"
    ],
    "engine": [
@@ -6875,7 +6964,7 @@
    "api": "D3D 9/10",
    "bits": "x86/x64",
    "status": "untested",
-   "note": "",
+   "note": "TriDef 3D 프로필 있음(TriDef 3D 설치 필수)",
    "flat2d": false,
    "flato_route": "",
    "flato_status": "",
@@ -6885,8 +6974,9 @@
    "title": "Crysis 2 Remastered",
    "steam_appid": 2096600,
    "product": "hub",
-   "method": "dx11",
+   "method": "tridef",
    "alts": [
+    "dx11",
     "vulkan"
    ],
    "engine": [
@@ -6895,7 +6985,7 @@
    "api": "D3D 11, Vulkan",
    "bits": "x64",
    "status": "untested",
-   "note": "Vulkan 렌더러로 바꾸면 VK3D도 가능",
+   "note": "TriDef 3D 프로필 있음(TriDef 3D 설치 필수); Vulkan 렌더러로 바꾸면 VK3D도 가능",
    "flat2d": false,
    "flato_route": "",
    "flato_status": "",
@@ -6905,8 +6995,9 @@
    "title": "Crysis 3 Remastered",
    "steam_appid": 2096610,
    "product": "hub",
-   "method": "dx11",
+   "method": "tridef",
    "alts": [
+    "dx11",
     "vulkan"
    ],
    "engine": [
@@ -6915,7 +7006,7 @@
    "api": "D3D 11, Vulkan",
    "bits": "x64",
    "status": "untested",
-   "note": "Vulkan 렌더러로 바꾸면 VK3D도 가능",
+   "note": "TriDef 3D 프로필 있음(TriDef 3D 설치 필수); Vulkan 렌더러로 바꾸면 VK3D도 가능",
    "flat2d": false,
    "flato_route": "",
    "flato_status": "",
@@ -6925,8 +7016,9 @@
    "title": "Crysis Remastered",
    "steam_appid": 1715130,
    "product": "hub",
-   "method": "dx11",
+   "method": "tridef",
    "alts": [
+    "dx11",
     "vulkan"
    ],
    "engine": [
@@ -6935,7 +7027,7 @@
    "api": "D3D 11, Vulkan",
    "bits": "x64",
    "status": "untested",
-   "note": "Vulkan 렌더러로 바꾸면 VK3D도 가능",
+   "note": "TriDef 3D 프로필 있음(TriDef 3D 설치 필수); Vulkan 렌더러로 바꾸면 VK3D도 가능",
    "flat2d": false,
    "flato_route": "",
    "flato_status": "",
@@ -7512,13 +7604,15 @@
    "title": "DARK SOULS™: Prepare To Die Edition",
    "steam_appid": 211420,
    "product": "hub",
-   "method": "dx9",
-   "alts": [],
+   "method": "tridef",
+   "alts": [
+    "dx9"
+   ],
    "engine": [],
    "api": "D3D 9",
    "bits": "x86",
    "status": "untested",
-   "note": "",
+   "note": "TriDef 3D 프로필 있음(TriDef 3D 설치 필수)",
    "flat2d": false,
    "flato_route": "",
    "flato_status": "",
@@ -7578,15 +7672,17 @@
    "title": "The Darkness II",
    "steam_appid": 67370,
    "product": "hub",
-   "method": "dx9",
-   "alts": [],
+   "method": "tridef",
+   "alts": [
+    "dx9"
+   ],
    "engine": [
     "Evolution"
    ],
    "api": "D3D 9",
    "bits": "x86",
    "status": "untested",
-   "note": "",
+   "note": "TriDef 3D 프로필 있음(TriDef 3D 설치 필수)",
    "flat2d": false,
    "flato_route": "",
    "flato_status": "",
@@ -7616,15 +7712,17 @@
    "title": "Darksiders",
    "steam_appid": 50620,
    "product": "hub",
-   "method": "dx9",
-   "alts": [],
+   "method": "tridef",
+   "alts": [
+    "dx9"
+   ],
    "engine": [
     "Phoenix Engine"
    ],
    "api": "D3D 9",
    "bits": "x86",
    "status": "untested",
-   "note": "",
+   "note": "TriDef 3D 프로필 있음(TriDef 3D 설치 필수)",
    "flat2d": false,
    "flato_route": "",
    "flato_status": "",
@@ -7634,15 +7732,17 @@
    "title": "Darksiders II",
    "steam_appid": 50650,
    "product": "hub",
-   "method": "dx9",
-   "alts": [],
+   "method": "tridef",
+   "alts": [
+    "dx9"
+   ],
    "engine": [
     "Phoenix Engine"
    ],
    "api": "D3D 9",
    "bits": "x86",
    "status": "untested",
-   "note": "",
+   "note": "TriDef 3D 프로필 있음(TriDef 3D 설치 필수)",
    "flat2d": false,
    "flato_route": "",
    "flato_status": "",
@@ -7875,15 +7975,17 @@
    "title": "Dead Island",
    "steam_appid": 91310,
    "product": "hub",
-   "method": "dx9",
-   "alts": [],
+   "method": "tridef",
+   "alts": [
+    "dx9"
+   ],
    "engine": [
     "Chrome Engine 5"
    ],
    "api": "D3D 9",
    "bits": "x86",
    "status": "untested",
-   "note": "",
+   "note": "TriDef 3D 프로필 있음(TriDef 3D 설치 필수)",
    "flat2d": false,
    "flato_route": "",
    "flato_status": "",
@@ -7911,15 +8013,17 @@
    "title": "Dead Island Riptide Definitive Edition",
    "steam_appid": 383180,
    "product": "hub",
-   "method": "dx11",
-   "alts": [],
+   "method": "tridef",
+   "alts": [
+    "dx11"
+   ],
    "engine": [
     "Chrome Engine 6"
    ],
    "api": "D3D 11",
    "bits": "x64",
    "status": "untested",
-   "note": "",
+   "note": "TriDef 3D 프로필 있음(TriDef 3D 설치 필수)",
    "flat2d": false,
    "flato_route": "",
    "flato_status": "",
@@ -7945,15 +8049,17 @@
    "title": "Dead Space",
    "steam_appid": 1693980,
    "product": "hub",
-   "method": "dx9",
-   "alts": [],
+   "method": "tridef",
+   "alts": [
+    "dx9"
+   ],
    "engine": [
     "Visceral Engine"
    ],
    "api": "D3D 9",
    "bits": "x86",
    "status": "untested",
-   "note": "",
+   "note": "TriDef 3D 프로필 있음(TriDef 3D 설치 필수)",
    "flat2d": false,
    "flato_route": "",
    "flato_status": "",
@@ -7981,15 +8087,17 @@
    "title": "Deadfall Adventures",
    "steam_appid": 231330,
    "product": "hub",
-   "method": "dx9",
-   "alts": [],
+   "method": "tridef",
+   "alts": [
+    "dx9"
+   ],
    "engine": [
     "Unreal Engine 3"
    ],
    "api": "D3D 9",
    "bits": "x86",
    "status": "untested",
-   "note": "",
+   "note": "TriDef 3D 프로필 있음(TriDef 3D 설치 필수)",
    "flat2d": false,
    "flato_route": "",
    "flato_status": "",
@@ -7999,15 +8107,17 @@
    "title": "Deadlight",
    "steam_appid": 211400,
    "product": "hub",
-   "method": "dx11",
-   "alts": [],
+   "method": "tridef",
+   "alts": [
+    "dx11"
+   ],
    "engine": [
     "Unreal Engine 3"
    ],
    "api": "D3D 11 (엔진 기본값 추정)",
    "bits": "x86",
    "status": "untested",
-   "note": "2.5D / 3D 렌더링: 일반 입체로 됨",
+   "note": "TriDef 3D 프로필 있음(TriDef 3D 설치 필수); 2.5D / 3D 렌더링: 일반 입체로 됨",
    "flat2d": false,
    "flato_route": "",
    "flato_status": "",
@@ -8035,15 +8145,17 @@
    "title": "The Deadly Tower of Monsters",
    "steam_appid": 353700,
    "product": "hub",
-   "method": "dx11",
-   "alts": [],
+   "method": "tridef",
+   "alts": [
+    "dx11"
+   ],
    "engine": [
     "Unreal Engine 3"
    ],
    "api": "D3D 11 (엔진 기본값 추정)",
    "bits": "x86",
    "status": "untested",
-   "note": "",
+   "note": "TriDef 3D 프로필 있음(TriDef 3D 설치 필수)",
    "flat2d": false,
    "flato_route": "",
    "flato_status": "",
@@ -8053,15 +8165,17 @@
    "title": "Dear Esther",
    "steam_appid": 203810,
    "product": "hub",
-   "method": "dx9",
-   "alts": [],
+   "method": "tridef",
+   "alts": [
+    "dx9"
+   ],
    "engine": [
     "Source 2009"
    ],
    "api": "D3D 9",
    "bits": "x86",
    "status": "untested",
-   "note": "",
+   "note": "TriDef 3D 프로필 있음(TriDef 3D 설치 필수)",
    "flat2d": false,
    "flato_route": "",
    "flato_status": "",
@@ -8584,15 +8698,17 @@
    "title": "Destiny 2",
    "steam_appid": 1085660,
    "product": "hub",
-   "method": "dx11",
-   "alts": [],
+   "method": "tridef",
+   "alts": [
+    "dx11"
+   ],
    "engine": [
     "Tiger Engine"
    ],
    "api": "D3D 11",
    "bits": "x64",
    "status": "untested",
-   "note": "",
+   "note": "TriDef 3D 프로필 있음(TriDef 3D 설치 필수)",
    "flat2d": false,
    "flato_route": "",
    "flato_status": "",
@@ -8729,7 +8845,9 @@
    "steam_appid": 6910,
    "product": "hub",
    "method": "opengl",
-   "alts": [],
+   "alts": [
+    "tridef"
+   ],
    "engine": [
     "Unreal Engine 1"
    ],
@@ -8746,8 +8864,9 @@
    "title": "Deus Ex: Human Revolution",
    "steam_appid": 28050,
    "product": "hub",
-   "method": "dx11",
+   "method": "tridef",
    "alts": [
+    "dx11",
     "dx9"
    ],
    "engine": [
@@ -8756,7 +8875,7 @@
    "api": "D3D 9/11",
    "bits": "x86",
    "status": "untested",
-   "note": "",
+   "note": "TriDef 3D 프로필 있음(TriDef 3D 설치 필수)",
    "flat2d": false,
    "flato_route": "",
    "flato_status": "",
@@ -8766,8 +8885,9 @@
    "title": "Deus Ex: Human Revolution - Director’s Cut",
    "steam_appid": 238010,
    "product": "hub",
-   "method": "dx11",
+   "method": "tridef",
    "alts": [
+    "dx11",
     "dx9"
    ],
    "engine": [
@@ -8776,7 +8896,7 @@
    "api": "D3D 9/11",
    "bits": "x86",
    "status": "untested",
-   "note": "",
+   "note": "TriDef 3D 프로필 있음(TriDef 3D 설치 필수)",
    "flat2d": false,
    "flato_route": "",
    "flato_status": "",
@@ -9019,8 +9139,9 @@
    "title": "DiRT 3",
    "steam_appid": 44320,
    "product": "hub",
-   "method": "dx11",
+   "method": "tridef",
    "alts": [
+    "dx11",
     "dx9"
    ],
    "engine": [
@@ -9029,7 +9150,7 @@
    "api": "D3D 9/11",
    "bits": "x86",
    "status": "untested",
-   "note": "",
+   "note": "TriDef 3D 프로필 있음(TriDef 3D 설치 필수)",
    "flat2d": false,
    "flato_route": "",
    "flato_status": "",
@@ -9039,8 +9160,9 @@
    "title": "DiRT 3 Complete Edition",
    "steam_appid": 321040,
    "product": "hub",
-   "method": "dx11",
+   "method": "tridef",
    "alts": [
+    "dx11",
     "dx9"
    ],
    "engine": [
@@ -9049,7 +9171,7 @@
    "api": "D3D 9/11",
    "bits": "x86",
    "status": "untested",
-   "note": "",
+   "note": "TriDef 3D 프로필 있음(TriDef 3D 설치 필수)",
    "flat2d": false,
    "flato_route": "",
    "flato_status": "",
@@ -9059,15 +9181,17 @@
    "title": "DiRT Rally",
    "steam_appid": 310560,
    "product": "hub",
-   "method": "dx11",
-   "alts": [],
+   "method": "tridef",
+   "alts": [
+    "dx11"
+   ],
    "engine": [
     "EGO 2.5"
    ],
    "api": "D3D 11",
    "bits": "x86",
    "status": "untested",
-   "note": "",
+   "note": "TriDef 3D 프로필 있음(TriDef 3D 설치 필수)",
    "flat2d": false,
    "flato_route": "",
    "flato_status": "",
@@ -9113,15 +9237,17 @@
    "title": "Dishonored",
    "steam_appid": 205100,
    "product": "hub",
-   "method": "dx9",
-   "alts": [],
+   "method": "tridef",
+   "alts": [
+    "dx9"
+   ],
    "engine": [
     "Unreal Engine 3"
    ],
    "api": "D3D 9",
    "bits": "x86/x64",
    "status": "untested",
-   "note": "",
+   "note": "TriDef 3D 프로필 있음(TriDef 3D 설치 필수)",
    "flat2d": false,
    "flato_route": "",
    "flato_status": "",
@@ -9367,15 +9493,17 @@
    "title": "Divinity: Original Sin Enhanced Edition",
    "steam_appid": 373420,
    "product": "hub",
-   "method": "dx11",
-   "alts": [],
+   "method": "tridef",
+   "alts": [
+    "dx11"
+   ],
    "engine": [
     "Divinity Engine"
    ],
    "api": "D3D 11",
    "bits": "x64",
    "status": "untested",
-   "note": "",
+   "note": "TriDef 3D 프로필 있음(TriDef 3D 설치 필수)",
    "flat2d": false,
    "flato_route": "",
    "flato_status": "",
@@ -9385,15 +9513,17 @@
    "title": "DmC Devil May Cry",
    "steam_appid": 220440,
    "product": "hub",
-   "method": "dx9",
-   "alts": [],
+   "method": "tridef",
+   "alts": [
+    "dx9"
+   ],
    "engine": [
     "Unreal Engine 3"
    ],
    "api": "D3D 9",
    "bits": "x86",
    "status": "untested",
-   "note": "",
+   "note": "TriDef 3D 프로필 있음(TriDef 3D 설치 필수)",
    "flat2d": false,
    "flato_route": "",
    "flato_status": "",
@@ -9695,8 +9825,9 @@
    "title": "Dota 2",
    "steam_appid": 570,
    "product": "hub",
-   "method": "dx11",
+   "method": "tridef",
    "alts": [
+    "dx11",
     "vulkan"
    ],
    "engine": [
@@ -9706,7 +9837,7 @@
    "api": "D3D 11, Vulkan",
    "bits": "x86/x64",
    "status": "untested",
-   "note": "Vulkan 렌더러로 바꾸면 VK3D도 가능",
+   "note": "TriDef 3D 프로필 있음(TriDef 3D 설치 필수); Vulkan 렌더러로 바꾸면 VK3D도 가능",
    "flat2d": false,
    "flato_route": "",
    "flato_status": "",
@@ -9826,15 +9957,17 @@
    "title": "Dragon Age™ Inquisition",
    "steam_appid": 1222690,
    "product": "hub",
-   "method": "dx11",
-   "alts": [],
+   "method": "tridef",
+   "alts": [
+    "dx11"
+   ],
    "engine": [
     "Frostbite 3"
    ],
    "api": "D3D 11",
    "bits": "x64",
    "status": "untested",
-   "note": "",
+   "note": "TriDef 3D 프로필 있음(TriDef 3D 설치 필수)",
    "flat2d": false,
    "flato_route": "",
    "flato_status": "",
@@ -9844,15 +9977,17 @@
    "title": "Dragon Age: Origins - Ultimate Edition",
    "steam_appid": 47810,
    "product": "hub",
-   "method": "dx9",
-   "alts": [],
+   "method": "tridef",
+   "alts": [
+    "dx9"
+   ],
    "engine": [
     "Eclipse"
    ],
    "api": "D3D 9",
    "bits": "x86",
    "status": "untested",
-   "note": "",
+   "note": "TriDef 3D 프로필 있음(TriDef 3D 설치 필수)",
    "flat2d": false,
    "flato_route": "",
    "flato_status": "",
@@ -9986,15 +10121,17 @@
    "title": "Dreamfall: The Longest Journey",
    "steam_appid": 6300,
    "product": "hub",
-   "method": "dx9",
-   "alts": [],
+   "method": "tridef",
+   "alts": [
+    "dx9"
+   ],
    "engine": [
     "Shark 3D"
    ],
    "api": "D3D 9",
    "bits": "x86",
    "status": "untested",
-   "note": "",
+   "note": "TriDef 3D 프로필 있음(TriDef 3D 설치 필수)",
    "flat2d": false,
    "flato_route": "",
    "flato_status": "",
@@ -10040,13 +10177,15 @@
    "title": "Driver San Francisco",
    "steam_appid": 33440,
    "product": "hub",
-   "method": "dx9",
-   "alts": [],
+   "method": "tridef",
+   "alts": [
+    "dx9"
+   ],
    "engine": [],
    "api": "D3D 9",
    "bits": "x86",
    "status": "untested",
-   "note": "",
+   "note": "TriDef 3D 프로필 있음(TriDef 3D 설치 필수)",
    "flat2d": false,
    "flato_route": "",
    "flato_status": "",
@@ -10092,15 +10231,17 @@
    "title": "Duke Nukem Forever",
    "steam_appid": 57900,
    "product": "hub",
-   "method": "dx9",
-   "alts": [],
+   "method": "tridef",
+   "alts": [
+    "dx9"
+   ],
    "engine": [
     "Unreal Engine 1"
    ],
    "api": "D3D 9",
    "bits": "x86",
    "status": "untested",
-   "note": "",
+   "note": "TriDef 3D 프로필 있음(TriDef 3D 설치 필수)",
    "flat2d": false,
    "flato_route": "",
    "flato_status": "",
@@ -10130,15 +10271,17 @@
    "title": "Dungeon Siege III",
    "steam_appid": 39160,
    "product": "hub",
-   "method": "dx9",
-   "alts": [],
+   "method": "tridef",
+   "alts": [
+    "dx9"
+   ],
    "engine": [
     "Onyx"
    ],
    "api": "D3D 9",
    "bits": "x86",
    "status": "untested",
-   "note": "",
+   "note": "TriDef 3D 프로필 있음(TriDef 3D 설치 필수)",
    "flat2d": false,
    "flato_route": "",
    "flato_status": "",
@@ -10203,15 +10346,17 @@
    "title": "Dying Light",
    "steam_appid": 239140,
    "product": "hub",
-   "method": "dx11",
-   "alts": [],
+   "method": "tridef",
+   "alts": [
+    "dx11"
+   ],
    "engine": [
     "Chrome Engine 6"
    ],
    "api": "D3D 11",
    "bits": "x64",
    "status": "untested",
-   "note": "",
+   "note": "TriDef 3D 프로필 있음(TriDef 3D 설치 필수)",
    "flat2d": false,
    "flato_route": "",
    "flato_status": "",
@@ -10239,15 +10384,17 @@
    "title": "E.Y.E: Divine Cybermancy",
    "steam_appid": 91700,
    "product": "hub",
-   "method": "dx9",
-   "alts": [],
+   "method": "tridef",
+   "alts": [
+    "dx9"
+   ],
    "engine": [
     "Source 2007"
    ],
    "api": "D3D 9",
    "bits": "x86",
    "status": "untested",
-   "note": "",
+   "note": "TriDef 3D 프로필 있음(TriDef 3D 설치 필수)",
    "flat2d": false,
    "flato_route": "",
    "flato_status": "",
@@ -10378,15 +10525,17 @@
    "title": "The Elder Scrolls V: Skyrim",
    "steam_appid": 72850,
    "product": "hub",
-   "method": "dx9",
-   "alts": [],
+   "method": "tridef",
+   "alts": [
+    "dx9"
+   ],
    "engine": [
     "Creation Engine"
    ],
    "api": "D3D 9",
    "bits": "x86",
    "status": "untested",
-   "note": "",
+   "note": "TriDef 3D 프로필 있음(TriDef 3D 설치 필수)",
    "flat2d": false,
    "flato_route": "",
    "flato_status": "",
@@ -10396,15 +10545,17 @@
    "title": "The Elder Scrolls V: Skyrim Special Edition",
    "steam_appid": 489830,
    "product": "hub",
-   "method": "dx11",
-   "alts": [],
+   "method": "tridef",
+   "alts": [
+    "dx11"
+   ],
    "engine": [
     "Creation Engine"
    ],
    "api": "D3D 11",
    "bits": "x64",
    "status": "untested",
-   "note": "",
+   "note": "TriDef 3D 프로필 있음(TriDef 3D 설치 필수)",
    "flat2d": false,
    "flato_route": "",
    "flato_status": "",
@@ -10522,15 +10673,17 @@
    "title": "Elite Dangerous",
    "steam_appid": 359320,
    "product": "hub",
-   "method": "dx11",
-   "alts": [],
+   "method": "tridef",
+   "alts": [
+    "dx11"
+   ],
    "engine": [
     "Cobra"
    ],
    "api": "D3D 11",
    "bits": "x64",
    "status": "untested",
-   "note": "",
+   "note": "TriDef 3D 프로필 있음(TriDef 3D 설치 필수)",
    "flat2d": false,
    "flato_route": "",
    "flato_status": "",
@@ -10979,8 +11132,10 @@
    "title": "EVE Online",
    "steam_appid": 8500,
    "product": "hub",
-   "method": "dx11",
-   "alts": [],
+   "method": "tridef",
+   "alts": [
+    "dx11"
+   ],
    "engine": [
     "Trinity",
     "Ambulation"
@@ -10988,7 +11143,7 @@
    "api": "D3D 11/12",
    "bits": "x64",
    "status": "untested",
-   "note": "",
+   "note": "TriDef 3D 프로필 있음(TriDef 3D 설치 필수)",
    "flat2d": false,
    "flato_route": "",
    "flato_status": "",
@@ -11053,15 +11208,17 @@
    "title": "The Evil Within",
    "steam_appid": 268050,
    "product": "hub",
-   "method": "dx11",
-   "alts": [],
+   "method": "tridef",
+   "alts": [
+    "dx11"
+   ],
    "engine": [
     "id Tech 5"
    ],
    "api": "D3D 11",
    "bits": "x64",
    "status": "untested",
-   "note": "",
+   "note": "TriDef 3D 프로필 있음(TriDef 3D 설치 필수)",
    "flat2d": false,
    "flato_route": "",
    "flato_status": "",
@@ -11071,15 +11228,17 @@
    "title": "The Evil Within 2",
    "steam_appid": 601430,
    "product": "hub",
-   "method": "dx11",
-   "alts": [],
+   "method": "tridef",
+   "alts": [
+    "dx11"
+   ],
    "engine": [
     "STEM Engine"
    ],
    "api": "D3D 11",
    "bits": "x64",
    "status": "untested",
-   "note": "",
+   "note": "TriDef 3D 프로필 있음(TriDef 3D 설치 필수)",
    "flat2d": false,
    "flato_route": "",
    "flato_status": "",
@@ -11268,15 +11427,17 @@
    "title": "F.E.A.R.",
    "steam_appid": 21090,
    "product": "hub",
-   "method": "dx9",
-   "alts": [],
+   "method": "tridef",
+   "alts": [
+    "dx9"
+   ],
    "engine": [
     "Lithtech Jupiter EX"
    ],
    "api": "D3D 9",
    "bits": "x86",
    "status": "untested",
-   "note": "",
+   "note": "TriDef 3D 프로필 있음(TriDef 3D 설치 필수)",
    "flat2d": false,
    "flato_route": "",
    "flato_status": "",
@@ -11286,8 +11447,9 @@
    "title": "F.E.A.R. 3",
    "steam_appid": 21100,
    "product": "hub",
-   "method": "dx11",
+   "method": "tridef",
    "alts": [
+    "dx11",
     "dx9"
    ],
    "engine": [
@@ -11296,7 +11458,7 @@
    "api": "D3D 9/11",
    "bits": "x86",
    "status": "untested",
-   "note": "",
+   "note": "TriDef 3D 프로필 있음(TriDef 3D 설치 필수)",
    "flat2d": false,
    "flato_route": "",
    "flato_status": "",
@@ -11306,15 +11468,17 @@
    "title": "F.E.A.R.: Extraction Point",
    "steam_appid": 21110,
    "product": "hub",
-   "method": "dx9",
-   "alts": [],
+   "method": "tridef",
+   "alts": [
+    "dx9"
+   ],
    "engine": [
     "Lithtech Jupiter EX"
    ],
    "api": "D3D 9",
    "bits": "x86",
    "status": "untested",
-   "note": "",
+   "note": "TriDef 3D 프로필 있음(TriDef 3D 설치 필수)",
    "flat2d": false,
    "flato_route": "",
    "flato_status": "",
@@ -11324,15 +11488,17 @@
    "title": "F.E.A.R.: Perseus Mandate",
    "steam_appid": 21120,
    "product": "hub",
-   "method": "dx9",
-   "alts": [],
+   "method": "tridef",
+   "alts": [
+    "dx9"
+   ],
    "engine": [
     "Lithtech Jupiter EX"
    ],
    "api": "D3D 9",
    "bits": "x86",
    "status": "untested",
-   "note": "",
+   "note": "TriDef 3D 프로필 있음(TriDef 3D 설치 필수)",
    "flat2d": false,
    "flato_route": "",
    "flato_status": "",
@@ -11376,13 +11542,15 @@
    "title": "Fable - The Lost Chapters",
    "steam_appid": 204030,
    "product": "hub",
-   "method": "dx9",
-   "alts": [],
+   "method": "tridef",
+   "alts": [
+    "dx9"
+   ],
    "engine": [],
    "api": "D3D 9",
    "bits": "x86",
    "status": "untested",
-   "note": "",
+   "note": "TriDef 3D 프로필 있음(TriDef 3D 설치 필수)",
    "flat2d": false,
    "flato_route": "",
    "flato_status": "",
@@ -11464,7 +11632,9 @@
    "steam_appid": 290770,
    "product": "flato3d",
    "method": "unity",
-   "alts": [],
+   "alts": [
+    "tridef"
+   ],
    "engine": [
     "Unity 5",
     "Unity 2020"
@@ -11552,15 +11722,17 @@
    "title": "Fallout 3: Game of the Year Edition",
    "steam_appid": 22370,
    "product": "hub",
-   "method": "dx9",
-   "alts": [],
+   "method": "tridef",
+   "alts": [
+    "dx9"
+   ],
    "engine": [
     "Gamebryo (TES Engine)"
    ],
    "api": "D3D 9",
    "bits": "x86",
    "status": "untested",
-   "note": "",
+   "note": "TriDef 3D 프로필 있음(TriDef 3D 설치 필수)",
    "flat2d": false,
    "flato_route": "",
    "flato_status": "",
@@ -11570,15 +11742,17 @@
    "title": "Fallout 4",
    "steam_appid": 377160,
    "product": "hub",
-   "method": "dx11",
-   "alts": [],
+   "method": "tridef",
+   "alts": [
+    "dx11"
+   ],
    "engine": [
     "Creation Engine"
    ],
    "api": "D3D 11",
    "bits": "x64",
    "status": "untested",
-   "note": "",
+   "note": "TriDef 3D 프로필 있음(TriDef 3D 설치 필수)",
    "flat2d": false,
    "flato_route": "",
    "flato_status": "",
@@ -11640,15 +11814,17 @@
    "title": "Fallout: New Vegas",
    "steam_appid": 22380,
    "product": "hub",
-   "method": "dx9",
-   "alts": [],
+   "method": "tridef",
+   "alts": [
+    "dx9"
+   ],
    "engine": [
     "Gamebryo (TES Engine)"
    ],
    "api": "D3D 9",
    "bits": "x86",
    "status": "untested",
-   "note": "",
+   "note": "TriDef 3D 프로필 있음(TriDef 3D 설치 필수)",
    "flat2d": false,
    "flato_route": "",
    "flato_status": "",
@@ -12222,15 +12398,17 @@
    "title": "Flashback",
    "steam_appid": 245730,
    "product": "hub",
-   "method": "unity",
-   "alts": [],
+   "method": "tridef",
+   "alts": [
+    "unity"
+   ],
    "engine": [
     "Unity 2018"
    ],
    "api": "D3D 11",
    "bits": "x64",
    "status": "untested",
-   "note": "2.5D / 3D 렌더링: 일반 입체로 됨",
+   "note": "TriDef 3D 프로필 있음(TriDef 3D 설치 필수); 2.5D / 3D 렌더링: 일반 입체로 됨",
    "flat2d": false,
    "flato_route": "",
    "flato_status": "",
@@ -12276,15 +12454,17 @@
    "title": "FlatOut",
    "steam_appid": 6220,
    "product": "hub",
-   "method": "dx9",
-   "alts": [],
+   "method": "tridef",
+   "alts": [
+    "dx9"
+   ],
    "engine": [
     "ROMU Engine"
    ],
    "api": "D3D 9",
    "bits": "x86",
    "status": "untested",
-   "note": "",
+   "note": "TriDef 3D 프로필 있음(TriDef 3D 설치 필수)",
    "flat2d": false,
    "flato_route": "",
    "flato_status": "",
@@ -12921,15 +13101,17 @@
    "title": "Garshasp: The Monster Slayer",
    "steam_appid": 99400,
    "product": "hub",
-   "method": "unknown",
-   "alts": [],
+   "method": "tridef",
+   "alts": [
+    "unknown"
+   ],
    "engine": [
     "Ogre"
    ],
    "api": "",
    "bits": "x86",
    "status": "untested",
-   "note": "",
+   "note": "TriDef 3D 프로필 있음(TriDef 3D 설치 필수)",
    "flat2d": false,
    "flato_route": "",
    "flato_status": "",
@@ -13133,15 +13315,17 @@
    "title": "GET EVEN",
    "steam_appid": 299950,
    "product": "hub",
-   "method": "dx11",
-   "alts": [],
+   "method": "tridef",
+   "alts": [
+    "dx11"
+   ],
    "engine": [
     "Unreal Engine 3"
    ],
    "api": "D3D 11",
    "bits": "x64",
    "status": "untested",
-   "note": "",
+   "note": "TriDef 3D 프로필 있음(TriDef 3D 설치 필수)",
    "flat2d": false,
    "flato_route": "",
    "flato_status": "",
@@ -13313,8 +13497,9 @@
    "title": "Giana Sisters: Twisted Dreams",
    "steam_appid": 223220,
    "product": "hub",
-   "method": "dx11",
+   "method": "tridef",
    "alts": [
+    "dx11",
     "dx9"
    ],
    "engine": [
@@ -13323,7 +13508,7 @@
    "api": "D3D 9/11",
    "bits": "x86",
    "status": "untested",
-   "note": "2.5D / 3D 렌더링: 일반 입체로 됨",
+   "note": "TriDef 3D 프로필 있음(TriDef 3D 설치 필수); 2.5D / 3D 렌더링: 일반 입체로 됨",
    "flat2d": false,
    "flato_route": "",
    "flato_status": "",
@@ -13563,15 +13748,17 @@
    "title": "Gone Home",
    "steam_appid": 232430,
    "product": "hub",
-   "method": "unity",
-   "alts": [],
+   "method": "tridef",
+   "alts": [
+    "unity"
+   ],
    "engine": [
     "Unity 2018"
    ],
    "api": "D3D 11",
    "bits": "x86/x64",
    "status": "untested",
-   "note": "",
+   "note": "TriDef 3D 프로필 있음(TriDef 3D 설치 필수)",
    "flat2d": false,
    "flato_route": "",
    "flato_status": "",
@@ -13797,15 +13984,17 @@
    "title": "Grand Theft Auto: San Andreas",
    "steam_appid": 12120,
    "product": "hub",
-   "method": "dx9",
-   "alts": [],
+   "method": "tridef",
+   "alts": [
+    "dx9"
+   ],
    "engine": [
     "RenderWare"
    ],
    "api": "D3D 9",
    "bits": "x86",
    "status": "untested",
-   "note": "",
+   "note": "TriDef 3D 프로필 있음(TriDef 3D 설치 필수)",
    "flat2d": false,
    "flato_route": "",
    "flato_status": "",
@@ -13815,15 +14004,17 @@
    "title": "Grand Theft Auto: San Andreas",
    "steam_appid": 12250,
    "product": "hub",
-   "method": "dx9",
-   "alts": [],
+   "method": "tridef",
+   "alts": [
+    "dx9"
+   ],
    "engine": [
     "RenderWare"
    ],
    "api": "D3D 9",
    "bits": "x86",
    "status": "untested",
-   "note": "",
+   "note": "TriDef 3D 프로필 있음(TriDef 3D 설치 필수)",
    "flat2d": false,
    "flato_route": "",
    "flato_status": "",
@@ -13833,15 +14024,17 @@
    "title": "Grand Theft Auto V",
    "steam_appid": null,
    "product": "hub",
-   "method": "dx11",
-   "alts": [],
+   "method": "tridef",
+   "alts": [
+    "dx11"
+   ],
    "engine": [
     "RAGE"
    ],
    "api": "D3D 11",
    "bits": "x64",
    "status": "untested",
-   "note": "",
+   "note": "TriDef 3D 프로필 있음(TriDef 3D 설치 필수)",
    "flat2d": false,
    "flato_route": "",
    "flato_status": "",
@@ -14057,15 +14250,17 @@
    "title": "GRID",
    "steam_appid": 12750,
    "product": "hub",
-   "method": "dx9",
-   "alts": [],
+   "method": "tridef",
+   "alts": [
+    "dx9"
+   ],
    "engine": [
     "EGO 1.0"
    ],
    "api": "D3D 9",
    "bits": "x86",
    "status": "untested",
-   "note": "",
+   "note": "TriDef 3D 프로필 있음(TriDef 3D 설치 필수)",
    "flat2d": false,
    "flato_route": "",
    "flato_status": "",
@@ -14075,15 +14270,17 @@
    "title": "GRID 2",
    "steam_appid": 44350,
    "product": "hub",
-   "method": "dx11",
-   "alts": [],
+   "method": "tridef",
+   "alts": [
+    "dx11"
+   ],
    "engine": [
     "EGO 3.0"
    ],
    "api": "D3D 11",
    "bits": "x86",
    "status": "untested",
-   "note": "",
+   "note": "TriDef 3D 프로필 있음(TriDef 3D 설치 필수)",
    "flat2d": false,
    "flato_route": "",
    "flato_status": "",
@@ -14448,8 +14645,9 @@
    "title": "Half-Life 2",
    "steam_appid": 220,
    "product": "hub",
-   "method": "dx9",
+   "method": "tridef",
    "alts": [
+    "dx9",
     "vulkan"
    ],
    "engine": [
@@ -14459,7 +14657,7 @@
    "api": "D3D 9, Vulkan",
    "bits": "x86/x64",
    "status": "untested",
-   "note": "Vulkan 렌더러로 바꾸면 VK3D도 가능",
+   "note": "TriDef 3D 프로필 있음(TriDef 3D 설치 필수); Vulkan 렌더러로 바꾸면 VK3D도 가능",
    "flat2d": false,
    "flato_route": "",
    "flato_status": "",
@@ -14622,7 +14820,9 @@
    "steam_appid": 277430,
    "product": "flato3d",
    "method": "dx11",
-   "alts": [],
+   "alts": [
+    "tridef"
+   ],
    "engine": [],
    "api": "D3D 11",
    "bits": "x86/x64",
@@ -14745,15 +14945,17 @@
    "title": "Hard Reset",
    "steam_appid": 98400,
    "product": "hub",
-   "method": "dx9",
-   "alts": [],
+   "method": "tridef",
+   "alts": [
+    "dx9"
+   ],
    "engine": [
     "Road Hog Engine"
    ],
    "api": "D3D 9",
    "bits": "x86",
    "status": "untested",
-   "note": "",
+   "note": "TriDef 3D 프로필 있음(TriDef 3D 설치 필수)",
    "flat2d": false,
    "flato_route": "",
    "flato_status": "",
@@ -15417,15 +15619,17 @@
    "title": "Hitman: Absolution",
    "steam_appid": 203140,
    "product": "hub",
-   "method": "dx11",
-   "alts": [],
+   "method": "tridef",
+   "alts": [
+    "dx11"
+   ],
    "engine": [
     "Glacier 2"
    ],
    "api": "D3D 11",
    "bits": "x86",
    "status": "untested",
-   "note": "",
+   "note": "TriDef 3D 프로필 있음(TriDef 3D 설치 필수)",
    "flat2d": false,
    "flato_route": "",
    "flato_status": "",
@@ -15505,8 +15709,9 @@
    "title": "Homefront",
    "steam_appid": 55100,
    "product": "hub",
-   "method": "dx11",
+   "method": "tridef",
    "alts": [
+    "dx11",
     "dx9"
    ],
    "engine": [
@@ -15515,7 +15720,7 @@
    "api": "D3D 9/11",
    "bits": "x86",
    "status": "untested",
-   "note": "",
+   "note": "TriDef 3D 프로필 있음(TriDef 3D 설치 필수)",
    "flat2d": false,
    "flato_route": "",
    "flato_status": "",
@@ -15525,15 +15730,17 @@
    "title": "Homefront: The Revolution",
    "steam_appid": 223100,
    "product": "hub",
-   "method": "dx11",
-   "alts": [],
+   "method": "tridef",
+   "alts": [
+    "dx11"
+   ],
    "engine": [
     "CryEngine (4th generation)"
    ],
    "api": "D3D 11",
    "bits": "x64",
    "status": "untested",
-   "note": "",
+   "note": "TriDef 3D 프로필 있음(TriDef 3D 설치 필수)",
    "flat2d": false,
    "flato_route": "",
    "flato_status": "",
@@ -15914,15 +16121,17 @@
    "title": "Hunted: The Demon's Forge",
    "steam_appid": 22450,
    "product": "hub",
-   "method": "dx9",
-   "alts": [],
+   "method": "tridef",
+   "alts": [
+    "dx9"
+   ],
    "engine": [
     "Unreal Engine 3"
    ],
    "api": "D3D 9",
    "bits": "x86",
    "status": "untested",
-   "note": "",
+   "note": "TriDef 3D 프로필 있음(TriDef 3D 설치 필수)",
    "flat2d": false,
    "flato_route": "",
    "flato_status": "",
@@ -16002,15 +16211,17 @@
    "title": "I Am Alive",
    "steam_appid": 214250,
    "product": "hub",
-   "method": "dx9",
-   "alts": [],
+   "method": "tridef",
+   "alts": [
+    "dx9"
+   ],
    "engine": [
     "LEAD Engine"
    ],
    "api": "D3D 9",
    "bits": "x86",
    "status": "untested",
-   "note": "",
+   "note": "TriDef 3D 프로필 있음(TriDef 3D 설치 필수)",
    "flat2d": false,
    "flato_route": "",
    "flato_status": "",
@@ -16146,8 +16357,9 @@
    "title": "The Incredible Adventures of Van Helsing",
    "steam_appid": 215530,
    "product": "hub",
-   "method": "dx11",
+   "method": "tridef",
    "alts": [
+    "dx11",
     "dx9",
     "opengl"
    ],
@@ -16155,7 +16367,7 @@
    "api": "D3D 9/11, OpenGL",
    "bits": "x86/x64",
    "status": "untested",
-   "note": "OpenGL 렌더러로 바꾸면 OGL3D도 가능",
+   "note": "TriDef 3D 프로필 있음(TriDef 3D 설치 필수); OpenGL 렌더러로 바꾸면 OGL3D도 가능",
    "flat2d": false,
    "flato_route": "",
    "flato_status": "",
@@ -16441,8 +16653,9 @@
    "title": "INSIDE",
    "steam_appid": 304430,
    "product": "hub",
-   "method": "unity",
+   "method": "tridef",
    "alts": [
+    "unity",
     "dx9"
    ],
    "engine": [
@@ -16451,7 +16664,7 @@
    "api": "D3D 9/11",
    "bits": "x64",
    "status": "untested",
-   "note": "2.5D / 3D 렌더링: 일반 입체로 됨",
+   "note": "TriDef 3D 프로필 있음(TriDef 3D 설치 필수); 2.5D / 3D 렌더링: 일반 입체로 됨",
    "flat2d": false,
    "flato_route": "",
    "flato_status": "",
@@ -16613,7 +16826,7 @@
    "note": "평면 2D 레이어: Geo Gaming Hub로는 깊이가 거의 없음",
    "flat2d": true,
    "flato_route": "opengl",
-   "flato_status": "untested",
+   "flato_status": "verified",
    "pcgw_page": "Intravenous 2"
   },
   {
@@ -16638,15 +16851,17 @@
    "title": "Inversion™",
    "steam_appid": 212410,
    "product": "hub",
-   "method": "unknown",
-   "alts": [],
+   "method": "tridef",
+   "alts": [
+    "unknown"
+   ],
    "engine": [
     "Saber3D Engine"
    ],
    "api": "",
    "bits": "x86",
    "status": "untested",
-   "note": "",
+   "note": "TriDef 3D 프로필 있음(TriDef 3D 설치 필수)",
    "flat2d": false,
    "flato_route": "",
    "flato_status": "",
@@ -16747,15 +16962,17 @@
    "title": "Jade Empire: Special Edition",
    "steam_appid": 7110,
    "product": "hub",
-   "method": "dx9",
-   "alts": [],
+   "method": "tridef",
+   "alts": [
+    "dx9"
+   ],
    "engine": [
     "Odyssey"
    ],
    "api": "D3D 9",
    "bits": "x86",
    "status": "untested",
-   "note": "",
+   "note": "TriDef 3D 프로필 있음(TriDef 3D 설치 필수)",
    "flat2d": false,
    "flato_route": "",
    "flato_status": "",
@@ -17153,15 +17370,17 @@
    "title": "Just Cause 2",
    "steam_appid": 8190,
    "product": "hub",
-   "method": "dx11",
-   "alts": [],
+   "method": "tridef",
+   "alts": [
+    "dx11"
+   ],
    "engine": [
     "Avalanche Engine 2.0"
    ],
    "api": "D3D 10",
    "bits": "x86",
    "status": "untested",
-   "note": "",
+   "note": "TriDef 3D 프로필 있음(TriDef 3D 설치 필수)",
    "flat2d": false,
    "flato_route": "",
    "flato_status": "",
@@ -17171,15 +17390,17 @@
    "title": "Just Cause 3",
    "steam_appid": 225540,
    "product": "hub",
-   "method": "dx11",
-   "alts": [],
+   "method": "tridef",
+   "alts": [
+    "dx11"
+   ],
    "engine": [
     "Avalanche Engine 3.0"
    ],
    "api": "D3D 11",
    "bits": "x64",
    "status": "untested",
-   "note": "",
+   "note": "TriDef 3D 프로필 있음(TriDef 3D 설치 필수)",
    "flat2d": false,
    "flato_route": "",
    "flato_status": "",
@@ -17225,15 +17446,17 @@
    "title": "Kane & Lynch 2: Dog Days - Complete Edition",
    "steam_appid": 28000,
    "product": "hub",
-   "method": "dx9",
-   "alts": [],
+   "method": "tridef",
+   "alts": [
+    "dx9"
+   ],
    "engine": [
     "Glacier"
    ],
    "api": "D3D 9",
    "bits": "x86",
    "status": "untested",
-   "note": "",
+   "note": "TriDef 3D 프로필 있음(TriDef 3D 설치 필수)",
    "flat2d": false,
    "flato_route": "",
    "flato_status": "",
@@ -17318,7 +17541,8 @@
    "product": "flato3d",
    "method": "unity",
    "alts": [
-    "opengl"
+    "opengl",
+    "tridef"
    ],
    "engine": [
     "Unity 4",
@@ -17450,8 +17674,9 @@
    "title": "Killing Floor",
    "steam_appid": 1250,
    "product": "hub",
-   "method": "dx9",
+   "method": "tridef",
    "alts": [
+    "dx9",
     "opengl"
    ],
    "engine": [
@@ -17460,7 +17685,7 @@
    "api": "D3D 8/9, OpenGL",
    "bits": "x86",
    "status": "untested",
-   "note": "OpenGL 렌더러로 바꾸면 OGL3D도 가능",
+   "note": "TriDef 3D 프로필 있음(TriDef 3D 설치 필수); OpenGL 렌더러로 바꾸면 OGL3D도 가능",
    "flat2d": false,
    "flato_route": "",
    "flato_status": "",
@@ -17540,15 +17765,17 @@
    "title": "Kingdom Come Deliverance",
    "steam_appid": 379430,
    "product": "hub",
-   "method": "dx11",
-   "alts": [],
+   "method": "tridef",
+   "alts": [
+    "dx11"
+   ],
    "engine": [
     "CryEngine (4th generation)"
    ],
    "api": "D3D 11",
    "bits": "x64",
    "status": "untested",
-   "note": "",
+   "note": "TriDef 3D 프로필 있음(TriDef 3D 설치 필수)",
    "flat2d": false,
    "flato_route": "",
    "flato_status": "",
@@ -17577,15 +17804,17 @@
    "title": "King's Bounty: The Legend",
    "steam_appid": 25900,
    "product": "hub",
-   "method": "dx9",
-   "alts": [],
+   "method": "tridef",
+   "alts": [
+    "dx9"
+   ],
    "engine": [
     "TheEngine"
    ],
    "api": "D3D 9",
    "bits": "x86",
    "status": "untested",
-   "note": "",
+   "note": "TriDef 3D 프로필 있음(TriDef 3D 설치 필수)",
    "flat2d": false,
    "flato_route": "",
    "flato_status": "",
@@ -17685,15 +17914,16 @@
    "title": "L.A. Noire",
    "steam_appid": 110800,
    "product": "hub",
-   "method": "dx11",
+   "method": "tridef",
    "alts": [
+    "dx11",
     "dx9"
    ],
    "engine": [],
    "api": "D3D 9/11",
    "bits": "x86",
    "status": "untested",
-   "note": "",
+   "note": "TriDef 3D 프로필 있음(TriDef 3D 설치 필수)",
    "flat2d": false,
    "flato_route": "",
    "flato_status": "",
@@ -17794,15 +18024,17 @@
    "title": "Lara Croft and the Guardian of Light",
    "steam_appid": 35130,
    "product": "hub",
-   "method": "dx9",
-   "alts": [],
+   "method": "tridef",
+   "alts": [
+    "dx9"
+   ],
    "engine": [
     "Crystal Engine"
    ],
    "api": "D3D 9",
    "bits": "x86",
    "status": "untested",
-   "note": "",
+   "note": "TriDef 3D 프로필 있음(TriDef 3D 설치 필수)",
    "flat2d": false,
    "flato_route": "",
    "flato_status": "",
@@ -17994,15 +18226,17 @@
    "title": "Left 4 Dead",
    "steam_appid": 500,
    "product": "hub",
-   "method": "dx9",
-   "alts": [],
+   "method": "tridef",
+   "alts": [
+    "dx9"
+   ],
    "engine": [
     "Source"
    ],
    "api": "D3D 9",
    "bits": "x86",
    "status": "untested",
-   "note": "",
+   "note": "TriDef 3D 프로필 있음(TriDef 3D 설치 필수)",
    "flat2d": false,
    "flato_route": "",
    "flato_status": "",
@@ -18012,15 +18246,17 @@
    "title": "Left 4 Dead 2",
    "steam_appid": 550,
    "product": "hub",
-   "method": "dx9",
-   "alts": [],
+   "method": "tridef",
+   "alts": [
+    "dx9"
+   ],
    "engine": [
     "Source"
    ],
    "api": "D3D 9, Vulkan",
    "bits": "x86",
    "status": "untested",
-   "note": "Vulkan 32비트: VK3D는 64비트만",
+   "note": "TriDef 3D 프로필 있음(TriDef 3D 설치 필수); Vulkan 32비트: VK3D는 64비트만",
    "flat2d": false,
    "flato_route": "",
    "flato_status": "",
@@ -18080,13 +18316,15 @@
    "title": "Legend of Grimrock 2",
    "steam_appid": 251730,
    "product": "hub",
-   "method": "dx9",
-   "alts": [],
+   "method": "tridef",
+   "alts": [
+    "dx9"
+   ],
    "engine": [],
    "api": "D3D 9",
    "bits": "x86",
    "status": "untested",
-   "note": "",
+   "note": "TriDef 3D 프로필 있음(TriDef 3D 설치 필수)",
    "flat2d": false,
    "flato_route": "",
    "flato_status": "",
@@ -18260,15 +18498,17 @@
    "title": "LEGO® Star Wars™: The Complete Saga",
    "steam_appid": 32440,
    "product": "hub",
-   "method": "dx9",
-   "alts": [],
+   "method": "tridef",
+   "alts": [
+    "dx9"
+   ],
    "engine": [
     "Nu2"
    ],
    "api": "D3D 9",
    "bits": "x86",
    "status": "untested",
-   "note": "",
+   "note": "TriDef 3D 프로필 있음(TriDef 3D 설치 필수)",
    "flat2d": false,
    "flato_route": "",
    "flato_status": "",
@@ -18920,15 +19160,17 @@
    "title": "Lost Planet 3",
    "steam_appid": 226720,
    "product": "hub",
-   "method": "dx9",
-   "alts": [],
+   "method": "tridef",
+   "alts": [
+    "dx9"
+   ],
    "engine": [
     "Unreal Engine 3"
    ],
    "api": "D3D 9",
    "bits": "x86",
    "status": "untested",
-   "note": "",
+   "note": "TriDef 3D 프로필 있음(TriDef 3D 설치 필수)",
    "flat2d": false,
    "flato_route": "",
    "flato_status": "",
@@ -19148,8 +19390,9 @@
    "title": "Mad Max",
    "steam_appid": 234140,
    "product": "hub",
-   "method": "dx11",
+   "method": "tridef",
    "alts": [
+    "dx11",
     "vulkan"
    ],
    "engine": [
@@ -19158,7 +19401,7 @@
    "api": "D3D 11, Vulkan",
    "bits": "x64",
    "status": "untested",
-   "note": "Vulkan 렌더러로 바꾸면 VK3D도 가능",
+   "note": "TriDef 3D 프로필 있음(TriDef 3D 설치 필수); Vulkan 렌더러로 바꾸면 VK3D도 가능",
    "flat2d": false,
    "flato_route": "",
    "flato_status": "",
@@ -19220,15 +19463,17 @@
    "title": "Mafia II: Definitive Edition",
    "steam_appid": 1030830,
    "product": "hub",
-   "method": "dx11",
-   "alts": [],
+   "method": "tridef",
+   "alts": [
+    "dx11"
+   ],
    "engine": [
     "Illusion Engine"
    ],
    "api": "D3D 11",
    "bits": "x64",
    "status": "untested",
-   "note": "",
+   "note": "TriDef 3D 프로필 있음(TriDef 3D 설치 필수)",
    "flat2d": false,
    "flato_route": "",
    "flato_status": "",
@@ -19290,15 +19535,17 @@
    "title": "Magicka",
    "steam_appid": 42910,
    "product": "hub",
-   "method": "dx9",
-   "alts": [],
+   "method": "tridef",
+   "alts": [
+    "dx9"
+   ],
    "engine": [
     "XNA"
    ],
    "api": "D3D 9",
    "bits": "x86",
    "status": "untested",
-   "note": "",
+   "note": "TriDef 3D 프로필 있음(TriDef 3D 설치 필수)",
    "flat2d": false,
    "flato_route": "",
    "flato_status": "",
@@ -19554,15 +19801,17 @@
    "title": "Mass Effect™: Andromeda",
    "steam_appid": 1238000,
    "product": "hub",
-   "method": "dx11",
-   "alts": [],
+   "method": "tridef",
+   "alts": [
+    "dx11"
+   ],
    "engine": [
     "Frostbite 3"
    ],
    "api": "D3D 11",
    "bits": "x64",
    "status": "untested",
-   "note": "",
+   "note": "TriDef 3D 프로필 있음(TriDef 3D 설치 필수)",
    "flat2d": false,
    "flato_route": "",
    "flato_status": "",
@@ -19660,8 +19909,9 @@
    "title": "Max Payne 3",
    "steam_appid": 204100,
    "product": "hub",
-   "method": "dx11",
+   "method": "tridef",
    "alts": [
+    "dx11",
     "dx9"
    ],
    "engine": [
@@ -19670,7 +19920,7 @@
    "api": "D3D 9/11",
    "bits": "x86",
    "status": "untested",
-   "note": "",
+   "note": "TriDef 3D 프로필 있음(TriDef 3D 설치 필수)",
    "flat2d": false,
    "flato_route": "",
    "flato_status": "",
@@ -19748,8 +19998,9 @@
    "title": "MechWarrior Online",
    "steam_appid": 342200,
    "product": "hub",
-   "method": "dx11",
+   "method": "tridef",
    "alts": [
+    "dx11",
     "dx9"
    ],
    "engine": [
@@ -19758,7 +20009,7 @@
    "api": "D3D 9/11",
    "bits": "x64",
    "status": "untested",
-   "note": "",
+   "note": "TriDef 3D 프로필 있음(TriDef 3D 설치 필수)",
    "flat2d": false,
    "flato_route": "",
    "flato_status": "",
@@ -19906,8 +20157,9 @@
    "title": "Metro 2033",
    "steam_appid": 43110,
    "product": "hub",
-   "method": "dx11",
+   "method": "tridef",
    "alts": [
+    "dx11",
     "dx9"
    ],
    "engine": [
@@ -19916,7 +20168,7 @@
    "api": "D3D 9/11",
    "bits": "x86",
    "status": "untested",
-   "note": "",
+   "note": "TriDef 3D 프로필 있음(TriDef 3D 설치 필수)",
    "flat2d": false,
    "flato_route": "",
    "flato_status": "",
@@ -20000,8 +20252,9 @@
    "title": "Metro: Last Light Complete Edition",
    "steam_appid": 43160,
    "product": "hub",
-   "method": "dx11",
+   "method": "tridef",
    "alts": [
+    "dx11",
     "dx9"
    ],
    "engine": [
@@ -20010,7 +20263,7 @@
    "api": "D3D 9/11",
    "bits": "x86",
    "status": "untested",
-   "note": "",
+   "note": "TriDef 3D 프로필 있음(TriDef 3D 설치 필수)",
    "flat2d": false,
    "flato_route": "",
    "flato_status": "",
@@ -20056,8 +20309,9 @@
    "title": "Middle-earth™: Shadow of Mordor™",
    "steam_appid": 241930,
    "product": "hub",
-   "method": "dx11",
+   "method": "tridef",
    "alts": [
+    "dx11",
     "vulkan"
    ],
    "engine": [
@@ -20066,7 +20320,7 @@
    "api": "D3D 11, Vulkan",
    "bits": "x64",
    "status": "untested",
-   "note": "Vulkan 렌더러로 바꾸면 VK3D도 가능",
+   "note": "TriDef 3D 프로필 있음(TriDef 3D 설치 필수); Vulkan 렌더러로 바꾸면 VK3D도 가능",
    "flat2d": false,
    "flato_route": "",
    "flato_status": "",
@@ -20687,8 +20941,9 @@
    "title": "MURDERED: SOUL SUSPECT™",
    "steam_appid": 233290,
    "product": "hub",
-   "method": "dx11",
+   "method": "tridef",
    "alts": [
+    "dx11",
     "dx9"
    ],
    "engine": [
@@ -20697,7 +20952,7 @@
    "api": "D3D 9/11",
    "bits": "x64",
    "status": "untested",
-   "note": "",
+   "note": "TriDef 3D 프로필 있음(TriDef 3D 설치 필수)",
    "flat2d": false,
    "flato_route": "",
    "flato_status": "",
@@ -21027,15 +21282,17 @@
    "title": "Need for Speed™ Rivals",
    "steam_appid": 1262600,
    "product": "hub",
-   "method": "dx11",
-   "alts": [],
+   "method": "tridef",
+   "alts": [
+    "dx11"
+   ],
    "engine": [
     "Frostbite 3"
    ],
    "api": "D3D 11",
    "bits": "x86/x64",
    "status": "untested",
-   "note": "",
+   "note": "TriDef 3D 프로필 있음(TriDef 3D 설치 필수)",
    "flat2d": false,
    "flato_route": "",
    "flato_status": "",
@@ -21627,15 +21884,17 @@
    "title": "Obduction",
    "steam_appid": 306760,
    "product": "hub",
-   "method": "ue4",
-   "alts": [],
+   "method": "tridef",
+   "alts": [
+    "ue4"
+   ],
    "engine": [
     "Unreal Engine 4"
    ],
    "api": "D3D 11",
    "bits": "x64",
    "status": "untested",
-   "note": "",
+   "note": "TriDef 3D 프로필 있음(TriDef 3D 설치 필수)",
    "flat2d": false,
    "flato_route": "",
    "flato_status": "",
@@ -21700,7 +21959,9 @@
    "steam_appid": 314660,
    "product": "flato3d",
    "method": "dx9",
-   "alts": [],
+   "alts": [
+    "tridef"
+   ],
    "engine": [
     "Unity 4"
    ],
@@ -21735,15 +21996,17 @@
    "title": "Of Orcs And Men",
    "steam_appid": 216910,
    "product": "hub",
-   "method": "dx9",
-   "alts": [],
+   "method": "tridef",
+   "alts": [
+    "dx9"
+   ],
    "engine": [
     "Silk"
    ],
    "api": "D3D 9",
    "bits": "x86",
    "status": "untested",
-   "note": "",
+   "note": "TriDef 3D 프로필 있음(TriDef 3D 설치 필수)",
    "flat2d": false,
    "flato_route": "",
    "flato_status": "",
@@ -22121,8 +22384,9 @@
    "title": "Outlast",
    "steam_appid": 238320,
    "product": "hub",
-   "method": "dx9",
+   "method": "tridef",
    "alts": [
+    "dx9",
     "opengl"
    ],
    "engine": [
@@ -22131,7 +22395,7 @@
    "api": "D3D 9, OpenGL",
    "bits": "x64",
    "status": "untested",
-   "note": "OpenGL 렌더러로 바꾸면 OGL3D도 가능",
+   "note": "TriDef 3D 프로필 있음(TriDef 3D 설치 필수); OpenGL 렌더러로 바꾸면 OGL3D도 가능",
    "flat2d": false,
    "flato_route": "",
    "flato_status": "",
@@ -22268,13 +22532,15 @@
    "title": "Overlord",
    "steam_appid": 11450,
    "product": "hub",
-   "method": "dx9",
-   "alts": [],
+   "method": "tridef",
+   "alts": [
+    "dx9"
+   ],
    "engine": [],
    "api": "D3D 9",
    "bits": "x86",
    "status": "untested",
-   "note": "",
+   "note": "TriDef 3D 프로필 있음(TriDef 3D 설치 필수)",
    "flat2d": false,
    "flato_route": "",
    "flato_status": "",
@@ -22284,13 +22550,15 @@
    "title": "Overlord II",
    "steam_appid": 12810,
    "product": "hub",
-   "method": "dx9",
-   "alts": [],
+   "method": "tridef",
+   "alts": [
+    "dx9"
+   ],
    "engine": [],
    "api": "D3D 9",
    "bits": "x86",
    "status": "untested",
-   "note": "",
+   "note": "TriDef 3D 프로필 있음(TriDef 3D 설치 필수)",
    "flat2d": false,
    "flato_route": "",
    "flato_status": "",
@@ -22614,8 +22882,10 @@
    "title": "PAYDAY 2",
    "steam_appid": 218620,
    "product": "hub",
-   "method": "dx11",
-   "alts": [],
+   "method": "tridef",
+   "alts": [
+    "dx11"
+   ],
    "engine": [
     "Diesel 2.0",
     "Diesel 3.0"
@@ -22623,7 +22893,7 @@
    "api": "D3D 11",
    "bits": "x64",
    "status": "untested",
-   "note": "",
+   "note": "TriDef 3D 프로필 있음(TriDef 3D 설치 필수)",
    "flat2d": false,
    "flato_route": "",
    "flato_status": "",
@@ -22633,15 +22903,17 @@
    "title": "PAYDAY: The Heist",
    "steam_appid": 24240,
    "product": "hub",
-   "method": "dx9",
-   "alts": [],
+   "method": "tridef",
+   "alts": [
+    "dx9"
+   ],
    "engine": [
     "Diesel"
    ],
    "api": "D3D 9",
    "bits": "x86",
    "status": "untested",
-   "note": "",
+   "note": "TriDef 3D 프로필 있음(TriDef 3D 설치 필수)",
    "flat2d": false,
    "flato_route": "",
    "flato_status": "",
@@ -23134,8 +23406,10 @@
    "title": "Portal",
    "steam_appid": 400,
    "product": "hub",
-   "method": "dx9",
-   "alts": [],
+   "method": "tridef",
+   "alts": [
+    "dx9"
+   ],
    "engine": [
     "Source 2007",
     "Source 2013 Singleplayer"
@@ -23143,7 +23417,7 @@
    "api": "D3D 9, Vulkan",
    "bits": "x86",
    "status": "untested",
-   "note": "Vulkan 32비트: VK3D는 64비트만",
+   "note": "TriDef 3D 프로필 있음(TriDef 3D 설치 필수); Vulkan 32비트: VK3D는 64비트만",
    "flat2d": false,
    "flato_route": "",
    "flato_status": "",
@@ -23153,15 +23427,17 @@
    "title": "Portal 2",
    "steam_appid": 620,
    "product": "hub",
-   "method": "dx9",
-   "alts": [],
+   "method": "tridef",
+   "alts": [
+    "dx9"
+   ],
    "engine": [
     "Source"
    ],
    "api": "D3D 9",
    "bits": "x86",
    "status": "untested",
-   "note": "",
+   "note": "TriDef 3D 프로필 있음(TriDef 3D 설치 필수)",
    "flat2d": false,
    "flato_route": "",
    "flato_status": "",
@@ -23330,7 +23606,9 @@
    "steam_appid": 480490,
    "product": "hub",
    "method": "opengl",
-   "alts": [],
+   "alts": [
+    "tridef"
+   ],
    "engine": [
     "id Tech 4"
    ],
@@ -23474,15 +23752,17 @@
    "title": "Project CARS",
    "steam_appid": 234630,
    "product": "hub",
-   "method": "dx11",
-   "alts": [],
+   "method": "tridef",
+   "alts": [
+    "dx11"
+   ],
    "engine": [
     "Madness Engine"
    ],
    "api": "D3D 11",
    "bits": "x64",
    "status": "untested",
-   "note": "",
+   "note": "TriDef 3D 프로필 있음(TriDef 3D 설치 필수)",
    "flat2d": false,
    "flato_route": "",
    "flato_status": "",
@@ -23598,15 +23878,17 @@
    "title": "Prototype",
    "steam_appid": 10150,
    "product": "hub",
-   "method": "dx9",
-   "alts": [],
+   "method": "tridef",
+   "alts": [
+    "dx9"
+   ],
    "engine": [
     "Titanium"
    ],
    "api": "D3D 9",
    "bits": "x86",
    "status": "untested",
-   "note": "",
+   "note": "TriDef 3D 프로필 있음(TriDef 3D 설치 필수)",
    "flat2d": false,
    "flato_route": "",
    "flato_status": "",
@@ -23616,15 +23898,17 @@
    "title": "PROTOTYPE 2",
    "steam_appid": 115320,
    "product": "hub",
-   "method": "dx9",
-   "alts": [],
+   "method": "tridef",
+   "alts": [
+    "dx9"
+   ],
    "engine": [
     "Titanium 2.0"
    ],
    "api": "D3D 9",
    "bits": "x86",
    "status": "untested",
-   "note": "",
+   "note": "TriDef 3D 프로필 있음(TriDef 3D 설치 필수)",
    "flat2d": false,
    "flato_route": "",
    "flato_status": "",
@@ -23634,13 +23918,15 @@
    "title": "Psychonauts",
    "steam_appid": 3830,
    "product": "hub",
-   "method": "dx9",
-   "alts": [],
+   "method": "tridef",
+   "alts": [
+    "dx9"
+   ],
    "engine": [],
    "api": "D3D 9",
    "bits": "x86",
    "status": "untested",
-   "note": "",
+   "note": "TriDef 3D 프로필 있음(TriDef 3D 설치 필수)",
    "flat2d": false,
    "flato_route": "",
    "flato_status": "",
@@ -23954,15 +24240,17 @@
    "title": "Quantum Conundrum",
    "steam_appid": 200010,
    "product": "hub",
-   "method": "dx11",
-   "alts": [],
+   "method": "tridef",
+   "alts": [
+    "dx11"
+   ],
    "engine": [
     "Unreal Engine 3"
    ],
    "api": "D3D 11 (엔진 기본값 추정)",
    "bits": "x86",
    "status": "untested",
-   "note": "",
+   "note": "TriDef 3D 프로필 있음(TriDef 3D 설치 필수)",
    "flat2d": false,
    "flato_route": "",
    "flato_status": "",
@@ -24131,7 +24419,9 @@
    "steam_appid": 242550,
    "product": "flato3d",
    "method": "dx9",
-   "alts": [],
+   "alts": [
+    "tridef"
+   ],
    "engine": [
     "UbiArt Framework"
    ],
@@ -24278,8 +24568,9 @@
    "title": "Red Faction: Armageddon",
    "steam_appid": 55110,
    "product": "hub",
-   "method": "dx11",
+   "method": "tridef",
    "alts": [
+    "dx11",
     "dx9"
    ],
    "engine": [
@@ -24288,7 +24579,7 @@
    "api": "D3D 9/11",
    "bits": "x86",
    "status": "untested",
-   "note": "",
+   "note": "TriDef 3D 프로필 있음(TriDef 3D 설치 필수)",
    "flat2d": false,
    "flato_route": "",
    "flato_status": "",
@@ -24528,15 +24819,17 @@
    "title": "Remember Me",
    "steam_appid": 228300,
    "product": "hub",
-   "method": "dx9",
-   "alts": [],
+   "method": "tridef",
+   "alts": [
+    "dx9"
+   ],
    "engine": [
     "Unreal Engine 3"
    ],
    "api": "D3D 9",
    "bits": "x86",
    "status": "untested",
-   "note": "",
+   "note": "TriDef 3D 프로필 있음(TriDef 3D 설치 필수)",
    "flat2d": false,
    "flato_route": "",
    "flato_status": "",
@@ -24722,13 +25015,15 @@
    "title": "Resident Evil 4",
    "steam_appid": 2050650,
    "product": "hub",
-   "method": "dx9",
-   "alts": [],
+   "method": "tridef",
+   "alts": [
+    "dx9"
+   ],
    "engine": [],
    "api": "D3D 9",
    "bits": "x86",
    "status": "untested",
-   "note": "",
+   "note": "TriDef 3D 프로필 있음(TriDef 3D 설치 필수)",
    "flat2d": false,
    "flato_route": "",
    "flato_status": "",
@@ -24738,8 +25033,9 @@
    "title": "Resident Evil 5",
    "steam_appid": 21690,
    "product": "hub",
-   "method": "dx11",
+   "method": "tridef",
    "alts": [
+    "dx11",
     "dx9"
    ],
    "engine": [
@@ -24748,7 +25044,7 @@
    "api": "D3D 9/10",
    "bits": "x86",
    "status": "untested",
-   "note": "",
+   "note": "TriDef 3D 프로필 있음(TriDef 3D 설치 필수)",
    "flat2d": false,
    "flato_route": "",
    "flato_status": "",
@@ -24758,15 +25054,17 @@
    "title": "Resident Evil 6",
    "steam_appid": 221040,
    "product": "hub",
-   "method": "dx9",
-   "alts": [],
+   "method": "tridef",
+   "alts": [
+    "dx9"
+   ],
    "engine": [
     "MT Framework"
    ],
    "api": "D3D 9",
    "bits": "x86",
    "status": "untested",
-   "note": "",
+   "note": "TriDef 3D 프로필 있음(TriDef 3D 설치 필수)",
    "flat2d": false,
    "flato_route": "",
    "flato_status": "",
@@ -25008,15 +25306,17 @@
    "title": "Ridge Racer™ Unbounded",
    "steam_appid": 202310,
    "product": "hub",
-   "method": "dx9",
-   "alts": [],
+   "method": "tridef",
+   "alts": [
+    "dx9"
+   ],
    "engine": [
     "ROMU Engine"
    ],
    "api": "D3D 9",
    "bits": "x86",
    "status": "untested",
-   "note": "",
+   "note": "TriDef 3D 프로필 있음(TriDef 3D 설치 필수)",
    "flat2d": false,
    "flato_route": "",
    "flato_status": "",
@@ -25044,15 +25344,17 @@
    "title": "RiME",
    "steam_appid": 493200,
    "product": "hub",
-   "method": "ue4",
-   "alts": [],
+   "method": "tridef",
+   "alts": [
+    "ue4"
+   ],
    "engine": [
     "Unreal Engine 4"
    ],
    "api": "D3D 11",
    "bits": "x64",
    "status": "untested",
-   "note": "",
+   "note": "TriDef 3D 프로필 있음(TriDef 3D 설치 필수)",
    "flat2d": false,
    "flato_route": "",
    "flato_status": "",
@@ -25116,8 +25418,9 @@
    "title": "Rise of the Tomb Raider",
    "steam_appid": 391220,
    "product": "hub",
-   "method": "dx11",
+   "method": "tridef",
    "alts": [
+    "dx11",
     "vulkan"
    ],
    "engine": [
@@ -25126,7 +25429,7 @@
    "api": "D3D 11/12, Vulkan",
    "bits": "x64",
    "status": "untested",
-   "note": "Vulkan 렌더러로 바꾸면 VK3D도 가능",
+   "note": "TriDef 3D 프로필 있음(TriDef 3D 설치 필수); Vulkan 렌더러로 바꾸면 VK3D도 가능",
    "flat2d": false,
    "flato_route": "",
    "flato_status": "",
@@ -25364,15 +25667,17 @@
    "title": "Rock of Ages",
    "steam_appid": 22230,
    "product": "hub",
-   "method": "dx9",
-   "alts": [],
+   "method": "tridef",
+   "alts": [
+    "dx9"
+   ],
    "engine": [
     "Unreal Engine 3"
    ],
    "api": "D3D 9",
    "bits": "x86",
    "status": "untested",
-   "note": "",
+   "note": "TriDef 3D 프로필 있음(TriDef 3D 설치 필수)",
    "flat2d": false,
    "flato_route": "",
    "flato_status": "",
@@ -25507,15 +25812,17 @@
    "title": "RollerCoaster Tycoon® 3: Complete Edition",
    "steam_appid": 1368820,
    "product": "hub",
-   "method": "dx9",
-   "alts": [],
+   "method": "tridef",
+   "alts": [
+    "dx9"
+   ],
    "engine": [
     "Cobra"
    ],
    "api": "D3D 9",
    "bits": "x86",
    "status": "untested",
-   "note": "",
+   "note": "TriDef 3D 프로필 있음(TriDef 3D 설치 필수)",
    "flat2d": false,
    "flato_route": "",
    "flato_status": "",
@@ -25695,15 +26002,17 @@
    "title": "Ryse: Son of Rome",
    "steam_appid": 302510,
    "product": "hub",
-   "method": "dx11",
-   "alts": [],
+   "method": "tridef",
+   "alts": [
+    "dx11"
+   ],
    "engine": [
     "CryEngine (4th generation)"
    ],
    "api": "D3D 11",
    "bits": "x64",
    "status": "untested",
-   "note": "",
+   "note": "TriDef 3D 프로필 있음(TriDef 3D 설치 필수)",
    "flat2d": false,
    "flato_route": "",
    "flato_status": "",
@@ -25713,8 +26022,9 @@
    "title": "S.T.A.L.K.E.R.: Call of Pripyat",
    "steam_appid": 41700,
    "product": "hub",
-   "method": "dx11",
+   "method": "tridef",
    "alts": [
+    "dx11",
     "dx9"
    ],
    "engine": [
@@ -25723,7 +26033,7 @@
    "api": "D3D 9/10/11",
    "bits": "x86",
    "status": "untested",
-   "note": "",
+   "note": "TriDef 3D 프로필 있음(TriDef 3D 설치 필수)",
    "flat2d": false,
    "flato_route": "",
    "flato_status": "",
@@ -25789,15 +26099,17 @@
    "title": "S.T.A.L.K.E.R.: Shadow of Chernobyl",
    "steam_appid": 4500,
    "product": "hub",
-   "method": "dx9",
-   "alts": [],
+   "method": "tridef",
+   "alts": [
+    "dx9"
+   ],
    "engine": [
     "X-Ray Engine"
    ],
    "api": "D3D 9",
    "bits": "x86",
    "status": "untested",
-   "note": "",
+   "note": "TriDef 3D 프로필 있음(TriDef 3D 설치 필수)",
    "flat2d": false,
    "flato_route": "",
    "flato_status": "",
@@ -25898,15 +26210,17 @@
    "title": "Saints Row 2",
    "steam_appid": 9480,
    "product": "hub",
-   "method": "dx9",
-   "alts": [],
+   "method": "tridef",
+   "alts": [
+    "dx9"
+   ],
    "engine": [
     "CTG"
    ],
    "api": "D3D 9",
    "bits": "x86",
    "status": "untested",
-   "note": "",
+   "note": "TriDef 3D 프로필 있음(TriDef 3D 설치 필수)",
    "flat2d": false,
    "flato_route": "",
    "flato_status": "",
@@ -25952,8 +26266,9 @@
    "title": "Saints Row: The Third",
    "steam_appid": 55230,
    "product": "hub",
-   "method": "dx11",
+   "method": "tridef",
    "alts": [
+    "dx11",
     "dx9"
    ],
    "engine": [
@@ -25962,7 +26277,7 @@
    "api": "D3D 9/11",
    "bits": "x86",
    "status": "untested",
-   "note": "",
+   "note": "TriDef 3D 프로필 있음(TriDef 3D 설치 필수)",
    "flat2d": false,
    "flato_route": "",
    "flato_status": "",
@@ -25972,15 +26287,17 @@
    "title": "Saints Row®: The Third™ Remastered",
    "steam_appid": 978300,
    "product": "hub",
-   "method": "dx11",
-   "alts": [],
+   "method": "tridef",
+   "alts": [
+    "dx11"
+   ],
    "engine": [
     "CTG"
    ],
    "api": "D3D 11",
    "bits": "x64",
    "status": "untested",
-   "note": "",
+   "note": "TriDef 3D 프로필 있음(TriDef 3D 설치 필수)",
    "flat2d": false,
    "flato_route": "",
    "flato_status": "",
@@ -26806,8 +27123,9 @@
    "title": "Serious Sam 3: BFE",
    "steam_appid": 41070,
    "product": "hub",
-   "method": "dx9",
+   "method": "tridef",
    "alts": [
+    "dx9",
     "opengl"
    ],
    "engine": [
@@ -26816,7 +27134,7 @@
    "api": "D3D 9, OpenGL, Vulkan",
    "bits": "x86",
    "status": "untested",
-   "note": "Vulkan 32비트: VK3D는 64비트만; OpenGL 렌더러로 바꾸면 OGL3D도 가능",
+   "note": "TriDef 3D 프로필 있음(TriDef 3D 설치 필수); Vulkan 32비트: VK3D는 64비트만; OpenGL 렌더러로 바꾸면 OGL3D도 가능",
    "flat2d": false,
    "flato_route": "",
    "flato_status": "",
@@ -27126,8 +27444,9 @@
    "title": "Shadow of the Tomb Raider",
    "steam_appid": 750920,
    "product": "hub",
-   "method": "dx11",
+   "method": "tridef",
    "alts": [
+    "dx11",
     "vulkan"
    ],
    "engine": [
@@ -27136,7 +27455,7 @@
    "api": "D3D 11/12, Vulkan",
    "bits": "x64",
    "status": "untested",
-   "note": "Vulkan 렌더러로 바꾸면 VK3D도 가능",
+   "note": "TriDef 3D 프로필 있음(TriDef 3D 설치 필수); Vulkan 렌더러로 바꾸면 VK3D도 가능",
    "flat2d": false,
    "flato_route": "",
    "flato_status": "",
@@ -27185,7 +27504,9 @@
    "steam_appid": 233130,
    "product": "none",
    "method": "none",
-   "alts": [],
+   "alts": [
+    "tridef"
+   ],
    "engine": [
     "Build"
    ],
@@ -27202,15 +27523,17 @@
    "title": "Shadow Warrior 2",
    "steam_appid": 324800,
    "product": "hub",
-   "method": "dx11",
-   "alts": [],
+   "method": "tridef",
+   "alts": [
+    "dx11"
+   ],
    "engine": [
     "Road Hog Engine"
    ],
    "api": "D3D 11",
    "bits": "x64",
    "status": "untested",
-   "note": "",
+   "note": "TriDef 3D 프로필 있음(TriDef 3D 설치 필수)",
    "flat2d": false,
    "flato_route": "",
    "flato_status": "",
@@ -27238,15 +27561,17 @@
    "title": "Shadowgrounds",
    "steam_appid": 2500,
    "product": "hub",
-   "method": "dx9",
-   "alts": [],
+   "method": "tridef",
+   "alts": [
+    "dx9"
+   ],
    "engine": [
     "Storm3D (Frozenbyte)"
    ],
    "api": "D3D 9",
    "bits": "x86",
    "status": "untested",
-   "note": "2.5D / 3D 렌더링: 일반 입체로 됨",
+   "note": "TriDef 3D 프로필 있음(TriDef 3D 설치 필수); 2.5D / 3D 렌더링: 일반 입체로 됨",
    "flat2d": false,
    "flato_route": "",
    "flato_status": "",
@@ -27257,7 +27582,9 @@
    "steam_appid": 11200,
    "product": "flato3d",
    "method": "dx9",
-   "alts": [],
+   "alts": [
+    "tridef"
+   ],
    "engine": [],
    "api": "D3D 9",
    "bits": "x86",
@@ -27415,7 +27742,9 @@
    "steam_appid": 6120,
    "product": "flato3d",
    "method": "dx9",
-   "alts": [],
+   "alts": [
+    "tridef"
+   ],
    "engine": [],
    "api": "D3D 9",
    "bits": "x86",
@@ -27895,7 +28224,9 @@
    "steam_appid": 207040,
    "product": "flato3d",
    "method": "dx9",
-   "alts": [],
+   "alts": [
+    "tridef"
+   ],
    "engine": [],
    "api": "D3D 9",
    "bits": "x86",
@@ -27962,15 +28293,17 @@
    "title": "Sins of a Solar Empire: Trinity",
    "steam_appid": 201290,
    "product": "hub",
-   "method": "dx9",
-   "alts": [],
+   "method": "tridef",
+   "alts": [
+    "dx9"
+   ],
    "engine": [
     "Iron Engine"
    ],
    "api": "D3D 9",
    "bits": "x86",
    "status": "untested",
-   "note": "",
+   "note": "TriDef 3D 프로필 있음(TriDef 3D 설치 필수)",
    "flat2d": false,
    "flato_route": "",
    "flato_status": "",
@@ -28104,13 +28437,15 @@
    "title": "Sleeping Dogs™",
    "steam_appid": 202170,
    "product": "hub",
-   "method": "dx11",
-   "alts": [],
+   "method": "tridef",
+   "alts": [
+    "dx11"
+   ],
    "engine": [],
    "api": "D3D 11",
    "bits": "x86",
    "status": "untested",
-   "note": "",
+   "note": "TriDef 3D 프로필 있음(TriDef 3D 설치 필수)",
    "flat2d": false,
    "flato_route": "",
    "flato_status": "",
@@ -28120,13 +28455,15 @@
    "title": "Sleeping Dogs: Definitive Edition",
    "steam_appid": 307690,
    "product": "hub",
-   "method": "dx11",
-   "alts": [],
+   "method": "tridef",
+   "alts": [
+    "dx11"
+   ],
    "engine": [],
    "api": "D3D 11",
    "bits": "x64",
    "status": "untested",
-   "note": "",
+   "note": "TriDef 3D 프로필 있음(TriDef 3D 설치 필수)",
    "flat2d": false,
    "flato_route": "",
    "flato_status": "",
@@ -28298,15 +28635,17 @@
    "title": "Sniper Elite V2",
    "steam_appid": 63380,
    "product": "hub",
-   "method": "unknown",
-   "alts": [],
+   "method": "tridef",
+   "alts": [
+    "unknown"
+   ],
    "engine": [
     "Asura"
    ],
    "api": "",
    "bits": "x86",
    "status": "untested",
-   "note": "",
+   "note": "TriDef 3D 프로필 있음(TriDef 3D 설치 필수)",
    "flat2d": false,
    "flato_route": "",
    "flato_status": "",
@@ -28334,15 +28673,17 @@
    "title": "Sniper: Ghost Warrior",
    "steam_appid": 34830,
    "product": "hub",
-   "method": "dx9",
-   "alts": [],
+   "method": "tridef",
+   "alts": [
+    "dx9"
+   ],
    "engine": [
     "Chrome Engine 4"
    ],
    "api": "D3D 9",
    "bits": "x86",
    "status": "untested",
-   "note": "",
+   "note": "TriDef 3D 프로필 있음(TriDef 3D 설치 필수)",
    "flat2d": false,
    "flato_route": "",
    "flato_status": "",
@@ -28372,15 +28713,17 @@
    "title": "Sniper Ghost Warrior 3",
    "steam_appid": 368070,
    "product": "hub",
-   "method": "dx11",
-   "alts": [],
+   "method": "tridef",
+   "alts": [
+    "dx11"
+   ],
    "engine": [
     "CryEngine (4th generation)"
    ],
    "api": "D3D 11",
    "bits": "x64",
    "status": "untested",
-   "note": "",
+   "note": "TriDef 3D 프로필 있음(TriDef 3D 설치 필수)",
    "flat2d": false,
    "flato_route": "",
    "flato_status": "",
@@ -28849,15 +29192,17 @@
    "title": "Spec Ops: The Line",
    "steam_appid": 50300,
    "product": "hub",
-   "method": "dx9",
-   "alts": [],
+   "method": "tridef",
+   "alts": [
+    "dx9"
+   ],
    "engine": [
     "Unreal Engine 3"
    ],
    "api": "D3D 9",
    "bits": "x86",
    "status": "untested",
-   "note": "",
+   "note": "TriDef 3D 프로필 있음(TriDef 3D 설치 필수)",
    "flat2d": false,
    "flato_route": "",
    "flato_status": "",
@@ -29088,13 +29433,15 @@
    "title": "Split/Second",
    "steam_appid": 297860,
    "product": "hub",
-   "method": "dx9",
-   "alts": [],
+   "method": "tridef",
+   "alts": [
+    "dx9"
+   ],
    "engine": [],
    "api": "D3D 9",
    "bits": "x86",
    "status": "untested",
-   "note": "",
+   "note": "TriDef 3D 프로필 있음(TriDef 3D 설치 필수)",
    "flat2d": false,
    "flato_route": "",
    "flato_status": "",
@@ -29161,15 +29508,17 @@
    "title": "The Stanley Parable",
    "steam_appid": 221910,
    "product": "hub",
-   "method": "dx9",
-   "alts": [],
+   "method": "tridef",
+   "alts": [
+    "dx9"
+   ],
    "engine": [
     "Source (Portal 2 branch)"
    ],
    "api": "D3D 9",
    "bits": "x86",
    "status": "untested",
-   "note": "",
+   "note": "TriDef 3D 프로필 있음(TriDef 3D 설치 필수)",
    "flat2d": false,
    "flato_route": "",
    "flato_status": "",
@@ -29179,13 +29528,15 @@
    "title": "Star Conflict",
    "steam_appid": 212070,
    "product": "hub",
-   "method": "dx9",
-   "alts": [],
+   "method": "tridef",
+   "alts": [
+    "dx9"
+   ],
    "engine": [],
    "api": "D3D 9",
    "bits": "x64",
    "status": "untested",
-   "note": "",
+   "note": "TriDef 3D 프로필 있음(TriDef 3D 설치 필수)",
    "flat2d": false,
    "flato_route": "",
    "flato_status": "",
@@ -29497,15 +29848,17 @@
    "title": "STAR WARS™: The Force Unleashed™ II",
    "steam_appid": 32500,
    "product": "hub",
-   "method": "dx9",
-   "alts": [],
+   "method": "tridef",
+   "alts": [
+    "dx9"
+   ],
    "engine": [
     "Ronin 2.0"
    ],
    "api": "D3D 9",
    "bits": "x86",
    "status": "untested",
-   "note": "",
+   "note": "TriDef 3D 프로필 있음(TriDef 3D 설치 필수)",
    "flat2d": false,
    "flato_route": "",
    "flato_status": "",
@@ -29627,15 +29980,17 @@
    "title": "Starpoint Gemini 2",
    "steam_appid": 236150,
    "product": "hub",
-   "method": "dx11",
-   "alts": [],
+   "method": "tridef",
+   "alts": [
+    "dx11"
+   ],
    "engine": [
     "IC Whale Engine"
    ],
    "api": "D3D 11",
    "bits": "x86/x64",
    "status": "untested",
-   "note": "",
+   "note": "TriDef 3D 프로필 있음(TriDef 3D 설치 필수)",
    "flat2d": false,
    "flato_route": "",
    "flato_status": "",
@@ -29684,15 +30039,17 @@
    "title": "State of Decay",
    "steam_appid": 241540,
    "product": "hub",
-   "method": "unknown",
-   "alts": [],
+   "method": "tridef",
+   "alts": [
+    "unknown"
+   ],
    "engine": [
     "CryEngine 3"
    ],
    "api": "",
    "bits": "x86",
    "status": "untested",
-   "note": "",
+   "note": "TriDef 3D 프로필 있음(TriDef 3D 설치 필수)",
    "flat2d": false,
    "flato_route": "",
    "flato_status": "",
@@ -30922,8 +31279,9 @@
    "title": "The Talos Principle",
    "steam_appid": 257510,
    "product": "hub",
-   "method": "dx11",
+   "method": "tridef",
    "alts": [
+    "dx11",
     "opengl",
     "vulkan"
    ],
@@ -30933,7 +31291,7 @@
    "api": "D3D 11/12, OpenGL, Vulkan",
    "bits": "x64",
    "status": "untested",
-   "note": "OpenGL 렌더러로 바꾸면 OGL3D도 가능; Vulkan 렌더러로 바꾸면 VK3D도 가능",
+   "note": "TriDef 3D 프로필 있음(TriDef 3D 설치 필수); OpenGL 렌더러로 바꾸면 OGL3D도 가능; Vulkan 렌더러로 바꾸면 VK3D도 가능",
    "flat2d": false,
    "flato_route": "",
    "flato_status": "",
@@ -30961,8 +31319,9 @@
    "title": "Team Fortress 2",
    "steam_appid": 440,
    "product": "hub",
-   "method": "dx9",
+   "method": "tridef",
    "alts": [
+    "dx9",
     "vulkan"
    ],
    "engine": [
@@ -30972,7 +31331,7 @@
    "api": "D3D 9, Vulkan",
    "bits": "x86/x64",
    "status": "untested",
-   "note": "Vulkan 렌더러로 바꾸면 VK3D도 가능",
+   "note": "TriDef 3D 프로필 있음(TriDef 3D 설치 필수); Vulkan 렌더러로 바꾸면 VK3D도 가능",
    "flat2d": false,
    "flato_route": "",
    "flato_status": "",
@@ -31167,13 +31526,15 @@
    "title": "The Testament of Sherlock Holmes",
    "steam_appid": 205650,
    "product": "hub",
-   "method": "dx9",
-   "alts": [],
+   "method": "tridef",
+   "alts": [
+    "dx9"
+   ],
    "engine": [],
    "api": "D3D 9",
    "bits": "x86",
    "status": "untested",
-   "note": "",
+   "note": "TriDef 3D 프로필 있음(TriDef 3D 설치 필수)",
    "flat2d": false,
    "flato_route": "",
    "flato_status": "",
@@ -31343,15 +31704,17 @@
    "title": "Thief",
    "steam_appid": 239160,
    "product": "hub",
-   "method": "dx11",
-   "alts": [],
+   "method": "tridef",
+   "alts": [
+    "dx11"
+   ],
    "engine": [
     "Unreal Engine 3"
    ],
    "api": "D3D 11",
    "bits": "x86/x64",
    "status": "untested",
-   "note": "",
+   "note": "TriDef 3D 프로필 있음(TriDef 3D 설치 필수)",
    "flat2d": false,
    "flato_route": "",
    "flato_status": "",
@@ -31644,7 +32007,9 @@
    "steam_appid": 4540,
    "product": "flato3d",
    "method": "dx9",
-   "alts": [],
+   "alts": [
+    "tridef"
+   ],
    "engine": [],
    "api": "D3D 9",
    "bits": "x86",
@@ -31659,15 +32024,16 @@
    "title": "Titan Quest Anniversary Edition",
    "steam_appid": 475150,
    "product": "hub",
-   "method": "dx11",
+   "method": "tridef",
    "alts": [
+    "dx11",
     "dx9"
    ],
    "engine": [],
    "api": "D3D 9/11",
    "bits": "x86",
    "status": "untested",
-   "note": "",
+   "note": "TriDef 3D 프로필 있음(TriDef 3D 설치 필수)",
    "flat2d": false,
    "flato_route": "",
    "flato_status": "",
@@ -31709,15 +32075,17 @@
    "title": "Titanfall® 2",
    "steam_appid": 1237970,
    "product": "hub",
-   "method": "dx11",
-   "alts": [],
+   "method": "tridef",
+   "alts": [
+    "dx11"
+   ],
    "engine": [
     "ReSource"
    ],
    "api": "D3D 11",
    "bits": "x64",
    "status": "untested",
-   "note": "",
+   "note": "TriDef 3D 프로필 있음(TriDef 3D 설치 필수)",
    "flat2d": false,
    "flato_route": "",
    "flato_status": "",
@@ -31817,15 +32185,16 @@
    "title": "Tom Clancy's H.A.W.X.",
    "steam_appid": 21900,
    "product": "hub",
-   "method": "dx11",
+   "method": "tridef",
    "alts": [
+    "dx11",
     "dx9"
    ],
    "engine": [],
    "api": "D3D 9/10",
    "bits": "x86",
    "status": "untested",
-   "note": "",
+   "note": "TriDef 3D 프로필 있음(TriDef 3D 설치 필수)",
    "flat2d": false,
    "flato_route": "",
    "flato_status": "",
@@ -31835,15 +32204,16 @@
    "title": "Tom Clancy's H.A.W.X. 2",
    "steam_appid": 48180,
    "product": "hub",
-   "method": "dx11",
+   "method": "tridef",
    "alts": [
+    "dx11",
     "dx9"
    ],
    "engine": [],
    "api": "D3D 9/11",
    "bits": "x86",
    "status": "untested",
-   "note": "",
+   "note": "TriDef 3D 프로필 있음(TriDef 3D 설치 필수)",
    "flat2d": false,
    "flato_route": "",
    "flato_status": "",
@@ -31887,13 +32257,15 @@
    "title": "Tomb Raider",
    "steam_appid": 203160,
    "product": "hub",
-   "method": "old",
-   "alts": [],
+   "method": "tridef",
+   "alts": [
+    "old"
+   ],
    "engine": [],
    "api": "Glide",
    "bits": "x86",
    "status": "untested",
-   "note": "",
+   "note": "TriDef 3D 프로필 있음(TriDef 3D 설치 필수)",
    "flat2d": false,
    "flato_route": "",
    "flato_status": "",
@@ -31903,15 +32275,17 @@
    "title": "Tomb Raider: Anniversary",
    "steam_appid": 8000,
    "product": "hub",
-   "method": "dx9",
-   "alts": [],
+   "method": "tridef",
+   "alts": [
+    "dx9"
+   ],
    "engine": [
     "Crystal Engine"
    ],
    "api": "D3D 9",
    "bits": "x86",
    "status": "untested",
-   "note": "",
+   "note": "TriDef 3D 프로필 있음(TriDef 3D 설치 필수)",
    "flat2d": false,
    "flato_route": "",
    "flato_status": "",
@@ -31953,15 +32327,17 @@
    "title": "Tomb Raider: Legend",
    "steam_appid": 7000,
    "product": "hub",
-   "method": "dx9",
-   "alts": [],
+   "method": "tridef",
+   "alts": [
+    "dx9"
+   ],
    "engine": [
     "Crystal Engine"
    ],
    "api": "D3D 9",
    "bits": "x86",
    "status": "untested",
-   "note": "",
+   "note": "TriDef 3D 프로필 있음(TriDef 3D 설치 필수)",
    "flat2d": false,
    "flato_route": "",
    "flato_status": "",
@@ -31971,15 +32347,17 @@
    "title": "Tomb Raider: Underworld",
    "steam_appid": 8140,
    "product": "hub",
-   "method": "dx9",
-   "alts": [],
+   "method": "tridef",
+   "alts": [
+    "dx9"
+   ],
    "engine": [
     "Crystal Engine"
    ],
    "api": "D3D 9",
    "bits": "x86",
    "status": "untested",
-   "note": "",
+   "note": "TriDef 3D 프로필 있음(TriDef 3D 설치 필수)",
    "flat2d": false,
    "flato_route": "",
    "flato_status": "",
@@ -32027,15 +32405,17 @@
    "title": "Torchlight",
    "steam_appid": 41500,
    "product": "hub",
-   "method": "dx9",
-   "alts": [],
+   "method": "tridef",
+   "alts": [
+    "dx9"
+   ],
    "engine": [
     "Ogre"
    ],
    "api": "D3D 9",
    "bits": "x86",
    "status": "untested",
-   "note": "",
+   "note": "TriDef 3D 프로필 있음(TriDef 3D 설치 필수)",
    "flat2d": false,
    "flato_route": "",
    "flato_status": "",
@@ -32045,15 +32425,17 @@
    "title": "Torchlight II",
    "steam_appid": 200710,
    "product": "hub",
-   "method": "dx9",
-   "alts": [],
+   "method": "tridef",
+   "alts": [
+    "dx9"
+   ],
    "engine": [
     "Ogre"
    ],
    "api": "D3D 9",
    "bits": "x86",
    "status": "untested",
-   "note": "",
+   "note": "TriDef 3D 프로필 있음(TriDef 3D 설치 필수)",
    "flat2d": false,
    "flato_route": "",
    "flato_status": "",
@@ -32117,8 +32499,9 @@
    "title": "Total War: SHOGUN 2",
    "steam_appid": 34330,
    "product": "hub",
-   "method": "dx11",
+   "method": "tridef",
    "alts": [
+    "dx11",
     "dx9"
    ],
    "engine": [
@@ -32127,7 +32510,7 @@
    "api": "D3D 9/11",
    "bits": "x86",
    "status": "untested",
-   "note": "",
+   "note": "TriDef 3D 프로필 있음(TriDef 3D 설치 필수)",
    "flat2d": false,
    "flato_route": "",
    "flato_status": "",
@@ -32313,15 +32696,17 @@
    "title": "Transformers: War for Cybertron",
    "steam_appid": 42650,
    "product": "hub",
-   "method": "dx9",
-   "alts": [],
+   "method": "tridef",
+   "alts": [
+    "dx9"
+   ],
    "engine": [
     "Unreal Engine 3"
    ],
    "api": "D3D 9",
    "bits": "x86",
    "status": "untested",
-   "note": "",
+   "note": "TriDef 3D 프로필 있음(TriDef 3D 설치 필수)",
    "flat2d": false,
    "flato_route": "",
    "flato_status": "",
@@ -32490,15 +32875,17 @@
    "title": "Trine",
    "steam_appid": 35700,
    "product": "hub",
-   "method": "dx9",
-   "alts": [],
+   "method": "tridef",
+   "alts": [
+    "dx9"
+   ],
    "engine": [
     "Storm3D (Frozenbyte)"
    ],
    "api": "D3D 9",
    "bits": "x86",
    "status": "untested",
-   "note": "2.5D / 3D 렌더링: 일반 입체로 됨",
+   "note": "TriDef 3D 프로필 있음(TriDef 3D 설치 필수); 2.5D / 3D 렌더링: 일반 입체로 됨",
    "flat2d": false,
    "flato_route": "",
    "flato_status": "",
@@ -32508,15 +32895,17 @@
    "title": "Trine 2",
    "steam_appid": 35720,
    "product": "hub",
-   "method": "dx9",
-   "alts": [],
+   "method": "tridef",
+   "alts": [
+    "dx9"
+   ],
    "engine": [
     "Frozenbyte Engine"
    ],
    "api": "D3D 9",
    "bits": "x86",
    "status": "untested",
-   "note": "2.5D / 3D 렌더링: 일반 입체로 됨",
+   "note": "TriDef 3D 프로필 있음(TriDef 3D 설치 필수); 2.5D / 3D 렌더링: 일반 입체로 됨",
    "flat2d": false,
    "flato_route": "",
    "flato_status": "",
@@ -33373,8 +33762,9 @@
    "title": "The Vanishing of Ethan Carter",
    "steam_appid": 258520,
    "product": "hub",
-   "method": "dx11",
+   "method": "tridef",
    "alts": [
+    "dx11",
     "dx9"
    ],
    "engine": [
@@ -33383,7 +33773,7 @@
    "api": "D3D 9/11",
    "bits": "x64",
    "status": "untested",
-   "note": "",
+   "note": "TriDef 3D 프로필 있음(TriDef 3D 설치 필수)",
    "flat2d": false,
    "flato_route": "",
    "flato_status": "",
@@ -33431,15 +33821,17 @@
    "title": "Vanquish",
    "steam_appid": 460810,
    "product": "hub",
-   "method": "dx9",
-   "alts": [],
+   "method": "tridef",
+   "alts": [
+    "dx9"
+   ],
    "engine": [
     "Platinum Engine"
    ],
    "api": "D3D 9",
    "bits": "x86",
    "status": "untested",
-   "note": "",
+   "note": "TriDef 3D 프로필 있음(TriDef 3D 설치 필수)",
    "flat2d": false,
    "flato_route": "",
    "flato_status": "",
@@ -33483,15 +33875,17 @@
    "title": "Velvet Assassin",
    "steam_appid": 16720,
    "product": "hub",
-   "method": "dx9",
-   "alts": [],
+   "method": "tridef",
+   "alts": [
+    "dx9"
+   ],
    "engine": [
     "Replay Engine"
    ],
    "api": "D3D 9",
    "bits": "x86",
    "status": "untested",
-   "note": "",
+   "note": "TriDef 3D 프로필 있음(TriDef 3D 설치 필수)",
    "flat2d": false,
    "flato_route": "",
    "flato_status": "",
@@ -33723,15 +34117,17 @@
    "title": "The Walking Dead",
    "steam_appid": 207610,
    "product": "hub",
-   "method": "dx9",
-   "alts": [],
+   "method": "tridef",
+   "alts": [
+    "dx9"
+   ],
    "engine": [
     "Telltale Tool"
    ],
    "api": "D3D 9",
    "bits": "x86",
    "status": "untested",
-   "note": "",
+   "note": "TriDef 3D 프로필 있음(TriDef 3D 설치 필수)",
    "flat2d": false,
    "flato_route": "",
    "flato_status": "",
@@ -33955,8 +34351,9 @@
    "title": "War Thunder",
    "steam_appid": 236390,
    "product": "hub",
-   "method": "dx11",
+   "method": "tridef",
    "alts": [
+    "dx11",
     "vulkan"
    ],
    "engine": [
@@ -33965,7 +34362,7 @@
    "api": "D3D 11/12, Vulkan",
    "bits": "x86/x64",
    "status": "untested",
-   "note": "Vulkan 렌더러로 바꾸면 VK3D도 가능",
+   "note": "TriDef 3D 프로필 있음(TriDef 3D 설치 필수); Vulkan 렌더러로 바꾸면 VK3D도 가능",
    "flat2d": false,
    "flato_route": "",
    "flato_status": "",
@@ -34009,15 +34406,17 @@
    "title": "Warframe",
    "steam_appid": 230410,
    "product": "hub",
-   "method": "dx11",
-   "alts": [],
+   "method": "tridef",
+   "alts": [
+    "dx11"
+   ],
    "engine": [
     "Evolution"
    ],
    "api": "D3D 11/12",
    "bits": "x64",
    "status": "untested",
-   "note": "",
+   "note": "TriDef 3D 프로필 있음(TriDef 3D 설치 필수)",
    "flat2d": false,
    "flato_route": "",
    "flato_status": "",
@@ -34115,13 +34514,15 @@
    "title": "Warhammer 40,000: Dawn of War",
    "steam_appid": 3556750,
    "product": "hub",
-   "method": "dx9",
-   "alts": [],
+   "method": "tridef",
+   "alts": [
+    "dx9"
+   ],
    "engine": [],
    "api": "D3D 9",
    "bits": "x86",
    "status": "untested",
-   "note": "",
+   "note": "TriDef 3D 프로필 있음(TriDef 3D 설치 필수)",
    "flat2d": false,
    "flato_route": "",
    "flato_status": "",
@@ -34197,15 +34598,17 @@
    "title": "Warhammer 40,000: Space Marine - Anniversary Edition",
    "steam_appid": 55150,
    "product": "hub",
-   "method": "dx9",
-   "alts": [],
+   "method": "tridef",
+   "alts": [
+    "dx9"
+   ],
    "engine": [
     "Phoenix Engine"
    ],
    "api": "D3D 9",
    "bits": "x86",
    "status": "untested",
-   "note": "",
+   "note": "TriDef 3D 프로필 있음(TriDef 3D 설치 필수)",
    "flat2d": false,
    "flato_route": "",
    "flato_status": "",
@@ -34467,15 +34870,17 @@
    "title": "Watch_Dogs",
    "steam_appid": 243470,
    "product": "hub",
-   "method": "dx11",
-   "alts": [],
+   "method": "tridef",
+   "alts": [
+    "dx11"
+   ],
    "engine": [
     "Disrupt"
    ],
    "api": "D3D 11",
    "bits": "x64",
    "status": "untested",
-   "note": "",
+   "note": "TriDef 3D 프로필 있음(TriDef 3D 설치 필수)",
    "flat2d": false,
    "flato_route": "",
    "flato_status": "",
@@ -34933,13 +35338,15 @@
    "title": "Wings of Prey: Special Edition",
    "steam_appid": 45300,
    "product": "hub",
-   "method": "dx9",
-   "alts": [],
+   "method": "tridef",
+   "alts": [
+    "dx9"
+   ],
    "engine": [],
    "api": "D3D 9",
    "bits": "x86",
    "status": "untested",
-   "note": "",
+   "note": "TriDef 3D 프로필 있음(TriDef 3D 설치 필수)",
    "flat2d": false,
    "flato_route": "",
    "flato_status": "",
@@ -34987,7 +35394,9 @@
    "steam_appid": 292030,
    "product": "hub",
    "method": "dx12",
-   "alts": [],
+   "alts": [
+    "tridef"
+   ],
    "engine": [
     "REDengine 3"
    ],
@@ -35005,7 +35414,9 @@
    "steam_appid": 499450,
    "product": "hub",
    "method": "dx12",
-   "alts": [],
+   "alts": [
+    "tridef"
+   ],
    "engine": [
     "REDengine 3"
    ],
@@ -35022,15 +35433,17 @@
    "title": "The Witcher: Enhanced Edition",
    "steam_appid": 20900,
    "product": "hub",
-   "method": "dx9",
-   "alts": [],
+   "method": "tridef",
+   "alts": [
+    "dx9"
+   ],
    "engine": [
     "Aurora"
    ],
    "api": "D3D 9",
    "bits": "x86",
    "status": "untested",
-   "note": "",
+   "note": "TriDef 3D 프로필 있음(TriDef 3D 설치 필수)",
    "flat2d": false,
    "flato_route": "",
    "flato_status": "",
@@ -35456,15 +35869,17 @@
    "title": "X3: Reunion",
    "steam_appid": 2810,
    "product": "hub",
-   "method": "dx9",
-   "alts": [],
+   "method": "tridef",
+   "alts": [
+    "dx9"
+   ],
    "engine": [
     "X³ Reality Engine"
    ],
    "api": "D3D 9",
    "bits": "x86",
    "status": "untested",
-   "note": "",
+   "note": "TriDef 3D 프로필 있음(TriDef 3D 설치 필수)",
    "flat2d": false,
    "flato_route": "",
    "flato_status": "",
@@ -35492,8 +35907,9 @@
    "title": "XCOM 2",
    "steam_appid": 268500,
    "product": "hub",
-   "method": "dx11",
+   "method": "tridef",
    "alts": [
+    "dx11",
     "opengl"
    ],
    "engine": [
@@ -35502,7 +35918,7 @@
    "api": "D3D 11, OpenGL",
    "bits": "x64",
    "status": "untested",
-   "note": "OpenGL 렌더러로 바꾸면 OGL3D도 가능",
+   "note": "TriDef 3D 프로필 있음(TriDef 3D 설치 필수); OpenGL 렌더러로 바꾸면 OGL3D도 가능",
    "flat2d": false,
    "flato_route": "",
    "flato_status": "",
@@ -35530,15 +35946,17 @@
    "title": "XCOM: Enemy Unknown",
    "steam_appid": 200510,
    "product": "hub",
-   "method": "dx9",
-   "alts": [],
+   "method": "tridef",
+   "alts": [
+    "dx9"
+   ],
    "engine": [
     "Unreal Engine 3"
    ],
    "api": "D3D 9",
    "bits": "x86",
    "status": "untested",
-   "note": "",
+   "note": "TriDef 3D 프로필 있음(TriDef 3D 설치 필수)",
    "flat2d": false,
    "flato_route": "",
    "flato_status": "",
@@ -35790,15 +36208,17 @@
    "title": "Zeno Clash",
    "steam_appid": 22200,
    "product": "hub",
-   "method": "dx9",
-   "alts": [],
+   "method": "tridef",
+   "alts": [
+    "dx9"
+   ],
    "engine": [
     "Source 2009"
    ],
    "api": "D3D 9",
    "bits": "x86",
    "status": "untested",
-   "note": "",
+   "note": "TriDef 3D 프로필 있음(TriDef 3D 설치 필수)",
    "flat2d": false,
    "flato_route": "",
    "flato_status": "",
@@ -35894,15 +36314,17 @@
    "title": "ZOMBI",
    "steam_appid": 339230,
    "product": "hub",
-   "method": "dx9",
-   "alts": [],
+   "method": "tridef",
+   "alts": [
+    "dx9"
+   ],
    "engine": [
     "LyN"
    ],
    "api": "D3D 9",
    "bits": "x86",
    "status": "untested",
-   "note": "",
+   "note": "TriDef 3D 프로필 있음(TriDef 3D 설치 필수)",
    "flat2d": false,
    "flato_route": "",
    "flato_status": "",
@@ -35930,15 +36352,17 @@
    "title": "Zombie Driver HD",
    "steam_appid": 220820,
    "product": "hub",
-   "method": "dx9",
-   "alts": [],
+   "method": "tridef",
+   "alts": [
+    "dx9"
+   ],
    "engine": [
     "Ogre"
    ],
    "api": "D3D 9",
    "bits": "x86",
    "status": "untested",
-   "note": "",
+   "note": "TriDef 3D 프로필 있음(TriDef 3D 설치 필수)",
    "flat2d": false,
    "flato_route": "",
    "flato_status": "",

@@ -74,6 +74,14 @@ def main():
     for pr in jload(FLATO_PROFILES, {'games': []})['games']:
         fprof[pr.get('steam_appid') or norm_loose(pr.get('name', ''))] = pr
 
+    # TriDef 3D profile names (data/tridef_profiles.txt): a game with a profile gets TriDef 3D, as the app's wizard picks it
+    tridef = set()
+    tp = os.path.join(ROOT, 'data', 'tridef_profiles.txt')
+    if os.path.exists(tp):
+        for line in open(tp, encoding='utf-8'):
+            line = line.strip()
+            if line and not line.startswith('#'):
+                tridef.add(norm_loose(re.sub(r'\s*\([^)]*\)\s*$', '', line)))
     out = []
     for g in games.values():
         pc = parse_pcgw(g['_pc']['text']) if g['_pc'] else None
@@ -104,6 +112,12 @@ def main():
         elif kind == 1:
             note = '2.5D / 3D 렌더링: 일반 입체로 됨' + ('; ' + note if note else '')
         if ck and product == 'flato3d': product = 'hub'   # tested with the hub (Broken Age, Darkest Dungeon are 2.5D)
+        # TriDef 3D renders Direct3D 9 / 11 only; tested games keep their tested method
+        if norm_loose(g['title']) in tridef and product == 'hub' and not ck and methods[0] not in ('opengl', 'vulkan', 'dx12'):
+            methods.insert(0, 'tridef')
+            note = 'TriDef 3D 프로필 있음(TriDef 3D 설치 필수)' + ('; ' + note if note else '')
+        elif norm_loose(g['title']) in tridef and 'tridef' not in methods:
+            methods.append('tridef')
         e = {'title': g['title'], 'steam_appid': g['steam_appid'], 'product': product, 'method': methods[0], 'alts': methods[1:],
              'engine': engines, 'api': api, 'bits': bits, 'status': status, 'note': note,
              'flat2d': kind in (2, 3, 4), 'flato_route': froute, 'flato_status': fstatus,

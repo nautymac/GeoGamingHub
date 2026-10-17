@@ -71,6 +71,7 @@ static partial class HubTest
             else if (mode == "vkunit") VkUnit(args[0]);
             else if (mode == "vkgui") VkGui();
             else if (mode == "cand") Cands();
+            else if (mode == "tri") Tri();
             else if (mode == "dx12unit") Dx12Unit(args[0]);
             else if (mode == "dx12gui") Dx12Gui();
         }

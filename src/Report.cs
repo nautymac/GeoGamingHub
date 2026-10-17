@@ -132,7 +132,7 @@ namespace GeoGamingHub
         public static bool Installed(string exe)
         {
             string dir = Path.GetDirectoryName(exe);
-            return (File.Exists(Path.Combine(dir, "d3d11.dll")) && File.Exists(Path.Combine(dir, "d3dxdm.ini"))) || GlOps.Installed(dir) || VkOps.Installed(dir);
+            return (File.Exists(Path.Combine(dir, "d3d11.dll")) && File.Exists(Path.Combine(dir, "d3dxdm.ini"))) || GlOps.Installed(dir) || VkOps.Installed(dir) || TriOps.RegisteredName(exe) != null;
         }
 
         // the engine words the list groups by (compat_list.py ENGINES)
@@ -141,6 +141,7 @@ namespace GeoGamingHub
             string dir = Path.GetDirectoryName(exe);
             if (GlOps.Installed(dir)) return "OpenGL";
             if (VkOps.Installed(dir)) return "Vulkan";
+            if (!File.Exists(Path.Combine(dir, "d3d11.dll")) && TriOps.RegisteredName(exe) != null) return "TriDef";
             if (Util.UnityVersion(dir, exe) != null) return "Unity";
             if (Util.IsUe4(exe)) return "UE4";
             if (Dx9Ops.Installed(dir)) return "DX9";
@@ -172,7 +173,13 @@ namespace GeoGamingHub
             string uv = Util.UnityVersion(dir, exe);
             if (uv != null) d.Add("Unity: " + uv);
 
-            if (VkOps.Installed(dir))
+            string tri = engine == "TriDef" ? TriOps.RegisteredName(exe) : null;
+            if (tri != null)
+            {
+                d.Add("TriDef 3D profile: " + (TriOps.Profile(tri) ?? "?"));
+                d.Add("SR weaving: " + (TriOps.Sr(tri) ? "on (SRWeave)" : "off"));
+            }
+            else if (VkOps.Installed(dir))
             {
                 var v = VkOps.Read(Path.Combine(dir, VkOps.IniName));
                 d.Add("VK3D: " + (VkOps.Version(Path.Combine(dir, VkOps.Dll)) ?? "?") + (Directory.Exists(Path.Combine(dir, VkOps.FixDirName)) ? " + game fix" : " generic"));

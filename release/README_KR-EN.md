@@ -18,6 +18,7 @@ side-by-side / top-and-bottom.
 | OpenGL | OGL3D (`opengl32.dll`) | 32 / 64 |
 | Vulkan | VK3D (`vulkan-1.dll`) | 64 |
 | DirectX 12 | DX12_3D (`d3d12.dll`) | 64 |
+| TriDef 3D 프로필이 있는 게임 / games with a TriDef 3D profile | 설치된 TriDef 3D + Tridef3D_Play (Steam 게임) / an installed TriDef 3D + Tridef3D_Play (Steam games) | 32 (DX9) / 64 (DX11) |
 
 geo-11 게임의 SR 위빙은 SRWeave(`dxgi.dll`)가, 자체 래퍼(OGL3D / VK3D / DX12_3D)는 래퍼가 직접 합니다.
 DXVK로 DirectX 9 / 11 게임을 Vulkan으로 바꿔 VK3D로 실행하는 방법도 있습니다(실험적, 64비트).
@@ -25,12 +26,28 @@ DXVK로 DirectX 9 / 11 게임을 Vulkan으로 바꿔 VK3D로 실행하는 방법
 geo-11 games are woven by SRWeave (`dxgi.dll`); the own wrappers (OGL3D / VK3D / DX12_3D) weave by themselves.
 A DirectX 9 / 11 game can also be run as Vulkan through DXVK and use VK3D (experimental, 64-bit).
 
+### TriDef 3D
+
+**TriDef 3D 설치 필수.** TriDef 3D(DDD, 2017년 단종)가 PC에 설치돼 있어야 합니다. 이 앱에는 TriDef 파일이 들어 있지 않습니다(재배포 불가).
+TriDef 3D Ignition 창 대신 앱이 게임을 TriDef에 등록하고(게임 이름으로 TriDef 프로필 자동 선택), **[실행]**은 `Tridef3D_Play`로
+게임을 시작해 TriDef DLL을 주입합니다(관리자 권한 확인 창). 게임 폴더에는 아무것도 넣지 않습니다. Steam 게임만 되고, Steam에서
+바로 실행하면 3D가 되지 않으니 앱의 [실행]으로 시작하세요. 깊이는 게임 안에서 TriDef 단축키로 조절합니다. 실행 파일을 고르면 TriDef
+프로필이 있는 게임은 자동으로 이 방식이 선택됩니다.
+
+**TriDef 3D must be installed.** TriDef 3D (DDD, discontinued in 2017) has to be on the PC; this app contains none of its
+files (they may not be redistributed). Instead of TriDef 3D Ignition's window, the app registers the game with TriDef (the
+TriDef profile is picked by the game's name), and **[Run]** starts it through `Tridef3D_Play`, which injects TriDef's DLLs
+(an administrator prompt appears). Nothing goes into the game folder. Steam games only; started directly from Steam the
+game is not in 3D, so use the app's [Run]. Depth is adjusted in game with TriDef's hotkeys. A game with a TriDef profile
+gets this method automatically when its exe is chosen.
+
 ## 들어 있는 것 / Contents
 
 | 경로 / Path | 내용 / Contents |
 |---|---|
 | `GeoGamingHub.exe` | 앱 / the app |
 | `data\game_candidates.json` | 후보 목록 탭의 게임별 추천 3D 방식 / per-game recommended method for the Candidates tab |
+| `data\tridef_profiles.txt` | TriDef 3D 프로필 이름(TriDef가 없는 PC에서 게임 확인용) / TriDef 3D profile names (to recognise games on PCs without TriDef) |
 | `Packages\Geo-11_Unity` | geo-11 0.6.109 + Unity Universal Fix + SRWeave |
 | `Packages\Geo-11_DX11` | geo-11 0.6.109 (Preferred) + SRWeave |
 | `Packages\Geo-11_UE4` | UE4 Universal Fix 2 + geo-11 0.6.109 + SRWeave |
@@ -39,6 +56,7 @@ A DirectX 9 / 11 game can also be run as Vulkan through DXVK and use VK3D (exper
 | `Packages\VK3D` | VK3D 0.1.0 (x64) + Quake II RTX 픽스 / fix |
 | `Packages\DX12_3D` | DX12_3D 0.1.0 (x64) + DXC (Windows SDK) |
 | `Packages\DXVK` | DXVK 3.1.1 (x64) |
+| `Packages\TriDef` | Tridef3D_Play (tridef3d-win11-injector) + Inject32 + SRWeave DX9/DX11 - TriDef 파일 없음 / no TriDef files |
 
 `Packages` 폴더는 `GeoGamingHub.exe` 옆에 있어야 합니다. zip을 모두 풀고 실행하세요(zip 안에서 바로 실행하지 마세요).
 Keep `Packages` next to `GeoGamingHub.exe`. Unzip everything first; don't run it from inside the zip.
@@ -120,6 +138,8 @@ geo-11: `d3d11_log.txt`). Each wrapper's README is inside `Packages\<wrapper>`.
 
 - OGL3D, DX12_3D: MIT (`Packages\OGL3D\LICENSE`).
 - DXVK: zlib/libpng (`Packages\DXVK\LICENSE`).
+- Tridef3D_Play / Inject32 / SRWeave (tridef3d-win11-injector): MIT (`Packages\TriDef\LICENSE`). TriDef 3D 자체는 포함되지 않으며
+  DDD의 소프트웨어입니다 / TriDef 3D itself is not included and is DDD's software.
 - geo-11 / 3DMigoto, Unity Universal Fix, UE4 Universal Fix 2, dgVoodoo2: 각 제작자의 조건 (각 패키지 폴더) /
   their authors' terms (in each package folder).
 - DXC (`dxcompiler.dll`, `dxil.dll`): Microsoft, Windows SDK 재배포 파일 / Windows SDK redistributables.

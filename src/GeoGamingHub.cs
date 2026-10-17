@@ -702,6 +702,9 @@ namespace GeoGamingHub
         RadioButton lastGeoKind, lastWrapKind; bool syncingCategory;
         RadioButton rbKindVk; CheckBox chkVkDxvk; Label lblVkDxvk;
         RadioButton rbKindDx12; Label lblDx12Install, lblStereoDx12;   // DirectX 12 games: DX12_3D (d3d12.dll proxy)
+        // TriDef 3D games (an installed TriDef 3D, registered here instead of in TriDef 3D Ignition, started by Tridef3D_Play)
+        RadioButton rbCatTri, rbKindTri; FlowLayoutPanel pnlKindTri; ComboBox cbTriProfile; Label lblTriState, lblTriInstall, lblStereoTri;
+        TableLayoutPanel gridStereo;
         // candidate list tab: data\game_candidates.json + the installed games of this PC
         ListView lvCands; TextBox tbCandSearch; ComboBox cbCandMethod, cbCandProduct; CheckBox chkCandInstalled; Label lblCandInfo;
         List<Candidate> candidates = new List<Candidate>(); bool candScanned, candScanning;   // Vulkan games: VK3D (vulkan-1.dll proxy), optionally DX9/11 through DXVK
@@ -741,10 +744,12 @@ namespace GeoGamingHub
                 { "ogl3d", FindPkg(root, "OGL3D") },        // OpenGL games: OGL3D x64|x86\opengl32.dll + OGL3D.ini
                 { "vk3d",  FindPkg(root, "VK3D") },         // Vulkan games: VK3D x64\vulkan-1.dll + VK3D.ini + profiles\<exe>
                 { "dxvk",  FindPkg(root, "DXVK") },         // DirectX 9 / 11 -> Vulkan (experimental route to VK3D)
+                { "tridef", FindPkg(root, "TriDef") },      // TriDef 3D games: Tridef3D_Play.exe + Inject32.exe + sr\x86|x64 (no TriDef files)
                 { "dx12",  FindPkg(root, "DX12_3D") },      // DirectX 12 games: DX12_3D x64\d3d12.dll + DX12_3D.ini + DX12_3D\(DXC) + profiles\<exe>
             };
             gamesFile = Path.Combine(exeDir, "games.list");
             Lang.Load(exeDir);   // settings.ini "lang=ko|en", else the Windows display language
+            TriOps.BundledList = DataFile("tridef_profiles.txt");   // TriDef's profile names, for PCs without TriDef 3D
             Report.LoadCache(exeDir);   // community 3D list (compat.json) from the last run; refreshed once the window is up
             Shown += (s, e) => FetchCommunity();
 
@@ -973,27 +978,32 @@ namespace GeoGamingHub
             return g;
         }
 
-        // a game type was picked: its category becomes the selected one and the other category's types are cleared
-        void KindPicked(RadioButton r, bool wrapper)
+        // a game type was picked: its category (0 geo-11, 1 own wrappers, 2 TriDef 3D) becomes the selected one and the
+        // other categories' types are cleared
+        void KindPicked(RadioButton r, int cat)
         {
-            if (wrapper) lastWrapKind = r; else lastGeoKind = r;
+            if (cat == 1) lastWrapKind = r; else if (cat == 0) lastGeoKind = r;
             if (syncingCategory) return;
             syncingCategory = true;
-            if (wrapper) { rbKindGeo.Checked = rbKindUe4.Checked = rbKindDx9.Checked = false; rbCatWrap.Checked = true; }
-            else { rbKindGl.Checked = rbKindVk.Checked = rbKindDx12.Checked = false; rbCatGeo.Checked = true; }
-            pnlKindGeo.Visible = !wrapper; pnlKindWrap.Visible = wrapper;
+            if (cat != 0) rbKindGeo.Checked = rbKindUe4.Checked = rbKindDx9.Checked = false;
+            if (cat != 1) rbKindGl.Checked = rbKindVk.Checked = rbKindDx12.Checked = false;
+            if (cat != 2) rbKindTri.Checked = false;
+            (cat == 0 ? rbCatGeo : cat == 1 ? rbCatWrap : rbCatTri).Checked = true;
+            pnlKindGeo.Visible = cat == 0; pnlKindWrap.Visible = cat == 1; pnlKindTri.Visible = cat == 2;
             syncingCategory = false;
         }
 
         // a category was picked: show its game types and select one (the last one picked there, else a guess from the exe)
-        void CategoryPicked(bool wrapper)
+        void CategoryPicked(int cat)
         {
             if (syncingCategory) return;
-            pnlKindGeo.Visible = !wrapper; pnlKindWrap.Visible = wrapper;
-            if (wrapper && !rbKindGl.Checked && !rbKindVk.Checked && !rbKindDx12.Checked)
+            bool wrapper = cat == 1;
+            pnlKindGeo.Visible = cat == 0; pnlKindWrap.Visible = cat == 1; pnlKindTri.Visible = cat == 2;
+            if (cat == 2) { if (!rbKindTri.Checked) rbKindTri.Checked = true; }
+            else if (wrapper && !rbKindGl.Checked && !rbKindVk.Checked && !rbKindDx12.Checked)
                 (lastWrapKind ?? (gameExe != null && Dx12Ops.IsDx12Game(gameExe) ? rbKindDx12
                                   : gameExe != null && !vkDxvkPossible && !VkOps.ImportsVulkan(gameExe) && GlOps.IsOpenGL(gameExe) ? rbKindGl : rbKindVk)).Checked = true;   // a DirectX 9/11 game (Unity players import opengl32 too) -> Vulkan through DXVK
-            else if (!wrapper && !rbKindGeo.Checked && !rbKindUe4.Checked && !rbKindDx9.Checked)
+            else if (cat == 0 && !rbKindGeo.Checked && !rbKindUe4.Checked && !rbKindDx9.Checked)
                 (lastGeoKind ?? (gameExe != null && Util.IsUe4(gameExe) ? rbKindUe4 : rbKindGeo)).Checked = true;
         }
         Label Head(string text)
@@ -1151,12 +1161,15 @@ namespace GeoGamingHub
             return t;
         }
 
-        string CandidatesFile()
+        string CandidatesFile() { return DataFile("game_candidates.json"); }
+
+        // data\<name> next to the exe (release) or next to its folder (development)
+        static string DataFile(string name)
         {
             string exeDir = Path.GetDirectoryName(Application.ExecutablePath);
             foreach (var d in new[] { exeDir, Path.GetDirectoryName(exeDir) })
             {
-                string f = d == null ? null : Path.Combine(d, "data", "game_candidates.json");
+                string f = d == null ? null : Path.Combine(d, "data", name);
                 if (f != null && File.Exists(f)) return f;
             }
             return null;
@@ -1264,6 +1277,7 @@ namespace GeoGamingHub
                 case "dx9": rbKindDx9.Checked = true; break;
                 case "opengl": rbKindGl.Checked = true; break;
                 case "dx12": rbKindDx12.Checked = true; break;
+                case "tridef": rbKindTri.Checked = true; break;
                 case "vulkan":
                     rbKindVk.Checked = true;
                     if (chkVkDxvk.Enabled) chkVkDxvk.Checked = true;   // a DirectX exe: the DXVK route
@@ -1344,10 +1358,13 @@ namespace GeoGamingHub
                 VkOps.Options vko = hasVk ? VkOps.Read(Path.Combine(dir, VkOps.IniName)) : null;
                 bool hasDx12 = exists && !hasGl && !hasVk && Dx12Ops.Installed(dir);   // DirectX 12 kind: DX12_3D, settings in DX12_3D.ini
                 Dx12Ops.Options d12o = hasDx12 ? Dx12Ops.Read(Path.Combine(dir, Dx12Ops.IniName)) : null;
-                string engine = !exists ? "-" : hasGl ? "OpenGL" : hasVk ? (VkOps.DxvkInstalled(dir) ? "Vulkan (DXVK)" : "Vulkan") : hasDx12 ? "DX12" : (Util.UnityVersion(dir, exe) != null ? "Unity" : Util.IsUe4(exe) ? "UE4" : Dx9Ops.Installed(dir) ? "DX9" : Lang.T("일반"));
+                string triName = exists && !hasGl && !hasVk && !hasDx12 && !hasGeo ? TriOps.RegisteredName(exe) : null;
+                bool hasTri = triName != null;   // TriDef 3D: registered in Ignition's list, started by Tridef3D_Play
+                string engine = !exists ? "-" : hasTri ? "TriDef" : hasGl ? "OpenGL" : hasVk ? (VkOps.DxvkInstalled(dir) ? "Vulkan (DXVK)" : "Vulkan") : hasDx12 ? "DX12" : (Util.UnityVersion(dir, exe) != null ? "Unity" : Util.IsUe4(exe) ? "UE4" : Dx9Ops.Installed(dir) ? "DX9" : Lang.T("일반"));
                 var bits = exists ? Util.ExeBits(exe) : null;
                 string sr = "-";
-                if (hasGl) sr = glo.Sr ? Lang.T("켬") : Lang.T("끔");
+                if (hasTri) sr = TriOps.Sr(triName) ? Lang.T("켬") : Lang.T("끔");
+                else if (hasGl) sr = glo.Sr ? Lang.T("켬") : Lang.T("끔");
                 else if (hasVk) sr = vko.Sr ? Lang.T("켬") : Lang.T("끔");
                 else if (hasDx12) sr = d12o.Sr ? Lang.T("켬") : Lang.T("끔");
                 else if (exists)
@@ -1394,8 +1411,9 @@ namespace GeoGamingHub
                     conv = d12o.Convergence.ToString(CultureInfo.InvariantCulture);
                 }
                 sep = Trim1(sep); conv = Trim1(conv);
-                string launch = exists ? Launchers.LaunchLabel(exe, Util.IsUe4(exe)) : "-";
-                bool installed = hasGeo || hasGl || hasVk || hasDx12;
+                string launch = !exists ? "-" : hasTri ? Lang.T("TriDef 실행기") : Launchers.LaunchLabel(exe, Util.IsUe4(exe));
+                if (hasTri) { up = "-"; sep = conv = "TriDef"; }
+                bool installed = hasGeo || hasGl || hasVk || hasDx12 || hasTri;
                 bool complete = rec.Done && installed;
                 string state = !exists ? Lang.T("파일 없음") : complete ? Lang.T("설정 완료") : Lang.T("재설정 필요");
                 it.SubItems.Add(state).ForeColor = complete ? Color.FromArgb(16, 124, 16) : Color.FromArgb(200, 90, 0);
@@ -1486,6 +1504,20 @@ namespace GeoGamingHub
             if (!File.Exists(exe)) { Status(Lang.T("실행 파일이 없습니다: ") + exe); return; }
             string dir = Path.GetDirectoryName(exe), appId, nm;
             bool ue4 = Util.IsUe4(exe);   // UF2 needs the game started with -dx11
+            string tn = TriOf(exe);
+            if (tn != null)
+            {
+                // TriDef 3D: Tridef3D_Play starts the game through Steam and injects TriDef (administrator rights)
+                try
+                {
+                    TriOps.Launch(pkgDirs["tridef"], tn, TriOps.Sr(tn));
+                    Log(Lang.T("TriDef 실행기로 실행: ") + tn + (TriOps.Sr(tn) ? " (--sr)" : ""));
+                    Status(Lang.T("TriDef 실행기로 실행: ") + tn);
+                }
+                catch (System.ComponentModel.Win32Exception ex) { Log(Lang.T("실행 취소 또는 실패: ") + ex.Message); Status(Lang.T("실행 취소 또는 실패: ") + ex.Message); }
+                catch (Exception ex) { Log(Lang.T("실행 실패: ") + ex.Message); Status(Lang.T("실행 실패: ") + ex.Message); }
+                return;
+            }
             try
             {
                 if (Util.FindSteamApp(dir, out appId, out nm))
@@ -1555,9 +1587,10 @@ namespace GeoGamingHub
             var catCol = new FlowLayoutPanel { AutoSize = true, FlowDirection = FlowDirection.TopDown, WrapContents = false, Margin = new Padding(0) };
             rbCatGeo = Radio(Lang.T("geo-11 - DirectX 9 / 11 게임"), true);
             rbCatWrap = Radio(Lang.T("자체 래퍼 - Vulkan / OpenGL / DirectX 12 게임"), false);
-            foreach (var r in new[] { rbCatGeo, rbCatWrap }) { r.Font = new Font(Font, FontStyle.Bold); catCol.Controls.Add(r); }
+            rbCatTri = Radio(Lang.T("TriDef 3D - TriDef 프로필이 있는 게임 (TriDef 3D 설치 필수)"), false);
+            foreach (var r in new[] { rbCatGeo, rbCatWrap, rbCatTri }) { r.Font = new Font(Font, FontStyle.Bold); catCol.Controls.Add(r); }
             p.Controls.Add(catCol);
-            p.Controls.Add(Note(Lang.T("geo-11은 커뮤니티 픽스(3DMigoto 계열)로 DirectX 9 / 11 게임을 입체로 만들고, 자체 래퍼(OGL3D / VK3D / DX12_3D)는 OpenGL·Vulkan·DirectX 12 게임의 양쪽 눈을 직접 그려 위빙합니다. 지원하지 않는 API의 게임은 DXVK로 Vulkan으로 바꿔 자체 래퍼를 쓸 수도 있습니다(실험적).")));
+            p.Controls.Add(Note(Lang.T("geo-11은 커뮤니티 픽스(3DMigoto 계열)로 DirectX 9 / 11 게임을 입체로 만들고, 자체 래퍼(OGL3D / VK3D / DX12_3D)는 OpenGL·Vulkan·DirectX 12 게임의 양쪽 눈을 직접 그려 위빙합니다. 지원하지 않는 API의 게임은 DXVK로 Vulkan으로 바꿔 자체 래퍼를 쓸 수도 있습니다(실험적). TriDef 3D는 PC에 설치된 TriDef 3D가 게임별 프로필로 입체를 만듭니다(TriDef 3D 설치 필수).")));
 
             p.Controls.Add(Head(Lang.T("게임 유형")));
             var kindCol = pnlKindGeo = new FlowLayoutPanel { AutoSize = true, FlowDirection = FlowDirection.TopDown, WrapContents = false, Margin = new Padding(0) };
@@ -1626,15 +1659,37 @@ namespace GeoGamingHub
             kindCol.Controls.Add(rbKindDx12);
             kindCol.Controls.Add(Note(Lang.T("DirectX 12 게임은 DX12_3D가 맡습니다. 게임 폴더에 d3d12.dll, DX12_3D.ini, DX12_3D 폴더(셰이더 패치용 DXC)를 넣으면 DX12_3D가 양쪽 눈을 그려 SR SDK로 직접 위빙합니다. 64비트 게임만 됩니다. 자동 수렴은 아직 없어 Convergence는 고정 값입니다. DLSS는 오른쪽 눈에 적용되지 않으므로 게임의 렌더 스케일이나 FSR / XeSS를 쓰세요. 언리얼 엔진 게임은 UU3D / UEVR 쪽이 더 낫습니다.")));
             p.Controls.Add(kindCol);
+            // TriDef 3D: the user's own TriDef install does the 3D; this app registers the game and starts it
+            pnlKindTri = new FlowLayoutPanel { AutoSize = true, FlowDirection = FlowDirection.TopDown, WrapContents = false, Margin = new Padding(0), Visible = false };
+            rbKindTri = Radio(Lang.T("TriDef 3D 프로필로 실행 (Steam 게임, 32비트 DX9 / 64비트 DX11)"), false);
+            rbKindTri.Font = new Font(Font, FontStyle.Bold);
+            pnlKindTri.Controls.Add(rbKindTri);
+            var triMust = new Label { AutoSize = true, ForeColor = Color.FromArgb(196, 43, 28), Font = new Font(Font, FontStyle.Bold), Margin = P(0, 4, 0, 4), MaximumSize = Sz(1040, 0),
+                Text = Lang.T("TriDef 3D 설치 필수: 이 방식은 PC에 설치된 TriDef 3D(DDD)가 3D를 만듭니다. 이 앱에는 TriDef 파일이 들어 있지 않으며(재배포 불가), TriDef 3D가 없으면 동작하지 않습니다.") };
+            pnlKindTri.Controls.Add(triMust);
+            pnlKindTri.Controls.Add(Note(Lang.T("TriDef 3D Ignition 창 대신 이 앱이 게임을 TriDef에 등록하고(프로필 지정), [실행]은 Tridef3D_Play로 게임을 시작해 TriDef DLL을 주입합니다(관리자 권한 확인 창이 뜹니다). 게임 폴더에는 아무것도 넣지 않습니다. Steam에서 바로 실행하면 3D가 되지 않으니 이 앱의 [실행]으로 시작하세요. 깊이는 TriDef 단축키로 조절합니다.")));
+            lblTriState = new Label { AutoSize = true, Margin = P(0, 2, 0, 6), MaximumSize = Sz(1040, 0) };
+            pnlKindTri.Controls.Add(lblTriState);
+            var triRow = new FlowLayoutPanel { AutoSize = true, WrapContents = false, Margin = P(0, 2, 0, 0) };
+            triRow.Controls.Add(Lbl(Lang.T("TriDef 프로필:")));
+            var profs = new List<object> { Lang.T("(프로필 없음 - 목록에서 고르세요)") };
+            foreach (var pn in TriOps.ProfileNames()) profs.Add(pn);
+            cbTriProfile = Combo(420, profs.ToArray(), 0);
+            triRow.Controls.Add(cbTriProfile);
+            pnlKindTri.Controls.Add(triRow);
+            pnlKindTri.Controls.Add(Note(Lang.T("실행 파일을 고르면 게임 이름(Steam 이름, 폴더, exe 이름)으로 TriDef 프로필을 찾아 자동으로 고릅니다. 프로필이 없는 게임은 화면만 좌우로 나뉘고 깊이가 없습니다.")));
+            p.Controls.Add(pnlKindTri);
             p.Controls.Add(Note(Lang.T("3D 방식에 따라 다음 단계의 항목이 달라집니다. 방식마다 다른 패키지이므로 한 게임에 두 가지를 같이 설치하지 마세요.")));
-            rbCatGeo.CheckedChanged += (s, e) => { if (rbCatGeo.Checked) CategoryPicked(false); };
-            rbCatWrap.CheckedChanged += (s, e) => { if (rbCatWrap.Checked) CategoryPicked(true); };
-            rbKindGeo.CheckedChanged += (s, e) => { if (rbKindGeo.Checked) { KindPicked(rbKindGeo, false); if (rbUe4 != null && rbUe4.Checked) rbPlain.Checked = true; } UpdateEnabled(); };
-            rbKindUe4.CheckedChanged += (s, e) => { if (rbKindUe4.Checked) { KindPicked(rbKindUe4, false); if (rbUe4 != null) rbUe4.Checked = true; } UpdateEnabled(); };
-            rbKindDx9.CheckedChanged += (s, e) => { if (rbKindDx9.Checked) { KindPicked(rbKindDx9, false); if (rbPlain != null) rbPlain.Checked = true; } UpdateEnabled(); };
-            rbKindGl.CheckedChanged += (s, e) => { if (rbKindGl.Checked) { KindPicked(rbKindGl, true); if (gameDir != null && chkSr != null) LoadWrapper(); } UpdateEnabled(); };
-            rbKindVk.CheckedChanged += (s, e) => { if (rbKindVk.Checked) { KindPicked(rbKindVk, true); if (gameDir != null && chkSr != null) LoadWrapper(); } UpdateEnabled(); };
-            rbKindDx12.CheckedChanged += (s, e) => { if (rbKindDx12.Checked) { KindPicked(rbKindDx12, true); if (gameDir != null && chkSr != null) LoadWrapper(); } UpdateEnabled(); };
+            rbCatGeo.CheckedChanged += (s, e) => { if (rbCatGeo.Checked) CategoryPicked(0); };
+            rbCatWrap.CheckedChanged += (s, e) => { if (rbCatWrap.Checked) CategoryPicked(1); };
+            rbCatTri.CheckedChanged += (s, e) => { if (rbCatTri.Checked) CategoryPicked(2); };
+            rbKindTri.CheckedChanged += (s, e) => { if (rbKindTri.Checked) { KindPicked(rbKindTri, 2); if (gameDir != null && chkSr != null) LoadTri(); } UpdateEnabled(); };
+            rbKindGeo.CheckedChanged += (s, e) => { if (rbKindGeo.Checked) { KindPicked(rbKindGeo, 0); if (rbUe4 != null && rbUe4.Checked) rbPlain.Checked = true; } UpdateEnabled(); };
+            rbKindUe4.CheckedChanged += (s, e) => { if (rbKindUe4.Checked) { KindPicked(rbKindUe4, 0); if (rbUe4 != null) rbUe4.Checked = true; } UpdateEnabled(); };
+            rbKindDx9.CheckedChanged += (s, e) => { if (rbKindDx9.Checked) { KindPicked(rbKindDx9, 0); if (rbPlain != null) rbPlain.Checked = true; } UpdateEnabled(); };
+            rbKindGl.CheckedChanged += (s, e) => { if (rbKindGl.Checked) { KindPicked(rbKindGl, 1); if (gameDir != null && chkSr != null) LoadWrapper(); } UpdateEnabled(); };
+            rbKindVk.CheckedChanged += (s, e) => { if (rbKindVk.Checked) { KindPicked(rbKindVk, 1); if (gameDir != null && chkSr != null) LoadWrapper(); } UpdateEnabled(); };
+            rbKindDx12.CheckedChanged += (s, e) => { if (rbKindDx12.Checked) { KindPicked(rbKindDx12, 1); if (gameDir != null && chkSr != null) LoadWrapper(); } UpdateEnabled(); };
             return t;
         }
 
@@ -1691,6 +1746,9 @@ namespace GeoGamingHub
             lblDx12Install = Note(Lang.T("DirectX 12 (DX12_3D): 64비트 d3d12.dll, DX12_3D.ini, DX12_3D 폴더(dxcompiler.dll, dxil.dll)를 게임 폴더에 넣습니다. 권장 값이 있는 게임(Helldivers 2)은 그 값으로 시작합니다. DX12_3D.ini가 이미 있으면 게임 안에서 저장한 값을 지키고, 다음 단계의 항목만 바꿉니다. 다른 d3d12.dll이 있으면 d3d12.dll.geo11sr_bak으로 보관합니다."));
             lblDx12Install.Visible = false;
             p.Controls.Add(lblDx12Install);
+            lblTriInstall = Note(Lang.T("TriDef 3D: 게임 폴더에는 아무것도 넣지 않고, TriDef 3D Ignition의 게임 목록(레지스트리 HKCU\\SOFTWARE\\DDD\\TriDefIgnition\\Games)에 이 게임을 고른 프로필과 함께 등록합니다. 비트는 실행 파일에서 읽습니다(32비트 = TriDef DX9, 64비트 = TriDef DX11)."));
+            lblTriInstall.Visible = false;
+            p.Controls.Add(lblTriInstall);
             pnlScope = new FlowLayoutPanel { AutoSize = true, FlowDirection = FlowDirection.TopDown, WrapContents = false, Margin = new Padding(0), Padding = new Padding(0) };
             pnlScope.Controls.Add(Head(Lang.T("설치 범위")));
             var scopeCol = new FlowLayoutPanel { AutoSize = true, FlowDirection = FlowDirection.TopDown, WrapContents = false, Margin = new Padding(0) };
@@ -1738,6 +1796,7 @@ namespace GeoGamingHub
         bool IsGlSelected { get { return rbKindGl != null && rbKindGl.Checked; } }
         bool IsVkSelected { get { return rbKindVk != null && rbKindVk.Checked; } }
         bool IsDx12Selected { get { return rbKindDx12 != null && rbKindDx12.Checked; } }
+        bool IsTriSelected { get { return rbKindTri != null && rbKindTri.Checked; } }
 
         // what 0000_Start_GEO11.cmd does after the package is copied, minus the interactive parts
         void Ue4PostInstall(string dir)
@@ -1887,6 +1946,7 @@ namespace GeoGamingHub
             numConv = new NumericUpDown { Minimum = 0.01m, Maximum = 10000, DecimalPlaces = 2, Increment = 0.1m, Value = 3.0m, Width = S(100), BorderStyle = BorderStyle.FixedSingle, Margin = P(0, 3, 12, 3) };
             g.Controls.Add(numConv, 1, 1);
             p.Controls.Add(g);
+            gridStereo = g;
             var geoConvNote = Note(Lang.T("dm_separation / dm_convergence. 게임 안에서 Separation·Convergence 증가/감소 키로 바꾸고 저장 키(기본 Ctrl+F7)로 저장할 수 있습니다. Convergence가 클수록 화면 밖으로 튀어나오는 느낌이 커집니다. 보통 1 - 8 정도이지만 픽스에 따라 100 이상을 쓰기도 합니다."));
             p.Controls.Add(geoConvNote);
             lblStereoGl = Note(Lang.T("OGL3D.ini separation / convergence. Separation은 깊이 세기(%, 기본 50)입니다. Convergence는 화면 면에 놓일 깊이로, 단위가 게임마다 크게 달라(예: 2 - 4000) 자동 수렴을 권합니다. 게임 안에서 Ctrl+F3~F6으로 바꾸고 Ctrl+F7로 저장하며, 수동 조절(Ctrl+F5/F6)은 자동 수렴을 끕니다. Ctrl+F2가 자동 수렴을 켜고 끕니다."));
@@ -1898,6 +1958,9 @@ namespace GeoGamingHub
             lblStereoDx12 = Note(Lang.T("DX12_3D.ini separation / convergence. Separation은 깊이 세기(%, 기본 25)입니다. Convergence는 화면 면에 놓일 깊이(게임 단위)로 게임마다 크게 다릅니다(Helldivers 2는 미터 단위라 2 - 5). DX12_3D는 아직 자동 수렴이 없습니다. 게임 안에서 Ctrl+F3~F6으로 바꾸고 Ctrl+F7로 저장합니다."));
             lblStereoDx12.Visible = false;
             p.Controls.Add(lblStereoDx12);
+            lblStereoTri = Note(Lang.T("TriDef 3D는 고른 프로필의 깊이 값으로 시작합니다. 게임 안에서 TriDef 단축키로 깊이(분리값)와 화면 위치(수렴)를 바꾸고, TriDef가 프로필에 저장합니다. 이 단계에서 정할 값은 없습니다."));
+            lblStereoTri.Visible = false;
+            p.Controls.Add(lblStereoTri);
             chkAutoConv = Check(Lang.T("자동 수렴 (dm_auto_convergence) - 장면에 따라 geo-11이 수렴을 자동으로 맞춤"), false, 0);
             chkAutoConv.CheckedChanged += (s, e) => UpdateEnabled();
             p.Controls.Add(chkAutoConv);
@@ -1984,6 +2047,7 @@ namespace GeoGamingHub
                 Lang.T("     UF2는 게임을 -dx11 인자로 실행해야 합니다. [완료] 때 Steam 시작 옵션(Steam을 잠시 종료했다가 다시 시작) 또는 Heroic(Epic/GOG)의 게임 설정에 -dx11을 넣고, 설치기의 [실행]도 -dx11을 붙입니다."),
                 Lang.T("  4. 3단계 [디스플레이]: SR 위빙 사용 여부(SR 패널이 아니면 끄고 3D 출력 모드 선택), 필요하면 업스케일. [다음]."),
                 Lang.T("     OpenGL 게임(게임 유형 'OpenGL - OGL3D')은 opengl32.dll + OGL3D.ini만 설치하고, 디스플레이·입체 값 단계의 항목을 OGL3D.ini에 씁니다(output, swap_eyes, upscale, separation, convergence)."),
+                Lang.T("     TriDef 3D(카테고리 'TriDef 3D')는 TriDef 3D가 설치돼 있어야 합니다. 게임을 TriDef에 등록만 하고(게임 폴더는 그대로), [실행]은 Tridef3D_Play로 시작합니다(Steam 게임, 관리자 권한)."),
                 Lang.T("     Vulkan 게임(게임 유형 'Vulkan - VK3D')은 vulkan-1.dll + VK3D.ini(+ 게임 전용 픽스)를 설치하고, 디스플레이·입체 값 단계의 항목을 VK3D.ini에 씁니다(output, swap_eyes, separation, convergence)."),
                 Lang.T("  5. 4단계 [입체 값]: Separation / Convergence. [완료]를 누르면 게임 폴더에 모두 적용되고 목록이 '설정 완료'로 바뀝니다."),
                 Lang.T("     중간에 [취소]하면 게임 폴더는 바뀌지 않고 목록에 '재설정 필요'로 남습니다. [완료] 전에는 아무것도 적용되지 않으므로, [설정 바꾸기]로 1단계부터 다시 하면 됩니다."),
@@ -2015,6 +2079,7 @@ namespace GeoGamingHub
                 Lang.T("  [전체 제거]       게임 폴더의 Uninstall.bat 실행 (geo-11, ShaderFixes, SRWeave 모두 삭제)."),
                 Lang.T("  OpenGL (OGL3D)   [전체 제거]는 opengl32.dll, OGL3D.ini, OGL3D.log를 지우고, [SR 위빙만 제거]는 OGL3D.ini의 output을 sbs로 바꿉니다."),
                 Lang.T("                   OGL3D 단축키: Ctrl+F3/F4 Separation, Ctrl+F5/F6 Convergence, Ctrl+F2 자동 수렴, Ctrl+F7 저장, Ctrl+F1 값 표시, Ctrl+T 3D, Ctrl+Alt+W 위빙"),
+                Lang.T("  TriDef 3D        [전체 제거]는 이 앱이 만든 TriDef 등록을 지우고, [SR 위빙만 제거]는 SR 위빙 없이 실행하게 바꿉니다. 깊이는 TriDef 단축키로 조절합니다."),
                 Lang.T("  Vulkan (VK3D)    [전체 제거]는 vulkan-1.dll, VK3D.ini, VK3D.log, VK3D_fix(와 DXVK 파일)를 지우고, [SR 위빙만 제거]는 VK3D.ini의 output을 sbs로 바꿉니다. 단축키는 OGL3D와 같습니다."),
                 Lang.T("  DirectX 12 (DX12_3D)  [전체 제거]는 d3d12.dll, DX12_3D.ini, DX12_3D.log, DX12_3D 폴더, 덤프를 지우고, [SR 위빙만 제거]는 DX12_3D.ini의 output을 sbs로 바꿉니다. 단축키는 OGL3D와 같습니다(자동 수렴 Ctrl+F2 제외)."),
             });
@@ -2038,13 +2103,15 @@ namespace GeoGamingHub
         {
             cbUnityVer.Enabled = rbUnity.Checked;
             bool gl = IsGlSelected, vk = IsVkSelected, dx12 = IsDx12Selected, w = gl || vk || dx12;   // w: one of our own wrappers (OGL3D / VK3D / DX12_3D)
-            if (IsUe4Selected) { rb64.Checked = true; rb32.Enabled = false; rb64.Enabled = true; }   // UF2 is 64-bit only
-            else if (w) { rb32.Enabled = rb64.Enabled = false; }   // OGL3D / VK3D: the DLL must match the exe's bitness (read from the exe)
+            bool tri = IsTriSelected;   // TriDef 3D: nothing of this app goes into the game folder
+            if (IsUe4Selected && !tri) { rb64.Checked = true; rb32.Enabled = false; rb64.Enabled = true; }   // UF2 is 64-bit only
+            else if (w || tri) { rb32.Enabled = rb64.Enabled = false; }   // OGL3D / VK3D: the DLL must match the exe's bitness (read from the exe)
             else { rb32.Enabled = rb64.Enabled = true; }
-            if (pnlUe4 != null) pnlUe4.Visible = IsUe4Selected && !w;
+            if (pnlUe4 != null) pnlUe4.Visible = IsUe4Selected && !w && !tri;
             // the engine / Unity-version rows belong to the geo-11 group only (DX9 = dgVoodoo2 + plain geo-11, engine fixed)
-            if (rowEngine != null) lblEngine.Visible = rowEngine.Visible = lblUnityVer.Visible = rowUnityVer.Visible = !IsUe4Selected && !IsDx9Selected && !w;
-            if (pnlScope != null) { pnlScope.Visible = !w; lblGlInstall.Visible = gl; lblVkInstall.Visible = vk; lblDx12Install.Visible = dx12; }
+            if (rowEngine != null) lblEngine.Visible = rowEngine.Visible = lblUnityVer.Visible = rowUnityVer.Visible = !IsUe4Selected && !IsDx9Selected && !w && !tri;
+            if (pnlScope != null) { pnlScope.Visible = !w && !tri; lblGlInstall.Visible = gl; lblVkInstall.Visible = vk; lblDx12Install.Visible = dx12; lblTriInstall.Visible = tri; }
+            if (lblTriState != null) UpdateTriState();
             if (chkVkDxvk != null) { chkVkDxvk.Enabled = lblVkDxvk.Enabled = vk && vkDxvkPossible; if (!chkVkDxvk.Enabled) chkVkDxvk.Checked = false; }
             if (IsDx9Selected && rbPlain != null && !rbPlain.Checked) rbPlain.Checked = true;
             if (rowDx9 != null) { rowDx9.Enabled = IsDx9Selected; rowDx9Vram.Enabled = IsDx9Selected; chkDx9Desktop.Enabled = IsDx9Selected; lblLaa.Enabled = IsDx9Selected; if (!IsDx9Selected) chkLaa.Checked = false; }
@@ -2055,30 +2122,33 @@ namespace GeoGamingHub
             if (pnlGlMode != null)
             {
                 // OpenGL / Vulkan kinds: OGL3D.ini / VK3D.ini output, swap_eyes (and upscale for OGL3D); the wrappers switch the lens themselves
-                pnlGeoMode.Visible = !w; pnlGlMode.Visible = w;
+                pnlGeoMode.Visible = !w && !tri; pnlGlMode.Visible = w;
                 if (w) SetWrapperModes(vk ? VkOps.Modes : dx12 ? Dx12Ops.Modes : GlOps.Modes);
                 lblGlModeHead.Text = vk ? Lang.T("3D 출력 모드 (VK3D.ini output)") : dx12 ? Lang.T("3D 출력 모드 (DX12_3D.ini output)") : Lang.T("3D 출력 모드 (OGL3D.ini output)");
                 lblGlModeNote.Text = vk || dx12 ? Lang.T("SR 위빙을 켜면 output = auto (SR 런타임이 없으면 sbs)입니다. 끄면 sbs(좌우) 또는 tab(상하)을 고릅니다.")
                                         : Lang.T("SR 위빙을 켜면 output = auto (SR 런타임이 없으면 sbs)입니다. 끄면 sbs(좌우), tab(상하), left / right(한쪽 눈)를 고릅니다.");
                 cbGlMode.Enabled = !chkSr.Checked;
                 if (w) chkSwap.Enabled = true;
-                chkLens.Visible = !w;
-                lblSrHead.Text = gl ? Lang.T("SR 위빙 (OGL3D)") : vk ? Lang.T("SR 위빙 (VK3D)") : dx12 ? Lang.T("SR 위빙 (DX12_3D)") : Lang.T("SR 위빙 (SRWeave dxgi.dll)");
-                foreach (var c in geoUpscaleControls) c.Visible = !w;
-                gridUpAdv.Visible = !w && chkUpAdv.Checked;
+                chkLens.Visible = !w && !tri;
+                chkSwap.Visible = !tri;   // TriDef: SRWeave's own hotkey (Ctrl+Alt+S) swaps the eyes
+                lblSrHead.Text = tri ? Lang.T("SR 위빙 (TriDef + SRWeave)") : gl ? Lang.T("SR 위빙 (OGL3D)") : vk ? Lang.T("SR 위빙 (VK3D)") : dx12 ? Lang.T("SR 위빙 (DX12_3D)") : Lang.T("SR 위빙 (SRWeave dxgi.dll)");
+                foreach (var c in geoUpscaleControls) c.Visible = !w && !tri;
+                gridUpAdv.Visible = !w && !tri && chkUpAdv.Checked;
                 lblUpNoteGl.Visible = gl;
-                lblUpHead.Visible = chkUpscale.Visible = !vk && !dx12;   // VK3D / DX12_3D have no upscaling of their own
-                if (vk || dx12) chkUpscale.Checked = false;
+                lblUpHead.Visible = chkUpscale.Visible = !vk && !dx12 && !tri;   // VK3D / DX12_3D / TriDef have no upscaling here
+                if (vk || dx12 || tri) chkUpscale.Checked = false;
             }
             if (lblStereoGl != null)
             {
-                foreach (var c in geoStereoNotes) c.Visible = !w;
+                foreach (var c in geoStereoNotes) c.Visible = !w && !tri;
+                lblStereoTri.Visible = tri;
+                gridStereo.Visible = !tri;
                 lblStereoGl.Visible = gl;
                 lblStereoVk.Visible = vk;
                 lblStereoDx12.Visible = dx12;
-                lblStereoHead.Text = gl ? Lang.T("기본 입체 값 (OGL3D.ini [Stereo])") : vk ? Lang.T("기본 입체 값 (VK3D.ini [Stereo])") : dx12 ? Lang.T("기본 입체 값 (DX12_3D.ini [Stereo])") : Lang.T("기본 입체 값 (d3dxdm.ini [Stereo])");
-                chkAutoConv.Visible = !dx12;   // DX12_3D has no automatic convergence yet
-                if (dx12) chkAutoConv.Checked = false;
+                lblStereoHead.Text = tri ? Lang.T("입체 값 (TriDef 프로필)") : gl ? Lang.T("기본 입체 값 (OGL3D.ini [Stereo])") : vk ? Lang.T("기본 입체 값 (VK3D.ini [Stereo])") : dx12 ? Lang.T("기본 입체 값 (DX12_3D.ini [Stereo])") : Lang.T("기본 입체 값 (d3dxdm.ini [Stereo])");
+                chkAutoConv.Visible = !dx12 && !tri;   // DX12_3D has no automatic convergence yet; TriDef keeps its own
+                if (dx12 || tri) chkAutoConv.Checked = false;
                 chkAutoConv.Text = gl ? Lang.T("자동 수렴 (convergence = auto) - 장면에 따라 OGL3D가 수렴을 맞춤 (권장)")
                                  : vk ? Lang.T("자동 수렴 (convergence = auto) - 장면에 따라 VK3D가 수렴을 맞춤 (권장)")
                                  : Lang.T("자동 수렴 (dm_auto_convergence) - 장면에 따라 geo-11이 수렴을 자동으로 맞춤");
@@ -2087,6 +2157,19 @@ namespace GeoGamingHub
             foreach (var k in SrKeys) keyBoxes[k.Id].Enabled = chkSr.Checked;
             if (chkUpscale != null)
                 cbUpscaleFs.Enabled = cbUpscaleMode.Enabled = numUpW.Enabled = numUpH.Enabled = chkUpscale.Checked;
+        }
+
+        // TriDef 3D: installed or not (required), and whether the launcher can start this game (Steam only)
+        void UpdateTriState()
+        {
+            string drv = TriOps.Installed() ? TriOps.DriverDir() : null;
+            string appId, nm;
+            bool steam = gameDir != null && Util.FindSteamApp(gameDir, out appId, out nm);
+            var lines = new List<string>();
+            lines.Add(drv != null ? Lang.T("TriDef 3D 설치됨: ") + drv : Lang.T("이 PC에 TriDef 3D가 설치돼 있지 않습니다. TriDef 3D를 설치해야 이 방식으로 3D가 됩니다."));
+            if (gameDir != null && !steam) lines.Add(Lang.T("Steam 게임이 아닙니다: TriDef 실행기는 Steam 게임만 시작할 수 있습니다."));
+            lblTriState.Text = string.Join("\n", lines);
+            lblTriState.ForeColor = drv != null && (gameDir == null || steam) ? Color.FromArgb(16, 124, 16) : Color.FromArgb(196, 43, 28);
         }
 
         // output choices of the wrapper kinds (OGL3D: sbs/tab/left/right, VK3D: sbs/tab); keeps the choice when possible
@@ -2207,7 +2290,20 @@ namespace GeoGamingHub
             else if (dx12) { notes.Remove(Lang.T("Unity 아님 (일반 geo-11)")); notes.Add("DirectX 12"); }
             else if (api != null) notes.Add(api);
             vkDxvkPossible = bits == 64 && api != null && !Dx12Ops.IsDx12Game(exePath) && !VkOps.ImportsVulkan(exePath);   // DXVK has no D3D12
+            string triReg = TriOps.RegisteredName(exePath);
+            string triProfile = (triReg != null ? TriOps.Profile(triReg) : null) ?? TriOps.Match(exePath);
+            string sid, snm;
+            bool steamGame = Util.FindSteamApp(gameDir, out sid, out snm);
+            bool otherInstall = GlOps.Installed(gameDir) || VkOps.Installed(gameDir) || Dx12Ops.Installed(gameDir) || Dx9Ops.Installed(gameDir) || File.Exists(Path.Combine(gameDir, "d3d11.dll"));
+            // TriDef 3D only renders Direct3D 9 / 11: not for OpenGL, Vulkan or DirectX 12-only games
+            bool tri = !otherInstall && (triReg != null || (triProfile != null && steamGame && !gl && !vk && !dx12));
+            if (tri) { gl = vk = dx12 = dx9 = false; }
+            if (triProfile != null) notes.Add(Lang.T("TriDef 프로필: ") + triProfile + (TriOps.Installed() ? "" : Lang.T(" (TriDef 3D 설치 필수)")));
+            if (triReg != null) notes.Add(Lang.T("TriDef 등록됨: ") + triReg);
+            if (cbTriProfile != null)
+                cbTriProfile.SelectedIndex = triProfile != null && cbTriProfile.Items.Contains(triProfile) ? cbTriProfile.Items.IndexOf(triProfile) : 0;
             rbKindUe4.Checked = rbUe4.Checked; rbKindDx9.Checked = dx9; rbKindGl.Checked = gl; rbKindVk.Checked = vk; rbKindDx12.Checked = dx12; rbKindGeo.Checked = !rbUe4.Checked && !dx9 && !gl && !vk && !dx12;
+            rbKindTri.Checked = tri;   // last: KindPicked clears the other categories' types
             // 4GB patch: only meaningful for a 32-bit exe without the flag; off unless the user wants it
             bool? laa = bits == 32 ? Util.IsLargeAddressAware(exePath) : null;
             chkLaa.Enabled = laa == false;
@@ -2223,7 +2319,7 @@ namespace GeoGamingHub
                 string vr = Dx9Ops.Vram(gameDir);
                 if (vr != null && cbDx9Vram.Items.Contains(vr)) cbDx9Vram.SelectedItem = vr;
             }
-            lblKindDetect.Text = Lang.T("자동 감지: ") + (gl ? Lang.T("OpenGL (opengl32.dll) → OGL3D") : vk ? Lang.T("Vulkan (vulkan-1.dll) → VK3D") : dx12 ? Lang.T("DirectX 12 (d3d12.dll) → DX12_3D") : rbUe4.Checked ? Lang.T("Unreal Engine 4 (Binaries\\Win64\\*-Win64-Shipping.exe 구조)") : uv != null ? "Unity " + uv : dx9 ? Lang.T("DirectX 9 (d3d9.dll) → dgVoodoo2 + 일반 geo-11") : Lang.T("Unity 아님 (일반 geo-11)") + (api != null ? " / " + api : "")) + Lang.T(" - 다르면 아래에서 바꾸세요.");
+            lblKindDetect.Text = Lang.T("자동 감지: ") + (tri ? Lang.T("TriDef 프로필 있음 → TriDef 3D (TriDef 3D 설치 필수)") : gl ? Lang.T("OpenGL (opengl32.dll) → OGL3D") : vk ? Lang.T("Vulkan (vulkan-1.dll) → VK3D") : dx12 ? Lang.T("DirectX 12 (d3d12.dll) → DX12_3D") : rbUe4.Checked ? Lang.T("Unreal Engine 4 (Binaries\\Win64\\*-Win64-Shipping.exe 구조)") : uv != null ? "Unity " + uv : dx9 ? Lang.T("DirectX 9 (d3d9.dll) → dgVoodoo2 + 일반 geo-11") : Lang.T("Unity 아님 (일반 geo-11)") + (api != null ? " / " + api : "")) + Lang.T(" - 다르면 아래에서 바꾸세요.");
             bool hasFix = File.Exists(Path.Combine(gameDir, "d3d11.dll"));
             if (hasFix) { notes.Add(Lang.T("기존 d3d11.dll(geo-11/3DMigoto) 있음 → 'SR 위빙만 추가' 권장")); rbSrOnly.Checked = true; LoadExisting(gameDir); }
             else
@@ -2236,6 +2332,7 @@ namespace GeoGamingHub
             string dx = Path.Combine(gameDir, "dxgi.dll");
             if (File.Exists(dx))
                 notes.Add(Util.SameFile(dx, Path.Combine(SrcDir(), "dxgi.dll")) ? Lang.T("SRWeave dxgi.dll 이미 설치됨") : Lang.T("다른 dxgi.dll(ReShade?) 있음 → 설치 시 dxgi.dll.reshade_bak으로 백업"));
+            if (tri) LoadTri();
             if (dx12)
             {
                 LoadWrapper();
@@ -2278,6 +2375,17 @@ namespace GeoGamingHub
             if (major == 5 && minor >= 6) return 1;
             if (major == 5) return 0;
             return UnityDefaultIndex;
+        }
+
+        // TriDef 3D: SR weaving as registered (on for a new game); bitness from the exe
+        void LoadTri()
+        {
+            string reg = TriOps.RegisteredName(gameExe);
+            chkSr.Checked = reg == null || TriOps.Sr(reg);
+            chkUpscale.Checked = false;
+            chkAutoConv.Checked = false;
+            var bits = Util.ExeBits(gameExe);
+            if (bits == 64) rb64.Checked = true; else if (bits == 32) rb32.Checked = true;
         }
 
         // OpenGL / Vulkan kinds: show the game's OGL3D.ini / VK3D.ini (or the package's defaults) in the display / stereo steps
@@ -2449,6 +2557,58 @@ namespace GeoGamingHub
             else { File.Move(dx, bak); Log(Lang.T("  기존 dxgi.dll(ReShade?) → dxgi.dll.reshade_bak")); }
         }
 
+        // TriDef 3D: register the game with the chosen profile (TriDef 3D itself must be installed); nothing in the game folder
+        void ApplyTri()
+        {
+            if (!TriOps.Installed())
+            {
+                Log(Lang.T("적용 안 함: TriDef 3D가 설치돼 있지 않습니다."));
+                MessageBox.Show(this, Lang.T("이 PC에 TriDef 3D가 설치돼 있지 않습니다.\n\nTriDef 3D 방식은 설치된 TriDef 3D(DDD)가 3D를 만듭니다. TriDef 3D를 먼저 설치하세요. 이 앱에는 TriDef 파일이 들어 있지 않습니다."), AppName, MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+            string appId, nm;
+            if (!Util.FindSteamApp(gameDir, out appId, out nm))
+            {
+                Log(Lang.T("적용 안 함: Steam 게임이 아닙니다 (TriDef 실행기는 Steam 게임만 시작합니다)."));
+                MessageBox.Show(this, Lang.T("Steam 게임이 아닙니다.\n\nTriDef 실행기(Tridef3D_Play)는 Steam으로 게임을 시작한 뒤 주입하므로 Steam 게임만 됩니다."), AppName, MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+            string profile = cbTriProfile.SelectedIndex > 0 ? (string)cbTriProfile.SelectedItem : null;
+            if (profile == null)
+            {
+                MessageBox.Show(this, Lang.T("TriDef 프로필을 고르세요. 프로필이 없으면 화면만 좌우로 나뉘고 깊이가 없습니다."), AppName, MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
+            try
+            {
+                string name = TriOps.RegisteredName(gameExe) ?? TriOps.KeyName(nm ?? Util.GameDisplayName(gameExe));
+                Log("----------------------------------------");
+                Log(Lang.T("적용: ") + "TriDef 3D / " + (Util.ExeBits(gameExe) == 64 ? "x64 (DX11)" : "x86 (DX9)") + " / SR " + (chkSr.Checked ? Lang.T("사용") : Lang.T("사용 안 함")));
+                foreach (var l in TriOps.Register(name, gameExe, profile, chkSr.Checked)) Log(l);
+                AddGameToList(gameExe, true);
+                wizardActive = false;
+                RefreshGameList();
+                tabs.SelectedIndex = TabList;
+                Log(Lang.T("완료."));
+                Status(Lang.T("설정 완료: ") + Path.GetFileName(gameExe) + "  (TriDef 3D)");
+                MessageBox.Show(this, Lang.T("TriDef 3D에 등록했습니다.\n\n[게임 목록]의 [실행]으로 시작하세요(관리자 권한 확인 창이 뜹니다). Steam에서 바로 실행하면 3D가 되지 않습니다. 깊이는 게임 안에서 TriDef 단축키로 조절합니다."), AppName, MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+            catch (Exception ex)
+            {
+                Log(Lang.T("오류: ") + ex.Message);
+                Status(Lang.T("오류: ") + ex.Message);
+                MessageBox.Show(this, ex.Message, Lang.T("오류"), MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        // a TriDef registration counts when no other 3D of this app is in the game folder
+        static string TriOf(string exe)
+        {
+            string dir = Path.GetDirectoryName(exe);
+            if (GlOps.Installed(dir) || VkOps.Installed(dir) || Dx12Ops.Installed(dir) || File.Exists(Path.Combine(dir, "d3d11.dll"))) return null;
+            return TriOps.RegisteredName(exe);
+        }
+
         void RemoveSrFiles(string dir, string ourDll, bool restore)
         {
             string dx = Path.Combine(dir, "dxgi.dll");
@@ -2470,6 +2630,7 @@ namespace GeoGamingHub
                 MessageBox.Show(this, Lang.T("이 게임 폴더에 안티치트가 있습니다: ") + ac + Lang.T("\n\n게임 폴더에 DLL을 넣으면 계정이 정지될 수 있어 설치하지 않습니다."), AppName, MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
+            if (IsTriSelected) { ApplyTri(); return; }
             if (IsGlSelected || IsVkSelected || IsDx12Selected) { ApplyWrapper(); return; }
             try
             {
@@ -2737,6 +2898,12 @@ namespace GeoGamingHub
             {
                 Log("----------------------------------------");
                 Log(Lang.T("단축키만 적용: ") + gameDir);
+                if (TriOf(gameExe) != null || IsTriSelected)
+                {
+                    Log(Lang.T("  TriDef 3D 게임의 단축키는 TriDef 3D 설정에서 바꿉니다. 이 탭의 키(geo-11 / SRWeave)는 쓰지 않습니다."));
+                    Status(Lang.T("TriDef 3D 게임의 단축키는 TriDef 3D 설정에서 바꿉니다."));
+                    return;
+                }
                 if (Dx12Ops.Installed(gameDir) || IsDx12Selected)
                 {
                     Log(Lang.T("  DirectX 12 (DX12_3D) 게임의 단축키는 DX12_3D.ini의 [Keys]에서 바꿉니다. 이 탭의 키(geo-11 / SRWeave)는 쓰지 않습니다."));
@@ -2768,6 +2935,15 @@ namespace GeoGamingHub
             {
                 Log("----------------------------------------");
                 Log(Lang.T("SR 위빙 제거"));
+                string trn = TriOf(gameExe);
+                if (trn != null)
+                {
+                    TriOps.SetSr(trn, false);
+                    Log(Lang.T("  TriDef 3D: SR 위빙 없이 실행 (3D는 TriDef의 좌우 SBS로 유지)"));
+                    Status(Lang.T("SR 위빙 제거 완료"));
+                    RefreshGameList();
+                    return;
+                }
                 if (Dx12Ops.Installed(gameDir))
                 {
                     // DX12_3D weaves by itself: switch its output to side-by-side
@@ -2805,6 +2981,21 @@ namespace GeoGamingHub
         void UninstallAll()
         {
             if (!RequireGame()) return;
+            string trn = TriOf(gameExe);
+            if (trn != null)
+            {
+                if (MessageBox.Show(this, Lang.T("TriDef 3D 등록을 지웁니다: ") + trn + Lang.T("\n\n게임 폴더는 바뀌지 않습니다. TriDef 3D Ignition에서 직접 추가한 게임이면 등록은 그대로 두고 이 앱의 설정만 지웁니다.\n\n계속할까요?"), Lang.T("전체 제거"), MessageBoxButtons.YesNo, MessageBoxIcon.Warning) != DialogResult.Yes) return;
+                try
+                {
+                    Log("----------------------------------------");
+                    Log(Lang.T("TriDef 3D 등록 제거: ") + trn);
+                    foreach (var l in TriOps.Unregister(trn)) Log(l);
+                    Status(Lang.T("전체 제거 완료"));
+                    RefreshGameList();
+                }
+                catch (Exception ex) { Log(Lang.T("오류: ") + ex.Message); MessageBox.Show(this, ex.Message, Lang.T("오류"), MessageBoxButtons.OK, MessageBoxIcon.Error); }
+                return;
+            }
             if (Dx12Ops.Installed(gameDir))
             {
                 if (MessageBox.Show(this, Lang.T("DX12_3D(DirectX 12)를 제거합니다: d3d12.dll, DX12_3D.ini(저장한 값 포함), DX12_3D.log, DX12_3D 폴더(DXC), 덤프를 지우고 보관해 둔 다른 d3d12.dll이 있으면 되돌립니다.\n\n") + gameDir + Lang.T("\n\n계속할까요?"), Lang.T("전체 제거"), MessageBoxButtons.YesNo, MessageBoxIcon.Warning) != DialogResult.Yes) return;
@@ -2869,7 +3060,7 @@ namespace GeoGamingHub
         void OpenSrLog()
         {
             if (!RequireGame()) return;
-            string l = Path.Combine(gameDir, GlOps.Installed(gameDir) ? "OGL3D.log" : VkOps.Installed(gameDir) ? "VK3D.log" : Dx12Ops.Installed(gameDir) ? "DX12_3D.log" : "SRWeave.log");
+            string l = TriOf(gameExe) != null ? TriOps.SrLog(pkgDirs["tridef"], gameExe) : Path.Combine(gameDir, GlOps.Installed(gameDir) ? "OGL3D.log" : VkOps.Installed(gameDir) ? "VK3D.log" : Dx12Ops.Installed(gameDir) ? "DX12_3D.log" : "SRWeave.log");
             if (File.Exists(l)) Process.Start("notepad.exe", "\"" + l + "\"");
             else { Log(Path.GetFileName(l) + Lang.T("가 아직 없습니다 (게임을 한 번 실행하면 생깁니다).")); Status(Path.GetFileName(l) + Lang.T("가 아직 없습니다.")); }
         }

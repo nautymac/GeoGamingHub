@@ -33,7 +33,7 @@ namespace GeoGamingHub
 
     static class Library
     {
-        public static readonly string[] Methods = { "unity", "ue4", "dx11", "dx9", "opengl", "vulkan", "dx12", "old", "none", "unknown" };
+        public static readonly string[] Methods = { "unity", "ue4", "dx11", "dx9", "opengl", "vulkan", "tridef", "dx12", "old", "none", "unknown" };
 
         public static string MethodLabel(string m)
         {
@@ -45,6 +45,7 @@ namespace GeoGamingHub
                 case "dx9": return Lang.T("DX9 → dgVoodoo2 + geo-11");
                 case "opengl": return Lang.T("OpenGL → OGL3D");
                 case "vulkan": return Lang.T("Vulkan → VK3D");
+                case "tridef": return Lang.T("TriDef 3D (프로필, 설치 필수)");
                 case "dx12": return Lang.T("DX12 → DX12_3D");
                 case "old": return Lang.T("DX8 이하 (미지원)");
                 case "none": return Lang.T("불가");
@@ -290,6 +291,7 @@ namespace GeoGamingHub
             if (exe == null || !File.Exists(exe)) return "unknown";
             string dir = Path.GetDirectoryName(exe);
             if (VkOps.Installed(dir)) return "vulkan";
+            if (!File.Exists(Path.Combine(dir, "d3d11.dll")) && TriOps.RegisteredName(exe) != null) return "tridef";
             if (Dx12Ops.Installed(dir)) return "dx12";
             if (GlOps.Installed(dir)) return "opengl";
             if (Util.UnityVersion(dir, exe) != null) return "unity";
