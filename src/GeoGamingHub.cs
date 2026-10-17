@@ -2297,7 +2297,7 @@ namespace GeoGamingHub
             bool otherInstall = GlOps.Installed(gameDir) || VkOps.Installed(gameDir) || Dx12Ops.Installed(gameDir) || Dx9Ops.Installed(gameDir) || File.Exists(Path.Combine(gameDir, "d3d11.dll"));
             // TriDef 3D only renders Direct3D 9 / 11: not for OpenGL, Vulkan or DirectX 12-only games
             bool tri = !otherInstall && (triReg != null || (triProfile != null && steamGame && !gl && !vk && !dx12));
-            if (tri) { gl = vk = dx12 = dx9 = false; }
+            if (tri) { gl = vk = dx12 = dx9 = false; notes.Remove(Lang.T("Unity 아님 (일반 geo-11)")); }
             if (triProfile != null) notes.Add(Lang.T("TriDef 프로필: ") + triProfile + (TriOps.Installed() ? "" : Lang.T(" (TriDef 3D 설치 필수)")));
             if (triReg != null) notes.Add(Lang.T("TriDef 등록됨: ") + triReg);
             if (cbTriProfile != null)
@@ -2309,7 +2309,7 @@ namespace GeoGamingHub
             chkLaa.Enabled = laa == false;
             chkLaa.Checked = false;
             chkLaa.Text = laa == true ? Lang.T("4GB 패치 - 이미 적용되어 있음") : bits == 64 ? Lang.T("4GB 패치 - 64비트 게임에는 필요 없음") : Lang.T("4GB 패치 (실행 파일에 LARGE_ADDRESS_AWARE 플래그) - 원하면 켜세요");
-            if (laa == false && !gl && !vk && !dx12) notes.Add(Lang.T("2GB 주소 공간 (LAA 없음)"));   // the 4GB patch is offered with the DX9 kind
+            if (laa == false && !gl && !vk && !dx12 && !tri) notes.Add(Lang.T("2GB 주소 공간 (LAA 없음)"));   // the 4GB patch is offered with the DX9 kind
             if (dx9)
             {
                 string iv = Dx9Ops.InstalledVersion(gameDir, pkgDirs["dx9"], bits ?? 32);
