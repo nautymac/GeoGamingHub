@@ -522,6 +522,30 @@ static partial class HubTest
         Ok(Shown(ctl("pnlGlMode")) && !Shown(ctl("pnlScope")) && !rb("rb32").Enabled && rb(Machine(rf) == 0x8664 ? "rb64" : "rb32").Checked, "manual switch to OpenGL: OGL3D controls, bits locked to the exe's (rfg.exe is 32-bit)  [glMode=" + Shown(ctl("pnlGlMode")) + " scope=" + Shown(ctl("pnlScope")) + " rb32.En=" + rb("rb32").Enabled + " rb64=" + rb("rb64").Checked + " gl=" + rb("rbKindGl").Checked + " geo=" + rb("rbKindGeo").Checked + "]");
         rb("rbKindGeo").Checked = true; Pump();
         Ok(!Shown(ctl("pnlGlMode")) && Shown(ctl("pnlScope")) && rb("rb32").Enabled, "switch back to geo-11: geo-11 controls");
+        // install scope: full (SR on) / SBS only (SR off) follow [SR 위빙 사용]; 'SR 위빙만 추가' only over an existing fix
+        Ok(rb("rbFull").Checked && cb("chkSr").Checked && Shown(rb("rbSbsOnly")) && !Shown(rb("rbSrOnly")), "scope: full install, SBS only offered, SR-only hidden (no d3d11.dll)");
+        cb("chkSr").Checked = false; Pump();
+        Ok(rb("rbSbsOnly").Checked && !cb("chkSr").Checked && C<ComboBox>(form, "cbMode").Enabled, "SR off -> SBS only, output mode selectable");
+        rb("rbFull").Checked = true; Pump();
+        Ok(cb("chkSr").Checked && !rb("rbSbsOnly").Checked, "full install -> SR on again");
+        rb("rbSbsOnly").Checked = true; Pump();
+        Ok(!cb("chkSr").Checked, "SBS only -> SR off");
+        string rfFix = Path.Combine(Path.GetDirectoryName(rf), "d3d11.dll");
+        File.WriteAllBytes(rfFix, new byte[] { 0 });
+        Call(form, "StartWizard", rf);
+        Pump();
+        Ok(Shown(rb("rbSrOnly")) && rb("rbSrOnly").Checked, "existing d3d11.dll: 'SR 위빙만 추가' shown and picked");
+        File.Delete(rfFix);
+        Call(form, "StartWizard", rf);
+        Pump();
+        Ok(!Shown(rb("rbSrOnly")) && rb("rbFull").Checked && cb("chkSr").Checked, "no fix again: SR-only hidden, full install with SR");
+        // look: category cards drive the hidden category radios
+        var cards = rb("rbCatGeo").Parent.Controls.Cast<Control>().SelectMany(c => c.Controls.Cast<Control>()).Where(c => c.GetType().Name == "CatCard").ToList();
+        Ok(cards.Count == 3 && !Shown(rb("rbCatGeo")) && !Shown(rb("rbCatWrap")) && !Shown(rb("rbCatTri")), "3D method: three category cards, radios hidden");
+        Call(cards[1], "OnClick", EventArgs.Empty); Pump();
+        Ok(rb("rbCatWrap").Checked && Shown(ctl("pnlKindWrap")), "card click picks the own-wrapper category");
+        Call(cards[0], "OnClick", EventArgs.Empty); Pump();
+        Ok(rb("rbCatGeo").Checked && Shown(ctl("pnlKindGeo")), "card click picks geo-11 again");
         Call(form, "StartWizard", sr);
         Pump();
         Ok(rb("rbKindUe4").Checked && !rb("rbKindGl").Checked && rb("rb64").Checked && !rb("rb32").Enabled, "Steel Rats: UE4 kind, 64-bit only");

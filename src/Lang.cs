@@ -126,7 +126,9 @@ namespace GeoGamingHub
             { "설치 범위", "Install scope" },
             { "전체 설치 (geo-11 + 픽스 + SR 위빙) - 처음 설치하는 게임", "Full install (geo-11 + fix + SR weaving) - first-time install for this game" },
             { "SR 위빙만 추가 (기존 픽스 유지) - 이미 geo-11/3DMigoto 픽스가 있는 게임", "Add SR weaving only (keep existing fix) - game that already has a geo-11/3DMigoto fix" },
-            { "SR 위빙만 추가: dxgi.dll + SRWeave.ini만 넣고 d3dx.ini / ShaderFixes는 건드리지 않습니다. 게임 폴더에 d3d11.dll이 있으면 자동으로 이 쪽이 선택됩니다.", "SR weaving only: copies just dxgi.dll + SRWeave.ini and leaves d3dx.ini / ShaderFixes alone. Selected automatically when the game folder already has d3d11.dll." },
+            { "SBS만 설치 (3D TV, Non-SR 모니터용) - geo-11 + 픽스, SR 위빙 없이 좌우(SBS) 출력", "SBS only (3D TV, non-SR monitor) - geo-11 + fix, side-by-side output without SR weaving" },
+            { "SBS만 설치: geo-11과 픽스만 넣고 SR 위빙(dxgi.dll, SRWeave.ini)은 넣지 않습니다. 3D TV나 일반(Non-SR) 모니터에서 좌우(SBS) 화면으로 봅니다. 출력 모드(상하 등)는 다음 단계에서 바꿀 수 있습니다. 'SR 위빙만 추가'는 게임 폴더에 이미 geo-11/3DMigoto 픽스(d3d11.dll)가 있을 때만 나타나며, dxgi.dll + SRWeave.ini만 넣고 d3dx.ini / ShaderFixes는 건드리지 않습니다.",
+              "SBS only: installs geo-11 and the fix without SR weaving (no dxgi.dll / SRWeave.ini), for a 3D TV or a regular (non-SR) monitor showing side-by-side. The output mode (e.g. top-and-bottom) can be changed in the next step. 'Add SR weaving only' appears only when the game folder already has a geo-11/3DMigoto fix (d3d11.dll); it copies just dxgi.dll + SRWeave.ini and leaves d3dx.ini / ShaderFixes alone." },
             // display step
             { "SR 위빙 (SRWeave dxgi.dll)", "SR weaving (SRWeave dxgi.dll)" },
             { "SR 위빙 사용 - 렌티큘러(무안경 3D) 패널용, ReShade 없이 SR SDK 위버로 직접 위빙", "Use SR weaving - for lenticular (glasses-free 3D) panels, weaves with the SR SDK directly, no ReShade" },
@@ -204,7 +206,7 @@ namespace GeoGamingHub
             { "  SRWeave dxgi.dll 삭제", "  SRWeave dxgi.dll deleted" }, { " 삭제", " deleted" }, { "  ShaderFixes\\SRWeave 삭제", "  ShaderFixes\\SRWeave deleted" },
             { "  dxgi.dll.reshade_bak → dxgi.dll 복원 (ReShade)", "  dxgi.dll.reshade_bak → dxgi.dll restored (ReShade)" },
             { "패키지가 없습니다: ", "Package not found: " }, { "\n이 설치기 폴더 옆에 패키지 폴더가 있어야 합니다.", "\nThe package folders must sit next to this installer's folder." },
-            { "적용: ", "Applying: " }, { "일반 geo-11", "generic geo-11" }, { "전체 설치", "full install" }, { "SR만 추가", "SR weaving only" }, { "사용", "on" }, { "사용 안 함", "off" },
+            { "적용: ", "Applying: " }, { "일반 geo-11", "generic geo-11" }, { "전체 설치", "full install" }, { "SBS만 설치", "SBS only" }, { "SR만 추가", "SR weaving only" }, { "사용", "on" }, { "사용 안 함", "off" },
             { "  원본: ", "  source: " }, { "  패키지 파일 복사 완료", "  package files copied" }, { "  dxgi.dll + SRWeave.ini 복사 (기존 픽스 유지)", "  dxgi.dll + SRWeave.ini copied (existing fix kept)" },
             { "  d3dx_user.ini: 게임 안에서 저장했던 separation/convergence도 같은 값으로 바꿈", "  d3dx_user.ini: in-game saved separation/convergence set to the same values" },
             { "  경고: d3dxdm.ini 없음 - geo-11이 아닌 3DMigoto 픽스입니다. SRWeave는 geo-11 sbs 출력이 필요합니다.", "  warning: no d3dxdm.ini - this is a 3DMigoto fix, not geo-11. SRWeave needs geo-11's sbs output." },
@@ -296,6 +298,13 @@ namespace GeoGamingHub
             { "\n\n게임 폴더에 DLL을 넣으면 계정이 정지될 수 있어 설치하지 않습니다.", "\n\nA DLL in the game folder could get the account banned, so nothing is installed." },
             { "안티치트 있음(", "anti-cheat (" },
             { ") - 설치하지 않습니다", ") - not installing" },
+            // 3D method category cards (Theme.cs)
+            { "DirectX 9 / 11 게임", "DirectX 9 / 11 games" },
+            { "커뮤니티 픽스 · Unity · DX11 · UE4 · DX9", "Community fixes · Unity · DX11 · UE4 · DX9" },
+            { "자체 래퍼", "Own wrappers" },
+            { "OpenGL · Vulkan · DirectX 12 게임", "OpenGL · Vulkan · DirectX 12 games" },
+            { "TriDef 프로필이 있는 Steam 게임", "Steam games with a TriDef profile" },
+            { "TriDef 3D 설치 필수", "TriDef 3D must be installed" },
             // TriDef 3D
             { "TriDef 실행기", "TriDef launcher" },
             { "TriDef 실행기로 실행: ", "Started with the TriDef launcher: " },

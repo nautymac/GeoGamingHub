@@ -78,9 +78,10 @@ Keep `Packages` next to `GeoGamingHub.exe`. Unzip everything first; don't run it
    Run `GeoGamingHub.exe`, then on **Games** click **[Add game (start setup)]** and pick the game's exe (or drop it on
    the window). You can also start from an installed game on the **Candidates** tab.
 2. **3D 방식** → **설치** → **디스플레이** → **입체 값**의 4단계를 [다음]으로 넘기고 [완료]를 누릅니다. 3D 방식은 실행 파일에서
-   자동으로 고르며, 다르면 바꿉니다.
+   자동으로 고르며, 다르면 바꿉니다. SR 디스플레이가 없으면 설치 단계에서 **SBS만 설치**(3D TV, Non-SR 모니터용)를 고릅니다.
    Go through the four steps **3D Method** → **Install** → **Display** → **Stereo values** with [Next], then click
-   [Finish]. The 3D method is detected from the exe; change it if it is wrong.
+   [Finish]. The 3D method is detected from the exe; change it if it is wrong. Without an SR display, pick **SBS only**
+   (3D TV, non-SR monitor) on the Install step.
 3. 게임을 실행합니다. 값은 게임 안에서 단축키로 바꾸고 저장합니다.
    Start the game. Adjust and save the values in-game with the hotkeys.
 4. 제거: 게임 목록에서 게임을 고르고 **[전체 제거]**(모든 파일 삭제, 보관해 둔 원래 파일 복원) 또는

@@ -688,7 +688,7 @@ namespace GeoGamingHub
         // ---- controls ----
         TabControl tabs;
         Label lblGame, lblDetect;
-        RadioButton rbUnity, rbPlain, rbUe4, rb64, rb32, rbFull, rbSrOnly;
+        RadioButton rbUnity, rbPlain, rbUe4, rb64, rb32, rbFull, rbSbsOnly, rbSrOnly;   // install scope: full (with SR) / SBS only (no SR) / SR only (existing fix)
         RadioButton rbKindGeo, rbKindUe4, rbKindDx9; Label lblKindGame, lblKindDetect;   // step 1: geo-11 (Unity / 일반), UE4 Universal Fix 2, or DX9 (dgVoodoo2 + 일반 geo-11)
         ComboBox cbDx9Ver, cbDx9Vram; CheckBox chkDx9Desktop; FlowLayoutPanel rowDx9, rowDx9Vram;
         RadioButton rbKindGl;   // OpenGL games: OGL3D (opengl32.dll proxy that weaves by itself, no geo-11)
@@ -782,6 +782,8 @@ namespace GeoGamingHub
             };
 
             BuildLayout();
+            Theme.Attach(this, dpi);
+            ApplyTheme();
             foreach (var kv in pkgDirs)
                 Log((Directory.Exists(kv.Value) ? Lang.T("패키지 확인: ") : Lang.T("패키지 없음: ")) + kv.Value);
             UpdateEnabled();
@@ -797,6 +799,8 @@ namespace GeoGamingHub
         }
 
         // ---- look ------------------------------------------------------------------------------
+        // The controls are built with these light colours; Theme.cs maps them to the charcoal theme, replaces the tab headers
+        // with a flat strip and shows the 3D-method categories as cards (after BuildLayout, see ApplyTheme).
         static readonly Color Accent = Color.FromArgb(0, 120, 212);
         static readonly Color AccentDark = Color.FromArgb(0, 90, 170);
         static readonly Color TextMain = Color.FromArgb(32, 32, 32);
@@ -869,6 +873,15 @@ namespace GeoGamingHub
             tabs.SelectedIndexChanged += (s, e) => UpdateWizardStatus();
         }
 
+        void ApplyTheme() { Theme.Apply(this, tabs, new[] { rbCatGeo, rbCatWrap, rbCatTri }, TabKind, TabStereo); }
+
+        // GeoGamingHub.exe --shot <png> <tab> [game exe]: what the off-screen screenshot shows
+        internal void PrepareShot(int tab, string exe)
+        {
+            if (exe != null) StartWizard(exe);
+            tabs.SelectedIndex = tab;
+        }
+
         // language switch: throw the controls away and build them again in the other language
         void RebuildUi()
         {
@@ -879,6 +892,7 @@ namespace GeoGamingHub
             wizardActive = false;
             Text = AppName;
             BuildLayout();
+            ApplyTheme();
             txtLog.Text = logText;
             UpdateEnabled();
             RefreshGameList();
@@ -1753,10 +1767,16 @@ namespace GeoGamingHub
             pnlScope.Controls.Add(Head(Lang.T("설치 범위")));
             var scopeCol = new FlowLayoutPanel { AutoSize = true, FlowDirection = FlowDirection.TopDown, WrapContents = false, Margin = new Padding(0) };
             rbFull = Radio(Lang.T("전체 설치 (geo-11 + 픽스 + SR 위빙) - 처음 설치하는 게임"), true);
+            rbSbsOnly = Radio(Lang.T("SBS만 설치 (3D TV, Non-SR 모니터용) - geo-11 + 픽스, SR 위빙 없이 좌우(SBS) 출력"), false);
+            // only offered when the game folder already has a geo-11 / 3DMigoto fix (DetectGame), so that fix is kept
             rbSrOnly = Radio(Lang.T("SR 위빙만 추가 (기존 픽스 유지) - 이미 geo-11/3DMigoto 픽스가 있는 게임"), false);
-            scopeCol.Controls.Add(rbFull); scopeCol.Controls.Add(rbSrOnly);
+            rbSrOnly.Visible = false;
+            scopeCol.Controls.Add(rbFull); scopeCol.Controls.Add(rbSbsOnly); scopeCol.Controls.Add(rbSrOnly);
+            // full = SR weaving on, SBS only = off: kept in step with [SR 위빙 사용] of the display step
+            rbFull.CheckedChanged += (s, e) => { if (rbFull.Checked && chkSr != null && !chkSr.Checked) chkSr.Checked = true; };
+            rbSbsOnly.CheckedChanged += (s, e) => { if (rbSbsOnly.Checked && chkSr != null && chkSr.Checked) chkSr.Checked = false; };
             pnlScope.Controls.Add(scopeCol);
-            pnlScope.Controls.Add(Note(Lang.T("SR 위빙만 추가: dxgi.dll + SRWeave.ini만 넣고 d3dx.ini / ShaderFixes는 건드리지 않습니다. 게임 폴더에 d3d11.dll이 있으면 자동으로 이 쪽이 선택됩니다.")));
+            pnlScope.Controls.Add(Note(Lang.T("SBS만 설치: geo-11과 픽스만 넣고 SR 위빙(dxgi.dll, SRWeave.ini)은 넣지 않습니다. 3D TV나 일반(Non-SR) 모니터에서 좌우(SBS) 화면으로 봅니다. 출력 모드(상하 등)는 다음 단계에서 바꿀 수 있습니다. 'SR 위빙만 추가'는 게임 폴더에 이미 geo-11/3DMigoto 픽스(d3d11.dll)가 있을 때만 나타나며, dxgi.dll + SRWeave.ini만 넣고 d3dx.ini / ShaderFixes는 건드리지 않습니다.")));
             p.Controls.Add(pnlScope);
 
             // UE4 only: Universal Fix 2 extras
@@ -1853,7 +1873,13 @@ namespace GeoGamingHub
             lblSrHead = Head(Lang.T("SR 위빙 (SRWeave dxgi.dll)"));
             p.Controls.Add(lblSrHead);
             chkSr = Check(Lang.T("SR 위빙 사용 - 렌티큘러(무안경 3D) 패널용, ReShade 없이 SR SDK 위버로 직접 위빙"), true, 0);
-            chkSr.CheckedChanged += (s, e) => UpdateEnabled();
+            chkSr.CheckedChanged += (s, e) =>
+            {
+                // the install scope follows: SR on -> full install, SR off -> SBS only ('SR 위빙만 추가' is left as it is)
+                if (chkSr.Checked && rbSbsOnly.Checked) rbFull.Checked = true;
+                else if (!chkSr.Checked && rbFull.Checked) rbSbsOnly.Checked = true;
+                UpdateEnabled();
+            };
             p.Controls.Add(chkSr);
             chkSwap = Check(Lang.T("좌우 눈 바꾸기 (입체가 뒤집혀 보일 때)"), false, 24);
             chkLens = Check(Lang.T("위빙 중 렌티큘러 렌즈 켜기"), true, 24);
@@ -2321,6 +2347,7 @@ namespace GeoGamingHub
             }
             lblKindDetect.Text = Lang.T("자동 감지: ") + (tri ? Lang.T("TriDef 프로필 있음 → TriDef 3D (TriDef 3D 설치 필수)") : gl ? Lang.T("OpenGL (opengl32.dll) → OGL3D") : vk ? Lang.T("Vulkan (vulkan-1.dll) → VK3D") : dx12 ? Lang.T("DirectX 12 (d3d12.dll) → DX12_3D") : rbUe4.Checked ? Lang.T("Unreal Engine 4 (Binaries\\Win64\\*-Win64-Shipping.exe 구조)") : uv != null ? "Unity " + uv : dx9 ? Lang.T("DirectX 9 (d3d9.dll) → dgVoodoo2 + 일반 geo-11") : Lang.T("Unity 아님 (일반 geo-11)") + (api != null ? " / " + api : "")) + Lang.T(" - 다르면 아래에서 바꾸세요.");
             bool hasFix = File.Exists(Path.Combine(gameDir, "d3d11.dll"));
+            rbSrOnly.Visible = hasFix;
             if (hasFix) { notes.Add(Lang.T("기존 d3d11.dll(geo-11/3DMigoto) 있음 → 'SR 위빙만 추가' 권장")); rbSrOnly.Checked = true; LoadExisting(gameDir); }
             else
             {
@@ -2636,9 +2663,10 @@ namespace GeoGamingHub
             {
                 string dir = gameDir, src = SrcDir(), ourDll = Path.Combine(src, "dxgi.dll");
                 if (!File.Exists(ourDll)) throw new Exception(Lang.T("패키지가 없습니다: ") + src + Lang.T("\n이 설치기 폴더 옆에 패키지 폴더가 있어야 합니다."));
-                bool useSr = chkSr.Checked, full = rbFull.Checked;
+                // SBS only = the full install without the SR weaving files
+                bool useSr = chkSr.Checked && !rbSbsOnly.Checked, full = rbFull.Checked || rbSbsOnly.Checked;
                 Log("----------------------------------------");
-                Log(Lang.T("적용: ") + (rbUnity.Checked ? "Unity" : IsUe4Selected ? "UE4 UF2" : IsDx9Selected ? "DX9 dgVoodoo2 " + cbDx9Ver.SelectedItem + " + " + Lang.T("일반 geo-11") : Lang.T("일반 geo-11")) + " / " + (rb64.Checked ? "x64" : "x32") + " / " + (full ? Lang.T("전체 설치") : Lang.T("SR만 추가")) + " / SR " + (useSr ? Lang.T("사용") : Lang.T("사용 안 함")));
+                Log(Lang.T("적용: ") + (rbUnity.Checked ? "Unity" : IsUe4Selected ? "UE4 UF2" : IsDx9Selected ? "DX9 dgVoodoo2 " + cbDx9Ver.SelectedItem + " + " + Lang.T("일반 geo-11") : Lang.T("일반 geo-11")) + " / " + (rb64.Checked ? "x64" : "x32") + " / " + (rbSbsOnly.Checked ? Lang.T("SBS만 설치") : full ? Lang.T("전체 설치") : Lang.T("SR만 추가")) + " / SR " + (useSr ? Lang.T("사용") : Lang.T("사용 안 함")));
                 Log(Lang.T("  원본: ") + src);
 
                 if (useSr) BackupReshade(dir, ourDll);
@@ -3069,11 +3097,21 @@ namespace GeoGamingHub
     static class Program
     {
         [STAThread]
-        static void Main()
+        static void Main(string[] args)
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new MainForm());
+            Theme.Init();
+            var f = new MainForm();
+            int shot = Array.IndexOf(args, "--shot");   // --shot <png> <tab> [game exe]: screenshot without showing the window
+            int tab;
+            if (shot >= 0 && args.Length > shot + 2 && int.TryParse(args[shot + 2], out tab))
+            {
+                string png = args[shot + 1], exe = args.Length > shot + 3 ? args[shot + 3] : null;
+                Theme.Shot(f, png, () => f.PrepareShot(tab, exe));
+                return;
+            }
+            Application.Run(f);
         }
     }
 }
