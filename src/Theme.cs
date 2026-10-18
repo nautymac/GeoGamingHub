@@ -13,13 +13,14 @@ namespace GeoGamingHub
 {
     static class Theme
     {
-        // charcoal rather than near-black (the first draft was too dark to read); notes and disabled text stay readable
-        public static readonly Color Window = C("#252A31"), Bar = C("#2A2F37"), Page = C("#2E333B"), Input = C("#383E47"), InputAlt = C("#3C424C"),
-            InputFocus = C("#3D4E61"), Card = C("#363C46"), CardOn = C("#2F4A3D"), Border = C("#4C5561"), BorderHover = C("#6E7987"), Line = C("#424954"),
-            Text = C("#F3F5F8"), Text2 = C("#DEE3E9"), Muted = C("#BAC2CC"), Dim = C("#A0A9B4"),
-            Accent = C("#3DD68C"), AccentHover = C("#5CE0A1"), AccentOff = C("#3F6E58"), OnAccent = C("#0F2A1B"), Sel = C("#30584A"),
-            Btn = C("#424A56"), BtnBorder = C("#5A6471"), BtnHover = C("#4C5562"), BtnDown = C("#56606E"),
-            Blue = C("#86C1FF"), Purple = C("#D2AEFF"), Red = C("#FF9090"), Green = C("#74E8AC"), Orange = C("#F7C772");
+        // the icon's colours: its neutral charcoal for the surfaces (not near-black: the first draft was too dark to read), the
+        // teal -> blue of its split screen for the accents, the cube's pale light for the text
+        public static readonly Color Window = C("#2B2A30"), Bar = C("#302F36"), Page = C("#35343B"), Input = C("#403F47"), InputAlt = C("#44434B"),
+            InputFocus = C("#3B4C5E"), Card = C("#3D3C44"), CardOn = C("#2F4A46"), Border = C("#55545D"), BorderHover = C("#7A7983"), Line = C("#4A4951"),
+            Text = C("#EEF4F7"), Text2 = C("#D2E2E8"), Muted = C("#B6C3CA"), Dim = C("#9DA8AF"),
+            Accent = C("#63C0AC"), Accent2 = C("#5A8CD4"), AccentHover = C("#7ACDBB"), AccentOff = C("#43605B"), OnAccent = C("#0E2622"), Sel = C("#34524D"),
+            Btn = C("#4A4952"), BtnBorder = C("#615F6A"), BtnHover = C("#54535D"), BtnDown = C("#5F5E69"),
+            Blue = C("#86AEEB"), Purple = C("#CDAEFF"), Red = C("#FF8E8E"), Green = C("#7DDCB5"), Orange = C("#F5C46E");
         static Color C(string h) { return ColorTranslator.FromHtml(h); }
 
         // MainForm's light-theme colours -> charcoal ones (by value; any other dark text colour is lightened)
@@ -442,7 +443,11 @@ namespace GeoGamingHub
                     }
                     TextRenderer.DrawText(g, text, font, new Rectangle(tx, 0, ts.Width + S(4), Height), sel ? Theme.Text : i == hover ? Theme.Text2 : Theme.Muted,
                         TextFormatFlags.VerticalCenter | TextFormatFlags.Left | TextFormatFlags.NoPadding | TextFormatFlags.SingleLine | TextFormatFlags.NoPrefix);
-                    if (sel) using (var b = new SolidBrush(Theme.Accent)) g.FillRectangle(b, x + S(6), Height - S(3), w - S(12), S(3));
+                    if (sel)   // teal -> blue, like the two halves of the icon's screen
+                    {
+                        var u = new Rectangle(x + S(6), Height - S(3), w - S(12), S(3));
+                        using (var b = new LinearGradientBrush(new Rectangle(u.X - 1, u.Y, u.Width + 2, u.Height), Theme.Accent, Theme.Accent2, LinearGradientMode.Horizontal)) g.FillRectangle(b, u);
+                    }
                     x += w;
                 }
                 g.DrawLine(line, 0, Height - 1, Width, Height - 1);
@@ -455,27 +460,33 @@ namespace GeoGamingHub
         protected override void OnMouseClick(MouseEventArgs e) { int h = HitTab(e.Location); if (h >= 0 && h < tabs.TabPages.Count) tabs.SelectedIndex = h; base.OnMouseClick(e); }
     }
 
-    // App name at the top left.
+    // App icon (src\app.ico, embedded as a resource) and name at the top left.
     sealed class Brand : Control
     {
         float k;
+        Image logo;
         int S(int v) { return (int)Math.Round(v * k); }
         public Brand()
         {
             SetStyle(ControlStyles.UserPaint | ControlStyles.AllPaintingInWmPaint | ControlStyles.OptimizedDoubleBuffer | ControlStyles.SupportsTransparentBackColor, true);
             using (var g = CreateGraphics()) k = g.DpiX / 96f;
             Size = new Size(S(250), S(40)); Margin = new Padding(0); BackColor = Color.Transparent;
+            try
+            {
+                using (var st = typeof(Brand).Assembly.GetManifestResourceStream("GeoGamingHub.app.ico"))
+                    if (st != null) using (var ic = new Icon(st, new Size(S(32), S(32)))) logo = ic.ToBitmap();
+            }
+            catch { }
         }
         protected override void OnPaint(PaintEventArgs e)
         {
             var g = e.Graphics;
-            g.SmoothingMode = SmoothingMode.AntiAlias;
-            var sq = new Rectangle(S(2), S(7), S(26), S(26));
-            using (var p = CatCard.Round(sq, S(6))) using (var b = new SolidBrush(Theme.Accent)) g.FillPath(b, p);
-            using (var f = new Font("Segoe UI", 11f, FontStyle.Bold)) TextRenderer.DrawText(g, "G", f, sq, Theme.OnAccent, TextFormatFlags.HorizontalCenter | TextFormatFlags.VerticalCenter | TextFormatFlags.NoPadding);
+            g.InterpolationMode = InterpolationMode.HighQualityBicubic;
+            if (logo != null) g.DrawImage(logo, new Rectangle(0, S(4), S(32), S(32)));
             using (var f = new Font("Segoe UI", 12.5f, FontStyle.Bold))
-                TextRenderer.DrawText(g, "GEO GAMING HUB", f, new Rectangle(S(38), 0, Width - S(38), Height), Theme.Text, TextFormatFlags.VerticalCenter | TextFormatFlags.Left | TextFormatFlags.NoPadding);
+                TextRenderer.DrawText(g, "GEO GAMING HUB", f, new Rectangle(S(42), 0, Width - S(42), Height), Theme.Text, TextFormatFlags.VerticalCenter | TextFormatFlags.Left | TextFormatFlags.NoPadding);
         }
+        protected override void Dispose(bool disposing) { if (disposing && logo != null) logo.Dispose(); base.Dispose(disposing); }
     }
 
     // One 3D-method category as a square card; clicking it checks MainForm's own (hidden) category radio button.
