@@ -219,12 +219,14 @@ namespace GeoGamingHub
             return log;
         }
 
-        // starts the game through the launcher (elevated: injection needs administrator rights)
+        // starts the game through the launcher (elevated: injection needs administrator rights). The launcher is a console
+        // program; its window is hidden (it only asks for input when no game name is given, and the name is always passed).
         public static void Launch(string pkgDir, string name, bool sr)
         {
             string exe = Path.Combine(pkgDir, Launcher);
             if (!File.Exists(exe)) throw new FileNotFoundException(Lang.T("TriDef 실행기가 패키지에 없습니다: ") + exe);
-            Process.Start(new ProcessStartInfo(exe, "\"" + name + "\"" + (sr ? " --sr" : "")) { UseShellExecute = true, Verb = "runas", WorkingDirectory = pkgDir });
+            Process.Start(new ProcessStartInfo(exe, "\"" + name + "\"" + (sr ? " --sr" : ""))
+            { UseShellExecute = true, Verb = "runas", WorkingDirectory = pkgDir, WindowStyle = ProcessWindowStyle.Hidden });
         }
 
         public static string SrLog(string pkgDir, string exe)

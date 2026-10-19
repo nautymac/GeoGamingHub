@@ -631,21 +631,26 @@ namespace GeoGamingHub
             return Path.GetFileNameWithoutExtension(exe);
         }
 
-        // run a console program hidden, return its output
+        // run a console program hidden, return its output. Both pipes are read at the same time: reading stdout to the end
+        // first deadlocked when the program filled the stderr pipe (Uninstall.bat prints "Could Not Find <path>" for every
+        // missing file, more than the pipe holds with a long game path). stdin is closed so a "pause" cannot wait forever,
+        // and a program that still has not finished after two minutes is ended.
         public static string RunHidden(string file, string args, string workDir)
         {
             var psi = new ProcessStartInfo(file, args)
             {
                 UseShellExecute = false, CreateNoWindow = true, WorkingDirectory = workDir,
-                RedirectStandardOutput = true, RedirectStandardError = true,
+                RedirectStandardOutput = true, RedirectStandardError = true, RedirectStandardInput = true,
                 StandardOutputEncoding = Encoding.Default, StandardErrorEncoding = Encoding.Default
             };
             using (var p = Process.Start(psi))
             {
-                string o = p.StandardOutput.ReadToEnd();
-                string e = p.StandardError.ReadToEnd();
-                p.WaitForExit();
-                return (o + e).Trim();
+                p.StandardInput.Close();
+                var o = p.StandardOutput.ReadToEndAsync();
+                var e = p.StandardError.ReadToEndAsync();
+                if (!p.WaitForExit(120000)) { try { p.Kill(); } catch { } p.WaitForExit(5000); }
+                System.Threading.Tasks.Task.WaitAll(new System.Threading.Tasks.Task[] { o, e }, 5000);
+                return ((o.IsCompleted ? o.Result : "") + (e.IsCompleted ? e.Result : "")).Trim();
             }
         }
     }

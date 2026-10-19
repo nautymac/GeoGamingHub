@@ -159,6 +159,19 @@ static partial class HubTest
         string pkg = Path.Combine(Path.GetDirectoryName(installer), @"Packages\OGL3D");
         Ok(Directory.Exists(pkg), "package folder " + pkg);
 
+        // Util.RunHidden: a batch file that writes far more to stderr than a pipe holds (Uninstall.bat in a long game
+        // path, Blade Runner Enhanced Edition) must not deadlock, and "pause" must not wait for a key
+        string longDir = Path.Combine(outDir, "Very Long Game Folder Name For The Uninstall Pipe Test", "Another Long Sub Folder Name Here");
+        Directory.CreateDirectory(longDir);
+        var bat = new StringBuilder();
+        for (int i = 0; i < 300; i++) bat.AppendLine("del not_there_" + i + ".dll");
+        bat.AppendLine("pause");
+        bat.AppendLine("echo done> finished.txt");
+        File.WriteAllText(Path.Combine(longDir, "Uninstall.bat"), bat.ToString());
+        var sw = Stopwatch.StartNew();
+        string runOut = (string)S("Util", "RunHidden", "cmd.exe", "/c \"" + Path.Combine(longDir, "Uninstall.bat") + "\"", longDir);
+        Ok(sw.ElapsedMilliseconds < 30000 && File.Exists(Path.Combine(longDir, "finished.txt")), "RunHidden: noisy batch file finishes (" + sw.ElapsedMilliseconds + " ms, " + runOut.Length + " chars of output)");
+
         // detection on the installed games (read-only)
         foreach (var e in new[] { Curse, Amnesia, BrokenAge, Dd64, Dd32 })
         {
