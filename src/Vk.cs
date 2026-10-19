@@ -206,7 +206,7 @@ namespace GeoGamingHub
             {
                 if (api == null || ImportsVulkan(exe)) throw new InvalidOperationException(Lang.T("DXVK는 DirectX 9 / 11 게임에만 씁니다."));   // a Vulkan game names d3d11/dxgi too (Quake II RTX)
                 string conflict = DxvkConflict(gameDir);
-                if (conflict != null) throw new InvalidOperationException(conflict + Lang.T("이(가) 게임 폴더에 있습니다(geo-11, SR 위빙, dgVoodoo 또는 ReShade). DXVK는 그 위에 설치할 수 없으니 먼저 [전체 제거]하세요."));
+                if (conflict != null) throw new InvalidOperationException(conflict + Lang.T("이(가) 게임 폴더에 있습니다(geo-11, SR 위빙, dgVoodoo 또는 ReShade). DXVK는 그 위에 설치할 수 없으니 먼저 [3D 픽스 제거]하세요."));
             }
 
             string dst = Path.Combine(gameDir, Dll);

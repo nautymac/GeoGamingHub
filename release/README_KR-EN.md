@@ -84,9 +84,9 @@ Keep `Packages` next to `GeoGamingHub.exe`. Unzip everything first; don't run it
    (3D TV, non-SR monitor) on the Install step.
 3. 게임을 실행합니다. 값은 게임 안에서 단축키로 바꾸고 저장합니다.
    Start the game. Adjust and save the values in-game with the hotkeys.
-4. 제거: 게임 목록에서 게임을 고르고 **[전체 제거]**(모든 파일 삭제, 보관해 둔 원래 파일 복원) 또는
+4. 제거: 게임 목록에서 게임을 고르고 **[3D 픽스 제거]**(모든 파일 삭제, 보관해 둔 원래 파일 복원) 또는
    **[SR 위빙만 제거]**(3D는 SBS로 유지).
-   Uninstall: select the game on **Games**, then **[Uninstall all]** (deletes every file and restores the kept
+   Uninstall: select the game on **Games**, then **[Uninstall 3D fix]** (deletes every file and restores the kept
    originals) or **[Remove SR weaving only]** (3D stays as SBS).
 
 게임 폴더에 있던 같은 이름의 다른 DLL(예: 다른 `d3d12.dll`)은 `.geo11sr_bak`으로 보관했다가 제거할 때 되돌립니다.

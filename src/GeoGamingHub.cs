@@ -1101,7 +1101,7 @@ namespace GeoGamingHub
             var bRefresh = MakeButton(Lang.T("새로 고침"), 100, false); bRefresh.Click += (s, e) => { RefreshGameList(); FetchCommunity(); };
             var bRemove = MakeButton(Lang.T("목록에서 빼기"), 120, false); bRemove.Click += (s, e) => RemoveSelected();
             var bRemoveSr = MakeButton(Lang.T("SR 위빙만 제거"), 130, false); bRemoveSr.Click += (s, e) => { if (SelectGameForAction()) RemoveSr(); };
-            var bUninstall = MakeButton(Lang.T("전체 제거"), 100, false); bUninstall.Click += (s, e) => { if (SelectGameForAction()) UninstallAll(); };
+            var bUninstall = MakeButton(Lang.T("3D 픽스 제거"), 100, false); bUninstall.Click += (s, e) => { if (SelectGameForAction()) UninstallAll(); };
             var bLog = MakeButton("SRWeave.log", 110, false); bLog.Click += (s, e) => { if (SelectGameForAction()) OpenSrLog(); };
             bLogGame = bLog;
             btnReport = MakeButton(Lang.T("3D 동작 보고..."), 120, false); btnReport.Click += (s, e) => ReportSelected();
@@ -1653,7 +1653,7 @@ namespace GeoGamingHub
             // optional 4GB patch (LARGE_ADDRESS_AWARE) for a 32-bit exe that lacks it
             chkLaa = Check(Lang.T("4GB 패치 (실행 파일에 LARGE_ADDRESS_AWARE 플래그) - 원하면 켜세요"), false, 24);
             kindCol.Controls.Add(chkLaa);
-            lblLaa = Note(Lang.T("32비트 게임은 주소 공간이 2GB뿐이라 dgVoodoo(패널 해상도) + geo-11(양안) + SR 위빙(복사본)을 더하면 메모리 부족으로 죽을 수 있습니다(\"Runtime Error\" 창, std::bad_alloc). 그럴 때 켜세요. 원본 exe는 <exe>.geo11sr_bak으로 보관하고 [전체 제거]가 되돌립니다. Steam '게임 파일 무결성 확인' 뒤에는 다시 적용해야 합니다."));
+            lblLaa = Note(Lang.T("32비트 게임은 주소 공간이 2GB뿐이라 dgVoodoo(패널 해상도) + geo-11(양안) + SR 위빙(복사본)을 더하면 메모리 부족으로 죽을 수 있습니다(\"Runtime Error\" 창, std::bad_alloc). 그럴 때 켜세요. 원본 exe는 <exe>.geo11sr_bak으로 보관하고 [3D 픽스 제거]가 되돌립니다. Steam '게임 파일 무결성 확인' 뒤에는 다시 적용해야 합니다."));
             lblLaa.Margin = P(24, 0, 0, 6);
             kindCol.Controls.Add(lblLaa);
             var dx9Overlay = new Label { AutoSize = true, ForeColor = Color.FromArgb(160, 90, 0), Margin = P(24, 0, 0, 6), MaximumSize = Sz(1000, 0),
@@ -2087,7 +2087,7 @@ namespace GeoGamingHub
                 Lang.T("     Vulkan 게임(게임 유형 'Vulkan - VK3D')은 vulkan-1.dll + VK3D.ini(+ 게임 전용 픽스)를 설치하고, 디스플레이·입체 값 단계의 항목을 VK3D.ini에 씁니다(output, swap_eyes, separation, convergence)."),
                 Lang.T("  5. 4단계 [입체 값]: Separation / Convergence. [완료]를 누르면 게임 폴더에 모두 적용되고 목록이 '설정 완료'로 바뀝니다."),
                 Lang.T("     중간에 [취소]하면 게임 폴더는 바뀌지 않고 목록에 '재설정 필요'로 남습니다. [완료] 전에는 아무것도 적용되지 않으므로, [설정 바꾸기]로 1단계부터 다시 하면 됩니다."),
-                Lang.T("  6. [게임 목록]에서 실행(Steam 게임은 Steam으로), 설정 바꾸기, 폴더 열기, SR 위빙만 제거, 전체 제거를 할 수 있습니다."),
+                Lang.T("  6. [게임 목록]에서 실행(Steam 게임은 Steam으로), 설정 바꾸기, 폴더 열기, SR 위빙만 제거, 3D 픽스 제거를 할 수 있습니다."),
                 Lang.T("  7. [단축키] 탭은 [완료]할 때 함께 저장됩니다. 이미 설정한 게임의 키만 바꾸려면 [설정 바꾸기] 뒤 [현재 게임에 단축키만 적용]."),
                 "",
                 Lang.T("■ 기본 단축키 ([단축키] 탭에서 입력란을 클릭하고 키를 눌러 바꿀 수 있습니다)"),
@@ -2112,12 +2112,12 @@ namespace GeoGamingHub
                 "",
                 Lang.T("■ 제거"),
                 Lang.T("  [SR 위빙만 제거]  dxgi.dll, SRWeave.ini/.log, ShaderFixes\\SRWeave 삭제, ReShade 백업 복원. geo-11은 그대로."),
-                Lang.T("  [전체 제거]       게임 폴더의 Uninstall.bat 실행 (geo-11, ShaderFixes, SRWeave 모두 삭제)."),
-                Lang.T("  OpenGL (OGL3D)   [전체 제거]는 opengl32.dll, OGL3D.ini, OGL3D.log를 지우고, [SR 위빙만 제거]는 OGL3D.ini의 output을 sbs로 바꿉니다."),
+                Lang.T("  [3D 픽스 제거]       게임 폴더의 Uninstall.bat 실행 (geo-11, ShaderFixes, SRWeave 모두 삭제)."),
+                Lang.T("  OpenGL (OGL3D)   [3D 픽스 제거]는 opengl32.dll, OGL3D.ini, OGL3D.log를 지우고, [SR 위빙만 제거]는 OGL3D.ini의 output을 sbs로 바꿉니다."),
                 Lang.T("                   OGL3D 단축키: Ctrl+F3/F4 Separation, Ctrl+F5/F6 Convergence, Ctrl+F2 자동 수렴, Ctrl+F7 저장, Ctrl+F1 값 표시, Ctrl+T 3D, Ctrl+Alt+W 위빙"),
-                Lang.T("  TriDef 3D        [전체 제거]는 이 앱이 만든 TriDef 등록을 지우고, [SR 위빙만 제거]는 SR 위빙 없이 실행하게 바꿉니다. 깊이는 TriDef 단축키로 조절합니다."),
-                Lang.T("  Vulkan (VK3D)    [전체 제거]는 vulkan-1.dll, VK3D.ini, VK3D.log, VK3D_fix(와 DXVK 파일)를 지우고, [SR 위빙만 제거]는 VK3D.ini의 output을 sbs로 바꿉니다. 단축키는 OGL3D와 같습니다."),
-                Lang.T("  DirectX 12 (DX12_3D)  [전체 제거]는 d3d12.dll, DX12_3D.ini, DX12_3D.log, DX12_3D 폴더, 덤프를 지우고, [SR 위빙만 제거]는 DX12_3D.ini의 output을 sbs로 바꿉니다. 단축키는 OGL3D와 같습니다(자동 수렴 Ctrl+F2 제외)."),
+                Lang.T("  TriDef 3D        [3D 픽스 제거]는 이 앱이 만든 TriDef 등록을 지우고, [SR 위빙만 제거]는 SR 위빙 없이 실행하게 바꿉니다. 깊이는 TriDef 단축키로 조절합니다."),
+                Lang.T("  Vulkan (VK3D)    [3D 픽스 제거]는 vulkan-1.dll, VK3D.ini, VK3D.log, VK3D_fix(와 DXVK 파일)를 지우고, [SR 위빙만 제거]는 VK3D.ini의 output을 sbs로 바꿉니다. 단축키는 OGL3D와 같습니다."),
+                Lang.T("  DirectX 12 (DX12_3D)  [3D 픽스 제거]는 d3d12.dll, DX12_3D.ini, DX12_3D.log, DX12_3D 폴더, 덤프를 지우고, [SR 위빙만 제거]는 DX12_3D.ini의 output을 sbs로 바꿉니다. 단축키는 OGL3D와 같습니다(자동 수렴 Ctrl+F2 제외)."),
             });
             t.Controls.Add(tb);
             return t;
@@ -2704,7 +2704,7 @@ namespace GeoGamingHub
                 {
                     // the game's own exe gets modified: ask once more before doing it
                     var ok = MessageBox.Show(this,
-                        Lang.T("4GB 패치는 게임 실행 파일을 직접 수정합니다 (헤더의 LARGE_ADDRESS_AWARE 플래그).\n\n") + gameExe + Lang.T("\n\n원본은 같은 폴더에 <exe>.geo11sr_bak으로 보관되고 [전체 제거]가 되돌립니다. Steam '게임 파일 무결성 확인' 뒤에는 다시 적용해야 합니다.\n\n지금 패치할까요?"),
+                        Lang.T("4GB 패치는 게임 실행 파일을 직접 수정합니다 (헤더의 LARGE_ADDRESS_AWARE 플래그).\n\n") + gameExe + Lang.T("\n\n원본은 같은 폴더에 <exe>.geo11sr_bak으로 보관되고 [3D 픽스 제거]가 되돌립니다. Steam '게임 파일 무결성 확인' 뒤에는 다시 적용해야 합니다.\n\n지금 패치할까요?"),
                         Lang.T("4GB 패치"), MessageBoxButtons.YesNo, MessageBoxIcon.Question);
                     if (ok == DialogResult.Yes && Util.SetLargeAddressAware(gameExe))
                     { Log(Lang.T("  4GB 패치: ") + Path.GetFileName(gameExe) + Lang.T("에 LARGE_ADDRESS_AWARE 설정 (원본 .geo11sr_bak)")); chkLaa.Enabled = false; chkLaa.Checked = false; chkLaa.Text = Lang.T("4GB 패치 - 이미 적용되어 있음"); }
@@ -3022,13 +3022,13 @@ namespace GeoGamingHub
             string trn = TriOf(gameExe);
             if (trn != null)
             {
-                if (MessageBox.Show(this, Lang.T("TriDef 3D 등록을 지웁니다: ") + trn + Lang.T("\n\n게임 폴더는 바뀌지 않습니다. TriDef 3D Ignition에서 직접 추가한 게임이면 등록은 그대로 두고 이 앱의 설정만 지웁니다.\n\n계속할까요?"), Lang.T("전체 제거"), MessageBoxButtons.YesNo, MessageBoxIcon.Warning) != DialogResult.Yes) return;
+                if (MessageBox.Show(this, Lang.T("TriDef 3D 등록을 지웁니다: ") + trn + Lang.T("\n\n게임 폴더는 바뀌지 않습니다. TriDef 3D Ignition에서 직접 추가한 게임이면 등록은 그대로 두고 이 앱의 설정만 지웁니다.\n\n계속할까요?"), Lang.T("3D 픽스 제거"), MessageBoxButtons.YesNo, MessageBoxIcon.Warning) != DialogResult.Yes) return;
                 try
                 {
                     Log("----------------------------------------");
                     Log(Lang.T("TriDef 3D 등록 제거: ") + trn);
                     foreach (var l in TriOps.Unregister(trn)) Log(l);
-                    Status(Lang.T("전체 제거 완료"));
+                    Status(Lang.T("3D 픽스 제거 완료"));
                     RefreshGameList();
                 }
                 catch (Exception ex) { Log(Lang.T("오류: ") + ex.Message); MessageBox.Show(this, ex.Message, Lang.T("오류"), MessageBoxButtons.OK, MessageBoxIcon.Error); }
@@ -3036,13 +3036,13 @@ namespace GeoGamingHub
             }
             if (Dx12Ops.Installed(gameDir))
             {
-                if (MessageBox.Show(this, Lang.T("DX12_3D(DirectX 12)를 제거합니다: d3d12.dll, DX12_3D.ini(저장한 값 포함), DX12_3D.log, DX12_3D 폴더(DXC), 덤프를 지우고 보관해 둔 다른 d3d12.dll이 있으면 되돌립니다.\n\n") + gameDir + Lang.T("\n\n계속할까요?"), Lang.T("전체 제거"), MessageBoxButtons.YesNo, MessageBoxIcon.Warning) != DialogResult.Yes) return;
+                if (MessageBox.Show(this, Lang.T("DX12_3D(DirectX 12)를 제거합니다: d3d12.dll, DX12_3D.ini(저장한 값 포함), DX12_3D.log, DX12_3D 폴더(DXC), 덤프를 지우고 보관해 둔 다른 d3d12.dll이 있으면 되돌립니다.\n\n") + gameDir + Lang.T("\n\n계속할까요?"), Lang.T("3D 픽스 제거"), MessageBoxButtons.YesNo, MessageBoxIcon.Warning) != DialogResult.Yes) return;
                 try
                 {
                     Log("----------------------------------------");
                     Log(Lang.T("DX12_3D 제거: ") + gameDir);
                     foreach (var l in Dx12Ops.Remove(gameDir)) Log(l);
-                    Status(Lang.T("전체 제거 완료"));
+                    Status(Lang.T("3D 픽스 제거 완료"));
                     RefreshGameList();
                 }
                 catch (Exception ex) { Log(Lang.T("오류: ") + ex.Message); MessageBox.Show(this, ex.Message, Lang.T("오류"), MessageBoxButtons.OK, MessageBoxIcon.Error); }
@@ -3050,13 +3050,13 @@ namespace GeoGamingHub
             }
             if (VkOps.Installed(gameDir))
             {
-                if (MessageBox.Show(this, Lang.T("VK3D(Vulkan)를 제거합니다: vulkan-1.dll, VK3D.ini(저장한 값 포함), VK3D.log, VK3D_fix, 프레임 덤프, 그리고 DXVK 파일(d3d9/d3d11/dxgi/d3d10core.dll, 있으면)을 지우고 보관해 둔 원래 DLL이 있으면 되돌립니다.\n\n") + gameDir + Lang.T("\n\n계속할까요?"), Lang.T("전체 제거"), MessageBoxButtons.YesNo, MessageBoxIcon.Warning) != DialogResult.Yes) return;
+                if (MessageBox.Show(this, Lang.T("VK3D(Vulkan)를 제거합니다: vulkan-1.dll, VK3D.ini(저장한 값 포함), VK3D.log, VK3D_fix, 프레임 덤프, 그리고 DXVK 파일(d3d9/d3d11/dxgi/d3d10core.dll, 있으면)을 지우고 보관해 둔 원래 DLL이 있으면 되돌립니다.\n\n") + gameDir + Lang.T("\n\n계속할까요?"), Lang.T("3D 픽스 제거"), MessageBoxButtons.YesNo, MessageBoxIcon.Warning) != DialogResult.Yes) return;
                 try
                 {
                     Log("----------------------------------------");
                     Log(Lang.T("VK3D 제거: ") + gameDir);
                     foreach (var l in VkOps.Remove(gameDir)) Log(l);
-                    Status(Lang.T("전체 제거 완료"));
+                    Status(Lang.T("3D 픽스 제거 완료"));
                     RefreshGameList();
                 }
                 catch (Exception ex) { Log(Lang.T("오류: ") + ex.Message); MessageBox.Show(this, ex.Message, Lang.T("오류"), MessageBoxButtons.OK, MessageBoxIcon.Error); }
@@ -3064,13 +3064,13 @@ namespace GeoGamingHub
             }
             if (GlOps.Installed(gameDir))
             {
-                if (MessageBox.Show(this, Lang.T("OGL3D(OpenGL)를 제거합니다: opengl32.dll, OGL3D.ini(저장한 값 포함), OGL3D.log, 프레임 덤프를 지우고 보관해 둔 다른 opengl32.dll이 있으면 되돌립니다.\n\n") + gameDir + Lang.T("\n\n계속할까요?"), Lang.T("전체 제거"), MessageBoxButtons.YesNo, MessageBoxIcon.Warning) != DialogResult.Yes) return;
+                if (MessageBox.Show(this, Lang.T("OGL3D(OpenGL)를 제거합니다: opengl32.dll, OGL3D.ini(저장한 값 포함), OGL3D.log, 프레임 덤프를 지우고 보관해 둔 다른 opengl32.dll이 있으면 되돌립니다.\n\n") + gameDir + Lang.T("\n\n계속할까요?"), Lang.T("3D 픽스 제거"), MessageBoxButtons.YesNo, MessageBoxIcon.Warning) != DialogResult.Yes) return;
                 try
                 {
                     Log("----------------------------------------");
                     Log(Lang.T("OGL3D 제거: ") + gameDir);
                     foreach (var l in GlOps.Remove(gameDir)) Log(l);
-                    Status(Lang.T("전체 제거 완료"));
+                    Status(Lang.T("3D 픽스 제거 완료"));
                     RefreshGameList();
                 }
                 catch (Exception ex) { Log(Lang.T("오류: ") + ex.Message); MessageBox.Show(this, ex.Message, Lang.T("오류"), MessageBoxButtons.OK, MessageBoxIcon.Error); }
@@ -3078,7 +3078,7 @@ namespace GeoGamingHub
             }
             string un = Path.Combine(gameDir, "Uninstall.bat");
             if (!File.Exists(un)) { Log(Lang.T("Uninstall.bat이 게임 폴더에 없습니다.")); Status(Lang.T("Uninstall.bat 없음")); return; }
-            if (MessageBox.Show(this, Lang.T("게임 폴더의 Uninstall.bat을 실행해 geo-11, ShaderFixes, SRWeave를 모두 지웁니다.\n\n") + gameDir + Lang.T("\n\n계속할까요?"), Lang.T("전체 제거"), MessageBoxButtons.YesNo, MessageBoxIcon.Warning) != DialogResult.Yes) return;
+            if (MessageBox.Show(this, Lang.T("게임 폴더의 Uninstall.bat을 실행해 geo-11, ShaderFixes, SRWeave를 모두 지웁니다.\n\n") + gameDir + Lang.T("\n\n계속할까요?"), Lang.T("3D 픽스 제거"), MessageBoxButtons.YesNo, MessageBoxIcon.Warning) != DialogResult.Yes) return;
             try
             {
                 Log("----------------------------------------");
@@ -3090,7 +3090,7 @@ namespace GeoGamingHub
                 string bak = Path.Combine(gameDir, "dxgi.dll.reshade_bak");
                 if (File.Exists(bak)) { File.Copy(bak, Path.Combine(gameDir, "dxgi.dll"), true); File.Delete(bak); Log(Lang.T("  dxgi.dll.reshade_bak → dxgi.dll 복원")); }
                 Log(Lang.T("Uninstall.bat 실행 완료."));
-                Status(Lang.T("전체 제거 완료"));
+                Status(Lang.T("3D 픽스 제거 완료"));
             }
             catch (Exception ex) { Log(Lang.T("오류: ") + ex.Message); MessageBox.Show(this, ex.Message, Lang.T("오류"), MessageBoxButtons.OK, MessageBoxIcon.Error); }
         }
