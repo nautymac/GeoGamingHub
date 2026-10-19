@@ -41,11 +41,11 @@ PROGRAMS = [("hub", "Geo Gaming Hub", "Geo Gaming Hub"), ("flato3d", "Flato3D (f
 METHOD_TEXT = {
     "unity": ("geo-11 Unity", "geo-11 Unity"), "ue4": ("geo-11 UE4 (UF2)", "geo-11 UE4 (UF2)"), "dx11": ("geo-11 generic (DX11)", "geo-11 일반 (DX11)"),
     "dx9": ("DX9 → dgVoodoo2 + geo-11", "DX9 → dgVoodoo2 + geo-11"), "opengl": ("OpenGL → OGL3D", "OpenGL → OGL3D"), "vulkan": ("Vulkan → VK3D", "Vulkan → VK3D"),
-    "dx12": ("DX12 (not supported yet)", "DX12 (아직 미지원)"), "old": ("DX8 or older", "DX8 이하"), "none": ("no route", "불가"),
-    "unknown": ("unknown", "미확인"), "flato3d": ("Flato3D", "Flato3D"),
+    "dx12": ("DirectX 12 → DX12_3D", "DirectX 12 → DX12_3D"), "tridef": ("TriDef 3D profile", "TriDef 3D 프로필"),
+    "old": ("DX8 or older", "DX8 이하"), "none": ("no route", "불가"), "unknown": ("unknown", "미확인"), "flato3d": ("Flato3D", "Flato3D"),
 }
 # the method a reporter used (the app writes these words) -> method key; first match wins
-USED = [("flato3d", r"flato"), ("vulkan", r"vk3d|vulkan|dxvk"), ("opengl", r"ogl3d|opengl"), ("ue4", r"ue\s*-?\s*4|uf2|unreal"),
+USED = [("flato3d", r"flato"), ("tridef", r"tridef"), ("dx12", r"dx12_?3d|dx\s*12|d3d\s*12|directx\s*12"), ("vulkan", r"vk3d|vulkan|dxvk"), ("opengl", r"ogl3d|opengl"), ("ue4", r"ue\s*-?\s*4|uf2|unreal"),
         ("unity", r"unity"), ("dx9", r"dx\s*9|dgvoodoo|d3d\s*9"), ("dx11", r"dx\s*1[01]|generic|preferred|일반|geo-?11")]
 
 
@@ -235,7 +235,7 @@ def render(games, lang, repo, total):
         if not rows_p:
             continue
         L += ["## " + (pko if ko else pen), ""]
-        order = ["unity", "ue4", "dx11", "dx9", "opengl", "vulkan", "dx12", "old", "none", "unknown"]
+        order = ["unity", "ue4", "dx11", "dx9", "opengl", "vulkan", "dx12", "tridef", "old", "none", "unknown"]
         for m in sorted({g["method"] for g in rows_p}, key=lambda x: order.index(x) if x in order else 99):
             rows = sorted((g for g in rows_p if g["method"] == m), key=lambda g: g["game"].lower())
             if pkey != "flato3d":

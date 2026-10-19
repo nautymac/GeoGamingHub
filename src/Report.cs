@@ -1,10 +1,11 @@
-// Community 3D compatibility reports.
-//   [3D 동작 보고...] opens the GitHub issue form (.github/ISSUE_TEMPLATE/compat_report.yml) in the browser with the
-//   game, engine and a setup summary filled in; the user picks the result and submits. Nothing is sent by the
-//   installer itself, and no folder paths go into the report.
-//   A GitHub Action (.github/workflows/compat-list.yml) turns the reports into COMPATIBILITY(.ko).md, grouped by
-//   engine and then by game, plus compat.json. The installer reads compat.json (cached next to the exe for offline
-//   use) for the game list's [3D 보고] column and disables the report button for games that are already listed.
+// Community 3D reports.
+//   [3D 동작 보고...] opens the GitHub issue form (.github/ISSUE_TEMPLATE/game_report.yml) in the browser with the
+//   game, its PCGamingWiki link, the 3D method used and a setup summary filled in; the user picks the result and
+//   submits. Nothing is sent by the app itself, and no folder paths go into the report.
+//   A GitHub Action (.github/workflows/community-list.yml, .github/scripts/community_list.py) turns the reports into
+//   COMMUNITY(.ko).md plus community.json, reading each game's PCGamingWiki page like the candidate list does. The app
+//   reads community.json (cached next to the exe for offline use) for the game list's [3D 보고] column and disables the
+//   report button for games that already have test reports.
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -24,8 +25,8 @@ namespace GeoGamingHub
     {
         const string Repo = "nautymac/GeoGamingHub";
         public static string FormUrl { get { return Lang.Setting("report", "https://github.com/" + Repo + "/issues/new"); } }
-        public static string ListUrl { get { return Lang.Setting("compat_list", "https://github.com/" + Repo + "/blob/master/" + (Lang.English ? "COMPATIBILITY.md" : "COMPATIBILITY.ko.md")); } }
-        static string JsonUrl { get { return Lang.Setting("compat_json", "https://raw.githubusercontent.com/" + Repo + "/master/compat.json"); } }
+        public static string ListUrl { get { return Lang.Setting("compat_list", "https://github.com/" + Repo + "/blob/main/" + (Lang.English ? "COMMUNITY.md" : "COMMUNITY.ko.md")); } }
+        static string JsonUrl { get { return Lang.Setting("compat_json", "https://raw.githubusercontent.com/" + Repo + "/main/community.json"); } }
 
         public sealed class Entry
         {
@@ -43,7 +44,7 @@ namespace GeoGamingHub
 
         public static void LoadCache(string exeDir)
         {
-            cacheFile = Path.Combine(exeDir, "compat.json");
+            cacheFile = Path.Combine(exeDir, "community.json");
             try { if (File.Exists(cacheFile)) { entries = Parse(File.ReadAllText(cacheFile, Encoding.UTF8)); Loaded = true; } }
             catch { }
         }
@@ -58,7 +59,7 @@ namespace GeoGamingHub
                 {
                     ServicePointManager.SecurityProtocol |= SecurityProtocolType.Tls12;
                     var req = (HttpWebRequest)WebRequest.Create(JsonUrl + "?t=" + DateTime.UtcNow.Ticks);   // skip stale proxies
-                    req.Timeout = 10000; req.ReadWriteTimeout = 10000; req.UserAgent = "geo-11-SR-installer";
+                    req.Timeout = 10000; req.ReadWriteTimeout = 10000; req.UserAgent = "GeoGamingHub";
                     string json;
                     using (var resp = req.GetResponse())
                     using (var sr = new StreamReader(resp.GetResponseStream(), Encoding.UTF8)) json = sr.ReadToEnd();
@@ -80,10 +81,10 @@ namespace GeoGamingHub
             foreach (var o in (ArrayList)games)
             {
                 var g = o as Dictionary<string, object>;
-                if (g == null) continue;
+                if (g == null || Int(g, "works") + Int(g, "issues") + Int(g, "broken") == 0) continue;   // suggestions only: nobody tried it yet
                 list.Add(new Entry
                 {
-                    Engine = Str(g, "engine"), Game = Str(g, "game"), Key = Str(g, "key"), Status = Str(g, "status"),
+                    Engine = Str(g, "method"), Game = Str(g, "game"), Key = Str(g, "key"), Status = Str(g, "status"),
                     Works = Int(g, "works"), Issues = Int(g, "issues"), Broken = Int(g, "broken"),
                     Steam = Arr(g, "steam"), Exe = Arr(g, "exe"),
                 });
@@ -98,21 +99,21 @@ namespace GeoGamingHub
             return g.TryGetValue(k, out v) && v is ArrayList ? ((ArrayList)v).Cast<object>().Select(x => (x ?? "").ToString().ToLowerInvariant()).ToArray() : new string[0];
         }
 
-        // same normalization as compat_list.py game_key()
+        // same normalization as community_list.py game_key()
         public static string Key(string name)
         {
             string n = Regex.Replace((name ?? "").ToLowerInvariant(), "[™®©]", "");
             return Regex.Replace(n, @"[\W_]+", "");
         }
 
-        // the list entry of this game: Steam AppID, then exe name, then game name; the same engine wins a tie
+        // the list entry of this game: Steam AppID, then exe name, then game name; the same 3D method wins a tie
         public static Entry Find(string exe)
         {
             if (string.IsNullOrEmpty(exe) || entries.Count == 0) return null;
             string dir = Path.GetDirectoryName(exe), appId, nm;
             string id = Util.FindSteamApp(dir, out appId, out nm) ? appId : null;
-            string file = Path.GetFileName(exe).ToLowerInvariant(), key = Key(GameName(exe)), eng = File.Exists(exe) ? Engine(exe) : null;
-            Func<IEnumerable<Entry>, Entry> pick = c => c.OrderByDescending(e => e.Engine == eng).FirstOrDefault();
+            string file = Path.GetFileName(exe).ToLowerInvariant(), key = Key(GameName(exe)), used = File.Exists(exe) ? MethodKey(exe) : null;
+            Func<IEnumerable<Entry>, Entry> pick = c => c.OrderByDescending(e => e.Engine == used).FirstOrDefault();
             return (id != null ? pick(entries.Where(e => e.Steam.Contains(id))) : null)
                 ?? pick(entries.Where(e => e.Exe.Contains(file)))
                 ?? pick(entries.Where(e => e.Key.Length > 0 && e.Key == key));
@@ -128,24 +129,68 @@ namespace GeoGamingHub
 
         // ---- a new report ----------------------------------------------------------------------
 
-        // a fix of this app is in the game folder (geo-11, OGL3D or VK3D)
+        // a fix of this app is in the game folder (geo-11, OGL3D, VK3D, DX12_3D) or the game is registered with TriDef 3D
         public static bool Installed(string exe)
         {
             string dir = Path.GetDirectoryName(exe);
-            return (File.Exists(Path.Combine(dir, "d3d11.dll")) && File.Exists(Path.Combine(dir, "d3dxdm.ini"))) || GlOps.Installed(dir) || VkOps.Installed(dir) || TriOps.RegisteredName(exe) != null;
+            return (File.Exists(Path.Combine(dir, "d3d11.dll")) && File.Exists(Path.Combine(dir, "d3dxdm.ini"))) || GlOps.Installed(dir) || VkOps.Installed(dir) ||
+                   Dx12Ops.Installed(dir) || TriOps.RegisteredName(exe) != null;
         }
 
-        // the engine words the list groups by (compat_list.py ENGINES)
+        // the engine / API word of the setup summary
         public static string Engine(string exe)
         {
             string dir = Path.GetDirectoryName(exe);
             if (GlOps.Installed(dir)) return "OpenGL";
             if (VkOps.Installed(dir)) return "Vulkan";
+            if (Dx12Ops.Installed(dir)) return "DX12";
             if (!File.Exists(Path.Combine(dir, "d3d11.dll")) && TriOps.RegisteredName(exe) != null) return "TriDef";
             if (Util.UnityVersion(dir, exe) != null) return "Unity";
             if (Util.IsUe4(exe)) return "UE4";
             if (Dx9Ops.Installed(dir)) return "DX9";
             return "DX11";
+        }
+
+        // the 3D method installed, in community_list.py's method keys
+        public static string MethodKey(string exe)
+        {
+            switch (Engine(exe))
+            {
+                case "OpenGL": return "opengl";
+                case "Vulkan": return "vulkan";
+                case "DX12": return "dx12";
+                case "TriDef": return "tridef";
+                case "Unity": return "unity";
+                case "UE4": return "ue4";
+                case "DX9": return "dx9";
+                default: return "dx11";
+            }
+        }
+
+        // the form's "3D method used" (community_list.py USED reads these words)
+        public static string MethodUsed(string exe)
+        {
+            switch (MethodKey(exe))
+            {
+                case "opengl": return "OGL3D";
+                case "vulkan": return VkOps.DxvkInstalled(Path.GetDirectoryName(exe)) ? "VK3D + DXVK" : "VK3D";
+                case "dx12": return "DX12_3D";
+                case "tridef": return "TriDef 3D";
+                case "unity": return "geo-11 Unity";
+                case "ue4": return "geo-11 UE4 (UF2)";
+                case "dx9": return "DX9 dgVoodoo2 + geo-11";
+                default: return "geo-11 DX11";
+            }
+        }
+
+        // the game's PCGamingWiki page for the form: the Steam AppID (PCGamingWiki resolves it), else the candidate list's page
+        public static string PcgwLink(string exe, IEnumerable<Candidate> candidates)
+        {
+            string dir = Path.GetDirectoryName(exe), appId, nm;
+            if (Util.FindSteamApp(dir, out appId, out nm) && !string.IsNullOrEmpty(appId)) return "https://www.pcgamingwiki.com/api/appid.php?appid=" + appId;
+            string key = Key(GameName(exe));
+            var c = (candidates ?? Enumerable.Empty<Candidate>()).FirstOrDefault(x => !string.IsNullOrEmpty(x.PcgwPage) && Key(x.Title) == key);
+            return c != null ? "https://www.pcgamingwiki.com/wiki/" + Uri.EscapeDataString(c.PcgwPage.Replace(' ', '_')) : "";
         }
 
         // Steam / Heroic name first: the list groups reports by name, and store names are the same for everyone
@@ -187,6 +232,14 @@ namespace GeoGamingHub
                 d.Add("Output: " + (v.Sr ? "SR weaving" : v.Mode));
                 d.Add("Separation / convergence: " + v.Separation.ToString(System.Globalization.CultureInfo.InvariantCulture) + " / " +
                       (v.Auto ? "auto" : v.Convergence.ToString(System.Globalization.CultureInfo.InvariantCulture)));
+            }
+            else if (Dx12Ops.Installed(dir))
+            {
+                var o = Dx12Ops.Read(Path.Combine(dir, Dx12Ops.IniName));
+                d.Add("DX12_3D: " + (Dx12Ops.Version(Path.Combine(dir, Dx12Ops.Dll)) ?? "?"));
+                d.Add("Output: " + (o.Sr ? "SR weaving" : o.Mode));
+                d.Add("Separation / convergence: " + o.Separation.ToString(System.Globalization.CultureInfo.InvariantCulture) + " / " +
+                      o.Convergence.ToString(System.Globalization.CultureInfo.InvariantCulture));
             }
             else if (GlOps.Installed(dir))
             {
@@ -244,13 +297,14 @@ namespace GeoGamingHub
             catch { return null; }
         }
 
-        public static string Url(string exe, string dx9Pkg)
+        public static string Url(string exe, string dx9Pkg, string pcgw)
         {
             string name = GameName(exe);
-            return FormUrl + "?template=compat_report.yml" +
+            return FormUrl + "?template=game_report.yml" +
                    "&title=" + Uri.EscapeDataString("[3D] " + name) +
                    "&game=" + Uri.EscapeDataString(name) +
-                   "&engine=" + Uri.EscapeDataString(Engine(exe)) +
+                   "&pcgw=" + Uri.EscapeDataString(pcgw ?? "") +
+                   "&used=" + Uri.EscapeDataString(MethodUsed(exe)) +
                    "&details=" + Uri.EscapeDataString(Details(exe, dx9Pkg));
         }
     }

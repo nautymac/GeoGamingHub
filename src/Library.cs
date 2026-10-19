@@ -21,7 +21,7 @@ namespace GeoGamingHub
 
     sealed class Candidate
     {
-        public string Title, SteamAppId, Method, Engine, Api, Bits, Status, Note;
+        public string Title, SteamAppId, Method, Engine, Api, Bits, Status, Note, PcgwPage;
         public string Product = "hub";            // hub (geometric stereo), flato3d (flat 2D layers: Flato3D-SR), none (AI 2D->3D only)
         public string FlatoRoute, FlatoStatus;     // Flato3D-SR's route (opengl / wined3d / d3d9 / d3d11 ...) and test status
         public string[] Alts = new string[0];
@@ -108,7 +108,8 @@ namespace GeoGamingHub
                     Title = Str(d, "title"), SteamAppId = Str(d, "steam_appid"), Method = Str(d, "method") ?? "unknown",
                     Alts = Arr(d, "alts"), Engine = string.Join(", ", Arr(d, "engine")), Api = Str(d, "api") ?? "", Bits = Str(d, "bits") ?? "",
                     Status = Str(d, "status") ?? "untested", Note = Str(d, "note") ?? "", Flat2D = Str(d, "flat2d") == "True",
-                    Product = Str(d, "product") ?? "hub", FlatoRoute = Str(d, "flato_route") ?? "", FlatoStatus = Str(d, "flato_status") ?? ""
+                    Product = Str(d, "product") ?? "hub", FlatoRoute = Str(d, "flato_route") ?? "", FlatoStatus = Str(d, "flato_status") ?? "",
+                    PcgwPage = Str(d, "pcgw_page") ?? ""
                 });
             }
             return list;

@@ -1,0 +1,86 @@
+# Rebuilds COMMUNITY.md, COMMUNITY.ko.md and community.json from the "3D report" and "Suggest a game" issues
+# (label: community) whenever one is opened, edited, closed, labelled or deleted. Each report's PCGamingWiki page is
+# read and classified like the app's candidate list (tools/library_survey: pcgw.py + hubclass.py).
+# A deleted issue always triggers a rebuild (its event payload may carry no labels).
+# Moderation: label an issue invalid / duplicate / spam / wontfix, or close it as "not planned", to drop it from the list.
+#
+# Every list run rebuilds from all issues on the newest main, so when reports arrive in a burst GitHub may cancel the
+# waiting runs in between (only one waits per concurrency group); the last run still covers every report.
+# The thank-you comment is its own job outside that group, so it is never cancelled.
+name: Community list
+
+on:
+  issues:
+    types: [opened, edited, closed, reopened, labeled, unlabeled, deleted]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  issues: write
+
+jobs:
+  list:
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      contains(github.event.issue.labels.*.name, 'community') ||
+      github.event.action == 'unlabeled' ||
+      github.event.action == 'deleted'
+    runs-on: ubuntu-latest
+    concurrency:
+      group: community-list
+      cancel-in-progress: false
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: ${{ github.event.repository.default_branch }}
+
+      - name: Build and commit the list
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          branch="${{ github.event.repository.default_branch }}"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          for attempt in 1 2 3 4 5; do
+            # always build on the newest branch head: the generated files are rebuilt, never merged
+            git fetch -q origin "$branch" && git reset -q --hard "origin/$branch"
+            python3 .github/scripts/community_list.py --out .
+            git add COMMUNITY.md COMMUNITY.ko.md community.json
+            if git diff --cached --quiet; then echo "list unchanged"; exit 0; fi
+            git commit -q -m "Update community list"
+            if git push -q origin "HEAD:$branch"; then echo "list updated"; exit 0; fi
+            echo "push rejected (branch moved), retrying"; sleep $((attempt * 3))
+          done
+          exit 1
+
+  thank:
+    if: github.event.action == 'opened' && contains(github.event.issue.labels.*.name, 'community')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Check the report
+        id: check
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
+        run: python3 .github/scripts/community_list.py --check "$ISSUE_NUMBER"
+
+      - name: Thank the reporter
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
+          LISTED: ${{ steps.check.outputs.listed }}
+          WHAT: ${{ steps.check.outputs.what }}
+        run: |
+          base="https://github.com/$GITHUB_REPOSITORY/blob/${{ github.event.repository.default_branch }}"
+          if [ "$LISTED" = "true" ]; then
+            body="Thanks! It goes into the [community list]($base/COMMUNITY.md) as **$WHAT** within a few minutes. If something is wrong, edit this issue and the list follows.
+
+          감사합니다! 몇 분 안에 [커뮤니티 목록]($base/COMMUNITY.ko.md)에 **$WHAT**(으)로 들어갑니다. 틀린 내용이 있으면 이 이슈를 수정하면 목록도 따라 바뀝니다."
+          else
+            body="Thanks! The PCGamingWiki link could not be read, so this is not in the [community list]($base/COMMUNITY.md) yet. Please edit the issue and paste the game's page address from pcgamingwiki.com (or its Steam store link).
+
+          감사합니다! PCGamingWiki 링크를 읽지 못해 아직 [커뮤니티 목록]($base/COMMUNITY.ko.md)에 들어가지 않았습니다. 이슈를 수정해 pcgamingwiki.com의 게임 문서 주소(또는 Steam 상점 주소)를 넣어 주세요."
+          fi
+          gh issue comment "$ISSUE_NUMBER" -R "$GITHUB_REPOSITORY" --body "$body"

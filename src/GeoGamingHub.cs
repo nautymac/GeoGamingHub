@@ -1496,7 +1496,7 @@ namespace GeoGamingHub
             if (ok != DialogResult.OK) return;
             try
             {
-                Process.Start(new ProcessStartInfo(Report.Url(exe, pkgDirs["dx9"])) { UseShellExecute = true });
+                Process.Start(new ProcessStartInfo(Report.Url(exe, pkgDirs["dx9"], Report.PcgwLink(exe, candidates.Count > 0 ? candidates : Library.Load(CandidatesFile())))) { UseShellExecute = true });
                 Log(Lang.T("보고 양식 열기: ") + Report.GameName(exe) + " (" + Report.Engine(exe) + ")");
                 Status(Lang.T("브라우저에서 결과를 고르고 제출하세요: ") + Report.GameName(exe));
             }

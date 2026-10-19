@@ -29,7 +29,7 @@ body:
     attributes:
       label: Program / 담당
       options:
-        - Geo Gaming Hub (geo-11, OGL3D, VK3D)
+        - Geo Gaming Hub (geo-11, OGL3D, VK3D, DX12_3D, TriDef 3D)
         - Flato3D (flat 2D games / 평면 2D 게임)
       default: 0
     validations:
@@ -38,7 +38,7 @@ body:
     id: used
     attributes:
       label: 3D method used / 사용한 3D 방식
-      description: "Filled in by the app, e.g. geo-11 Unity, geo-11 UE4, geo-11 DX11, DX9 dgVoodoo, OGL3D, VK3D, VK3D + DXVK, Flato3D"
+      description: "Filled in by the app, e.g. geo-11 Unity, geo-11 UE4, geo-11 DX11, DX9 dgVoodoo, OGL3D, VK3D, VK3D + DXVK, DX12_3D, TriDef 3D, Flato3D"
   - type: dropdown
     id: result
     attributes:

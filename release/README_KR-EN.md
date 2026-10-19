@@ -124,8 +124,11 @@ hand is at your own account risk.
   The **DXVK route** is experimental; games that work with geo-11 are better on geo-11.
 - 제3자 DLL을 막는 게임에서는 어느 방식도 로드되지 않습니다.
   Games that block third-party DLLs load none of these methods.
-- **[3D 동작 보고...]**와 **호환 게임 목록** 링크는 아직 연결되지 않았습니다(공개 저장소 준비 중).
-  **[Report 3D...]** and the **Compatibility list** link are not live yet (the public repository is not set up).
+- **[3D 동작 보고...]**는 GitHub 보고 양식(게임, PCGamingWiki 링크, 3D 방식, 설정이 채워짐)을 열고, **호환 게임 목록**은 보고로
+  자동으로 만들어지는 커뮤니티 목록을 엽니다. 저장소(nautymac/GeoGamingHub)가 아직 비공개라 지금은 저장소 권한이 있는 사람만 쓸 수 있습니다.
+  **[Report 3D...]** opens the GitHub report form (game, PCGamingWiki link, 3D method and setup filled in) and the
+  **Compatibility list** link opens the community list built from the reports. The repository (nautymac/GeoGamingHub) is
+  still private, so for now only people with access to it can use them.
 
 ## 문제 해결 / Troubleshooting
 
