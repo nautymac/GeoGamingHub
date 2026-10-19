@@ -473,6 +473,13 @@ static partial class HubTest
         foreach (ListViewItem it in lv.Items) it.Selected = string.Equals((string)it.Tag, ba, StringComparison.OrdinalIgnoreCase);
         Pump();
         Eq(C<Button>(form, "bLogGame").Text, "OGL3D.log", "log button names OGL3D.log for the OpenGL game");
+        var accent = (System.Drawing.Color)Ty("Theme").GetField("Accent").GetValue(null);
+        Ok(C<Button>(form, "btnLaunch").BackColor == accent, "set-up game selected: [실행] in the accent colour");
+        foreach (ListViewItem it in lv.Items) it.Selected = false;
+        Pump();
+        Ok(C<Button>(form, "btnLaunch").BackColor != accent, "nothing selected: [실행] plain");
+        foreach (ListViewItem it in lv.Items) it.Selected = string.Equals((string)it.Tag, ba, StringComparison.OrdinalIgnoreCase);
+        Pump();
         Call(form, "ApplyHotkeysOnly");
         Ok(!File.Exists(Path.Combine(baDir, "d3dxdm.ini")) && !File.Exists(Path.Combine(baDir, "d3dx.ini")) && !Directory.Exists(Path.Combine(baDir, "ShaderFixesDM")) && !File.Exists(Path.Combine(baDir, "SRWeave.ini")), "hotkeys-only writes nothing into an OpenGL game");
         Call(form, "RemoveSr");

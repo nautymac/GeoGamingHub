@@ -137,8 +137,15 @@ namespace GeoGamingHub
 
         static void StyleButton(Button b)
         {
-            bool primary = Same(b.BackColor, 0, 120, 212) || b.BackColor == Accent;
+            SetPrimary(b, Same(b.BackColor, 0, 120, 212) || b.BackColor == Accent);
+            if (rounded.Add(b)) RoundButton(b);
+        }
+
+        // accent (primary) or plain colours; also used to make a button stand out while it is the thing to press
+        public static void SetPrimary(Button b, bool primary)
+        {
             b.FlatStyle = FlatStyle.Flat; b.UseVisualStyleBackColor = false; b.FlatAppearance.BorderSize = 1;
+            if (b.Font.Bold != primary) b.Font = new Font(b.Font, primary ? FontStyle.Bold : FontStyle.Regular);
             if (primary)
             {
                 b.BackColor = Accent; b.ForeColor = OnAccent; b.FlatAppearance.BorderColor = Accent;
@@ -149,7 +156,7 @@ namespace GeoGamingHub
                 b.BackColor = Btn; b.ForeColor = Text; b.FlatAppearance.BorderColor = BtnBorder;
                 b.FlatAppearance.MouseOverBackColor = BtnHover; b.FlatAppearance.MouseDownBackColor = BtnDown;
             }
-            if (rounded.Add(b)) RoundButton(b);
+            b.Invalidate();
         }
 
         // rounded corners: the button is painted over (corners in the parent's colour, rounded fill + border, centred text)

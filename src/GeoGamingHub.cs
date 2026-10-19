@@ -694,6 +694,8 @@ namespace GeoGamingHub
         RadioButton rbKindGl;   // OpenGL games: OGL3D (opengl32.dll proxy that weaves by itself, no geo-11)
         Button bLogGame;        // SRWeave.log / OGL3D.log of the selected game
         Button btnReport;       // [3D 동작 보고...]: off for games already in the community list
+        Button btnLaunch;       // [실행]: accent colour while a game set up completely ('설정 완료') is selected
+        readonly HashSet<string> completeGames = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
         Label lblGlInstall; FlowLayoutPanel pnlScope;   // install step: OGL3D note / geo-11 install scope (hidden for OpenGL)
         Label lblSrHead; FlowLayoutPanel pnlGeoMode, pnlGlMode; ComboBox cbGlMode; Label lblGlModeNote;   // display step: direct_mode (geo-11) / output (OGL3D)
         readonly List<Control> geoUpscaleControls = new List<Control>(); TableLayoutPanel gridUpAdv; CheckBox chkUpAdv; Label lblUpNoteGl;
@@ -1089,7 +1091,7 @@ namespace GeoGamingHub
             var row2 = new FlowLayoutPanel { AutoSize = true, FlowDirection = FlowDirection.LeftToRight, WrapContents = true, Margin = P(0, 6, 0, 0), Padding = new Padding(0) };
             var bAdd = MakeButton(Lang.T("게임 추가 (설정 시작)"), 170, true); bAdd.Click += (s, e) => AddGameDialog();
             var bEdit = MakeButton(Lang.T("설정 바꾸기"), 110, false); bEdit.Click += (s, e) => EditSelected();
-            var bLaunch = MakeButton(Lang.T("실행"), 90, false); bLaunch.Click += (s, e) => LaunchSelected();
+            var bLaunch = btnLaunch = MakeButton(Lang.T("실행"), 90, false); bLaunch.Click += (s, e) => LaunchSelected();
             var bOpen = MakeButton(Lang.T("폴더 열기"), 100, false); bOpen.Click += (s, e) => { var g = SelectedGame(); if (g != null) Process.Start("explorer.exe", "\"" + Path.GetDirectoryName(g) + "\""); };
             var bRefresh = MakeButton(Lang.T("새로 고침"), 100, false); bRefresh.Click += (s, e) => { RefreshGameList(); FetchCommunity(); };
             var bRemove = MakeButton(Lang.T("목록에서 빼기"), 120, false); bRemove.Click += (s, e) => RemoveSelected();
@@ -1352,6 +1354,7 @@ namespace GeoGamingHub
         {
             lvGames.BeginUpdate();
             lvGames.Items.Clear();
+            completeGames.Clear();
             imgGames.Images.Clear();
             foreach (var rec in games)
             {
@@ -1429,6 +1432,7 @@ namespace GeoGamingHub
                 if (hasTri) { up = "-"; sep = conv = "TriDef"; }
                 bool installed = hasGeo || hasGl || hasVk || hasDx12 || hasTri;
                 bool complete = rec.Done && installed;
+                if (complete && exists) completeGames.Add(exe);
                 string state = !exists ? Lang.T("파일 없음") : complete ? Lang.T("설정 완료") : Lang.T("재설정 필요");
                 it.SubItems.Add(state).ForeColor = complete ? Color.FromArgb(16, 124, 16) : Color.FromArgb(200, 90, 0);
                 var ce = exists ? Report.Find(exe) : null;
@@ -1476,6 +1480,7 @@ namespace GeoGamingHub
             if (btnReport == null) return;
             string exe = lvGames.SelectedItems.Count > 0 ? (string)lvGames.SelectedItems[0].Tag : null;
             btnReport.Enabled = exe == null || !File.Exists(exe) || Report.Find(exe) == null;
+            if (btnLaunch != null) Theme.SetPrimary(btnLaunch, exe != null && completeGames.Contains(exe));   // ready to play: [실행] stands out
         }
 
         void ReportSelected()
