@@ -530,6 +530,27 @@ namespace GeoGamingHub
             return project != null ? Path.GetFileName(project) : null;
         }
 
+        // SRWeave's dxgi.dll of any build: the package's own file, or the marker every SRWeave build carries (its log
+        // header). An older SRWeave in a game folder is ours to replace or remove, not a ReShade dxgi.dll to back up.
+        public static bool IsSrWeave(string file, string ourDll)
+        {
+            if (!File.Exists(file)) return false;
+            if (SameFile(file, ourDll)) return true;
+            try
+            {
+                byte[] b = File.ReadAllBytes(file), m = Encoding.ASCII.GetBytes("SRWeave geo-11 (dxgi.dll proxy)");
+                for (int i = 0; i + m.Length <= b.Length; i++)
+                {
+                    if (b[i] != m[0]) continue;
+                    int k = 1;
+                    while (k < m.Length && b[i + k] == m[k]) k++;
+                    if (k == m.Length) return true;
+                }
+            }
+            catch { }
+            return false;
+        }
+
         public static bool SameFile(string a, string b)
         {
             if (!File.Exists(a) || !File.Exists(b)) return false;
@@ -2368,7 +2389,7 @@ namespace GeoGamingHub
             }
             string dx = Path.Combine(gameDir, "dxgi.dll");
             if (File.Exists(dx))
-                notes.Add(Util.SameFile(dx, Path.Combine(SrcDir(), "dxgi.dll")) ? Lang.T("SRWeave dxgi.dll 이미 설치됨") : Lang.T("다른 dxgi.dll(ReShade?) 있음 → 설치 시 dxgi.dll.reshade_bak으로 백업"));
+                notes.Add(Util.IsSrWeave(dx, Path.Combine(SrcDir(), "dxgi.dll")) ? Lang.T("SRWeave dxgi.dll 이미 설치됨") : Lang.T("다른 dxgi.dll(ReShade?) 있음 → 설치 시 dxgi.dll.reshade_bak으로 백업"));
             if (tri) LoadTri();
             if (dx12)
             {
@@ -2588,7 +2609,7 @@ namespace GeoGamingHub
         void BackupReshade(string dir, string ourDll)
         {
             string dx = Path.Combine(dir, "dxgi.dll");
-            if (!File.Exists(dx) || Util.SameFile(dx, ourDll)) return;
+            if (!File.Exists(dx) || Util.IsSrWeave(dx, ourDll)) return;
             string bak = Path.Combine(dir, "dxgi.dll.reshade_bak");
             if (File.Exists(bak)) { File.Delete(dx); Log(Lang.T("  기존 dxgi.dll 삭제 (dxgi.dll.reshade_bak이 이미 있음)")); }
             else { File.Move(dx, bak); Log(Lang.T("  기존 dxgi.dll(ReShade?) → dxgi.dll.reshade_bak")); }
@@ -2649,7 +2670,7 @@ namespace GeoGamingHub
         void RemoveSrFiles(string dir, string ourDll, bool restore)
         {
             string dx = Path.Combine(dir, "dxgi.dll");
-            if (Util.SameFile(dx, ourDll)) { File.Delete(dx); Log(Lang.T("  SRWeave dxgi.dll 삭제")); }
+            if (Util.IsSrWeave(dx, ourDll)) { File.Delete(dx); Log(Lang.T("  SRWeave dxgi.dll 삭제")); }
             foreach (var n in new[] { "SRWeave.ini", "SRWeave.log" }) { string p = Path.Combine(dir, n); if (File.Exists(p)) { File.Delete(p); Log("  " + n + Lang.T(" 삭제")); } }
             string sd = Path.Combine(dir, "ShaderFixes", "SRWeave");
             if (Directory.Exists(sd)) { Directory.Delete(sd, true); Log(Lang.T("  ShaderFixes\\SRWeave 삭제")); }

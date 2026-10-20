@@ -172,6 +172,13 @@ static partial class HubTest
         string runOut = (string)S("Util", "RunHidden", "cmd.exe", "/c \"" + Path.Combine(longDir, "Uninstall.bat") + "\"", longDir);
         Ok(sw.ElapsedMilliseconds < 30000 && File.Exists(Path.Combine(longDir, "finished.txt")), "RunHidden: noisy batch file finishes (" + sw.ElapsedMilliseconds + " ms, " + runOut.Length + " chars of output)");
 
+        // an older SRWeave build still counts as SRWeave (not a ReShade dxgi.dll to back up)
+        string fakePkg = Path.Combine(outDir, "pkg_dxgi.dll"), oldSr = Path.Combine(outDir, "old_srweave.dll"), reshade = Path.Combine(outDir, "reshade_dxgi.dll");
+        File.WriteAllBytes(fakePkg, new byte[] { 1, 2, 3 });
+        File.WriteAllBytes(oldSr, Encoding.ASCII.GetBytes("MZ....=== SRWeave geo-11 (dxgi.dll proxy) in %ls (pid %lu) ===...."));
+        File.WriteAllBytes(reshade, Encoding.ASCII.GetBytes("MZ....ReShade 6.0...."));
+        Ok((bool)S("Util", "IsSrWeave", oldSr, fakePkg) && (bool)S("Util", "IsSrWeave", fakePkg, fakePkg) && !(bool)S("Util", "IsSrWeave", reshade, fakePkg), "IsSrWeave: older SRWeave yes, package file yes, ReShade no");
+
         // detection on the installed games (read-only)
         foreach (var e in new[] { Curse, Amnesia, BrokenAge, Dd64, Dd32 })
         {
