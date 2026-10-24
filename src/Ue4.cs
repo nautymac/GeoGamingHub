@@ -200,7 +200,7 @@ namespace GeoGamingHub
         {
             this.gameDir = gameDir; this.exe = exe; this.log = log; this.dpi = dpi;
             Text = Lang.T("UE4 설정 (Universal Fix 2)") + " - " + Path.GetFileName(exe);
-            Font = new Font("Malgun Gothic", 10f);
+            Font = new Font(Lang.Face, 10f);
             BackColor = Color.White;
             FormBorderStyle = FormBorderStyle.FixedDialog; MaximizeBox = false; MinimizeBox = false;
             StartPosition = FormStartPosition.CenterParent;
@@ -224,7 +224,7 @@ namespace GeoGamingHub
             Controls.Add(col);
             col.BringToFront();
             Color accent = Color.FromArgb(0, 90, 170), muted = Color.FromArgb(110, 110, 110);
-            Func<string, Label> head = t => new Label { Text = t, AutoSize = true, ForeColor = accent, Font = new Font("Malgun Gothic", 10.5f, FontStyle.Bold), Margin = P(0, 10, 0, 4) };
+            Func<string, Label> head = t => new Label { Text = t, AutoSize = true, ForeColor = accent, Font = new Font(Lang.Face, 10.5f, FontStyle.Bold), Margin = P(0, 10, 0, 4) };
             Func<string, Label> note = t => new Label { Text = t, AutoSize = true, ForeColor = muted, Margin = P(0, 2, 0, 6), MaximumSize = new Size(S(590), 0) };
 
             // AA/AO

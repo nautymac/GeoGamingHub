@@ -783,7 +783,7 @@ namespace GeoGamingHub
 
             Text = AppName;
             try { Icon = Icon.ExtractAssociatedIcon(Application.ExecutablePath); } catch { }   // the exe's own icon (src\app.ico) in the title bar / taskbar
-            Font = new Font("Malgun Gothic", 10f);
+            Font = new Font(Lang.Face, 10f);
             // The exe is DPI-aware (manifest). Fonts scale by themselves (points); every pixel size below goes
             // through S() so the layout grows with the screen's scaling factor. WinForms' own AutoScale is off.
             AutoScaleMode = AutoScaleMode.None;
@@ -919,6 +919,7 @@ namespace GeoGamingHub
             keyBoxes.Clear();
             wizardActive = false;
             Text = AppName;
+            Font = new Font(Lang.Face, 10f);
             BuildLayout();
             ApplyTheme();
             txtLog.Text = logText;
@@ -1050,7 +1051,7 @@ namespace GeoGamingHub
         }
         Label Head(string text)
         {
-            return new Label { Text = text, AutoSize = true, ForeColor = AccentDark, Font = new Font("Malgun Gothic", 10.5f, FontStyle.Bold), Margin = P(0, 12, 0, 6) };
+            return new Label { Text = text, AutoSize = true, ForeColor = AccentDark, Font = new Font(Lang.Face, 10.5f, FontStyle.Bold), Margin = P(0, 12, 0, 6) };
         }
         Label Note(string text)
         {
@@ -2094,7 +2095,7 @@ namespace GeoGamingHub
         TabPage BuildHelpTab()
         {
             var t = NewTab(Lang.T("안내"));
-            var tb = new TextBox { Dock = DockStyle.Fill, Multiline = true, ReadOnly = true, ScrollBars = ScrollBars.Vertical, BackColor = Color.White, ForeColor = TextMain, BorderStyle = BorderStyle.None, Font = new Font("Malgun Gothic", 9.75f), WordWrap = true };
+            var tb = new TextBox { Dock = DockStyle.Fill, Multiline = true, ReadOnly = true, ScrollBars = ScrollBars.Vertical, BackColor = Color.White, ForeColor = TextMain, BorderStyle = BorderStyle.None, Font = new Font(Lang.Face, 9.75f), WordWrap = true };
             tb.Text = string.Join(Environment.NewLine, new[] {
                 Lang.T("■ 사용 순서"),
                 Lang.T("  1. [게임 목록] 탭에서 [게임 추가 (설정 시작)]을 누르고 게임 실행 파일을 고릅니다. 목록에 '재설정 필요'로 올라가고 1단계로 넘어갑니다."),

@@ -5,7 +5,7 @@
 PC 게임에 입체 3D를 설치하는 통합 앱입니다. 게임 실행 파일을 고르면 맞는 3D 방식을 골라 게임 폴더에 넣고 설정합니다.
 SR 디스플레이(Acer SpatialLabs / Leia SR)에서는 SR 위빙, 3D TV나 그 밖의 모니터에서는 Side-by-Side / Top-and-Bottom으로 출력합니다.
 
-![Geo Gaming Hub](docs/screenshot.png)
+![Geo Gaming Hub](docs/screenshot.ko.png)
 
 | 게임 | 방식 |
 |---|---|

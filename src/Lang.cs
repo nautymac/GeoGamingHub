@@ -13,6 +13,9 @@ namespace GeoGamingHub
     static class Lang
     {
         public static bool English;
+        // UI font: Malgun Gothic draws "\" as "₩", which only Korean readers expect in a path. Segoe UI still
+        // shows Hangul (game names, "한국어") through Windows font linking.
+        public static string Face { get { return English ? "Segoe UI" : "Malgun Gothic"; } }
         static string settingsFile;
         // other "key=value" lines of settings.ini (helixmod=, discord=: the community links in the status bar)
         static readonly Dictionary<string, string> settings = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
