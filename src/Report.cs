@@ -1,5 +1,6 @@
 // Community 3D reports.
-//   [3D 동작 보고...] opens the GitHub issue form (.github/ISSUE_TEMPLATE/game_report.yml) in the browser with the
+//   [3D 동작 보고...] opens the GitHub issue form in the app's language (.github/ISSUE_TEMPLATE/game_report.yml English,
+//   game_report.ko.yml Korean; same field ids, and community_list.py reads both) in the browser with the
 //   game, its PCGamingWiki link, the 3D method used and a setup summary filled in; the user picks the result and
 //   submits. Nothing is sent by the app itself, and no folder paths go into the report.
 //   A GitHub Action (.github/workflows/community-list.yml, .github/scripts/community_list.py) turns the reports into
@@ -300,7 +301,7 @@ namespace GeoGamingHub
         public static string Url(string exe, string dx9Pkg, string pcgw)
         {
             string name = GameName(exe);
-            return FormUrl + "?template=game_report.yml" +
+            return FormUrl + "?template=" + (Lang.English ? "game_report.yml" : "game_report.ko.yml") +
                    "&title=" + Uri.EscapeDataString("[3D] " + name) +
                    "&game=" + Uri.EscapeDataString(name) +
                    "&pcgw=" + Uri.EscapeDataString(pcgw ?? "") +

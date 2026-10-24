@@ -1,0 +1,60 @@
+name: 3D 동작 보고
+description: 게임이 Geo Gaming Hub나 Flato3D로 3D가 어떻게 되는지 알려 주세요
+title: "[3D] "
+labels: ["community", "report"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        앱의 **[3D 동작 보고...]** 버튼을 누르면 게임, PCGamingWiki 링크, 3D 방식, 설정이 채워집니다. 결과를 고르고 제출하세요. 엔진과 그래픽 API는 앱의 후보 목록과 같은 방식으로 PCGamingWiki 문서에서 읽고, 1~2분 안에 [커뮤니티 목록](https://github.com/nautymac/GeoGamingHub/blob/main/COMMUNITY.ko.md)에 들어갑니다. (English form: 3D report)
+  - type: input
+    id: game
+    attributes:
+      label: 게임
+      description: 가능하면 Steam에 표시되는 이름
+    validations:
+      required: true
+  - type: input
+    id: pcgw
+    attributes:
+      label: PCGamingWiki 링크
+      description: "pcgamingwiki.com에서 게임 문서 주소를 복사해 넣으세요 (Steam 상점 주소도 됩니다)"
+      placeholder: https://www.pcgamingwiki.com/wiki/Quake_II_RTX
+    validations:
+      required: true
+  - type: dropdown
+    id: program
+    attributes:
+      label: 담당
+      options:
+        - Geo Gaming Hub (geo-11, OGL3D, VK3D, DX12_3D, TriDef 3D)
+        - Flato3D (평면 2D 게임)
+      default: 0
+    validations:
+      required: true
+  - type: input
+    id: used
+    attributes:
+      label: 사용한 3D 방식
+      description: "앱이 채웁니다. 예: geo-11 Unity, geo-11 UE4, geo-11 DX11, DX9 dgVoodoo, OGL3D, VK3D, VK3D + DXVK, DX12_3D, TriDef 3D, Flato3D"
+  - type: dropdown
+    id: result
+    attributes:
+      label: 결과
+      options:
+        - 잘 됨
+        - 문제 있음
+        - 안 됨
+    validations:
+      required: true
+  - type: textarea
+    id: details
+    attributes:
+      label: 설정 정보
+      description: 앱이 채웁니다. 직접 쓸 때는 32/64비트와 버전을 적어 주세요.
+      render: text
+  - type: textarea
+    id: notes
+    attributes:
+      label: 메모
+      description: 잘 맞은 설정값, 알려진 문제, GPU, 디스플레이 등.

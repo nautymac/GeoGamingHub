@@ -72,15 +72,19 @@ jobs:
           ISSUE_NUMBER: ${{ github.event.issue.number }}
           LISTED: ${{ steps.check.outputs.listed }}
           WHAT: ${{ steps.check.outputs.what }}
+          BODY: ${{ github.event.issue.body }}
         run: |
           base="https://github.com/$GITHUB_REPOSITORY/blob/${{ github.event.repository.default_branch }}"
-          if [ "$LISTED" = "true" ]; then
-            body="Thanks! It goes into the [community list]($base/COMMUNITY.md) as **$WHAT** within a few minutes. If something is wrong, edit this issue and the list follows.
-
-          감사합니다! 몇 분 안에 [커뮤니티 목록]($base/COMMUNITY.ko.md)에 **$WHAT**(으)로 들어갑니다. 틀린 내용이 있으면 이 이슈를 수정하면 목록도 따라 바뀝니다."
+          # answer in the language of the form that was used (the Korean forms have "### 게임")
+          if printf '%s\n' "$BODY" | grep -q '^### 게임'; then
+            if [ "$LISTED" = "true" ]; then
+              body="감사합니다! 몇 분 안에 [커뮤니티 목록]($base/COMMUNITY.ko.md)에 **$WHAT**(으)로 들어갑니다. 틀린 내용이 있으면 이 이슈를 수정하면 목록도 따라 바뀝니다."
+            else
+              body="감사합니다! PCGamingWiki 링크를 읽지 못해 아직 [커뮤니티 목록]($base/COMMUNITY.ko.md)에 들어가지 않았습니다. 이슈를 수정해 pcgamingwiki.com의 게임 문서 주소(또는 Steam 상점 주소)를 넣어 주세요."
+            fi
+          elif [ "$LISTED" = "true" ]; then
+            body="Thanks! It goes into the [community list]($base/COMMUNITY.md) as **$WHAT** within a few minutes. If something is wrong, edit this issue and the list follows."
           else
-            body="Thanks! The PCGamingWiki link could not be read, so this is not in the [community list]($base/COMMUNITY.md) yet. Please edit the issue and paste the game's page address from pcgamingwiki.com (or its Steam store link).
-
-          감사합니다! PCGamingWiki 링크를 읽지 못해 아직 [커뮤니티 목록]($base/COMMUNITY.ko.md)에 들어가지 않았습니다. 이슈를 수정해 pcgamingwiki.com의 게임 문서 주소(또는 Steam 상점 주소)를 넣어 주세요."
+            body="Thanks! The PCGamingWiki link could not be read, so this is not in the [community list]($base/COMMUNITY.md) yet. Please edit the issue and paste the game's page address from pcgamingwiki.com (or its Steam store link)."
           fi
           gh issue comment "$ISSUE_NUMBER" -R "$GITHUB_REPOSITORY" --body "$body"

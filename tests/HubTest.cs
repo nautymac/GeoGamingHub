@@ -495,7 +495,7 @@ static partial class HubTest
         Eq(C<Button>(form, "bLogGame").Text, "OGL3D.log", "log button names OGL3D.log for the OpenGL game");
         // community report: the hub's form on main, with the method used and the PCGamingWiki link filled in
         string rurl = (string)S("Report", "Url", ba, Path.Combine(outDir, "nodx9"), "https://www.pcgamingwiki.com/api/appid.php?appid=1");
-        Ok(rurl.StartsWith("https://github.com/nautymac/GeoGamingHub/issues/new?template=game_report.yml") && rurl.Contains("&used=OGL3D&") && rurl.Contains("&pcgw=https%3A%2F%2Fwww.pcgamingwiki.com"), "report form URL: " + rurl.Substring(0, Math.Min(140, rurl.Length)));
+        Ok(rurl.StartsWith("https://github.com/nautymac/GeoGamingHub/issues/new?template=game_report.ko.yml") && rurl.Contains("&used=OGL3D&") && rurl.Contains("&pcgw=https%3A%2F%2Fwww.pcgamingwiki.com"), "report form URL: " + rurl.Substring(0, Math.Min(140, rurl.Length)));
         Ok(((string)Ty("Report").GetProperty("ListUrl").GetValue(null)).EndsWith("/blob/main/COMMUNITY.ko.md"), "community list link on main");
         var parsed = (System.Collections.ICollection)S("Report", "Parse", "{\"version\":1,\"games\":[{\"game\":\"Quake II RTX\",\"key\":\"quakeiirtx\",\"method\":\"vulkan\",\"status\":\"works\",\"works\":1,\"issues\":0,\"broken\":0,\"steam\":[\"1089130\"]},{\"game\":\"Torchlight\",\"key\":\"torchlight\",\"method\":\"dx9\",\"status\":\"untested\",\"works\":0,\"issues\":0,\"broken\":0,\"steam\":[\"41500\"]}]}");
         Eq(parsed.Count, 1, "community.json: tested games read, suggestions left out");
@@ -588,6 +588,7 @@ static partial class HubTest
         Ty("Lang").GetField("English").SetValue(null, true);
         Call(form, "RebuildUi");
         Pump();
+        Ok(((string)S("Report", "Url", ba, Path.Combine(outDir, "nodx9"), "")).Contains("?template=game_report.yml&"), "English UI -> English report form");
         Eq(C<System.Collections.ICollection>(form, "geoUpscaleControls").Count, 4, "rebuild: upscale control list not duplicated");
         Eq(C<System.Collections.ICollection>(form, "geoStereoNotes").Count, 2, "rebuild: stereo note list not duplicated");
         tabs = C<TabControl>(form, "tabs");   // new controls after the rebuild
