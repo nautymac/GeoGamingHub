@@ -740,7 +740,8 @@ namespace GeoGamingHub
         bool vkDxvkPossible;   // the selected exe is a 64-bit DX9 / DX11 game (the DXVK route of the Vulkan kind)
         CheckBox chkLaa; Label lblLaa;   // 4GB patch for 32-bit exes without LARGE_ADDRESS_AWARE (DX9 kind, optional)
         Label lblEngine, lblUnityVer; FlowLayoutPanel rowEngine, rowUnityVer;
-        Panel pnlUe4; CheckBox chkEngineIni; Button btnUe4Tool;
+        Panel pnlUe4; CheckBox chkEngineIni; Button btnUe4Tool; Label lblUe4Dlss;
+        bool ue4Dlss;   // the selected exe is a UE4 game that ships DLSS
         ComboBox cbUnityVer; Label lblUnityDetected;
         CheckBox chkSr, chkSwap, chkLens; ComboBox cbMode; Label lblModeNote;
         CheckBox chkUpscale; ComboBox cbUpscaleFs, cbUpscaleMode; NumericUpDown numUpW, numUpH; Label lblUpNote;
@@ -1815,7 +1816,11 @@ namespace GeoGamingHub
             pnlUe4 = new Panel { AutoSize = true, AutoSizeMode = AutoSizeMode.GrowAndShrink, Margin = new Padding(0), Padding = new Padding(0), Visible = false };
             var ue4Col = new FlowLayoutPanel { AutoSize = true, FlowDirection = FlowDirection.TopDown, WrapContents = false, Margin = new Padding(0), Padding = new Padding(0) };
             ue4Col.Controls.Add(Head(Lang.T("Unreal Engine 4 추가 설정 (Universal Fix 2)")));
-            chkEngineIni = Check(Lang.T("AA/AO 개선 설치 (모션 블러·비네트·렌즈 플레어 끄기, 게임 AA 설정은 그대로)"), true, 0);
+            // only for a game with DLSS (DetectGame); the game is still 2D here, so DLSS can be turned off before [완료]
+            lblUe4Dlss = new Label { AutoSize = true, ForeColor = Color.FromArgb(196, 43, 28), Font = new Font(Font, FontStyle.Bold), Margin = P(0, 2, 0, 8), MaximumSize = Sz(1040, 0), Visible = false,
+                Text = Lang.T("주의: 이 게임에는 DLSS가 있습니다. geo-11에서 DLSS를 켜면 게임이 GPU 오류(0x887A0006 HUNG)로 꺼질 수 있습니다. [완료] 때 게임 설정에서 DLSS가 켜져 있으면 끌지 묻습니다. 설정을 찾지 못하는 게임도 있으니 3D로 실행하기 전에 게임 옵션도 확인하세요.") };
+            ue4Col.Controls.Add(lblUe4Dlss);
+            chkEngineIni =Check(Lang.T("AA/AO 개선 설치 (모션 블러·비네트·렌즈 플레어 끄기, 게임 AA 설정은 그대로)"), true, 0);
             ue4Col.Controls.Add(chkEngineIni);
             ue4Col.Controls.Add(Note(Lang.T("게임의 설정 폴더(%LOCALAPPDATA%\\<프로젝트>\\Saved\\Config\\WindowsNoEditor)의 Engine.ini와 Scalability.ini 끝에 패키지의 권장 설정을 붙이고 원본은 *_backup.ini로 보관합니다. 게임을 한 번도 실행하지 않아 그 폴더가 없으면 건너뛰고 로그에 남깁니다.")));
             btnUe4Tool = MakeButton(Lang.T("UE4 설정... (AA/AO, 전체화면, VSync, HUD 프로필)"), 260, false); btnUe4Tool.Height = S(32); btnUe4Tool.Margin = P(0, 4, 0, 0);
@@ -2165,7 +2170,7 @@ namespace GeoGamingHub
             if (IsUe4Selected && !tri) { rb64.Checked = true; rb32.Enabled = false; rb64.Enabled = true; }   // UF2 is 64-bit only
             else if (w || tri) { rb32.Enabled = rb64.Enabled = false; }   // OGL3D / VK3D: the DLL must match the exe's bitness (read from the exe)
             else { rb32.Enabled = rb64.Enabled = true; }
-            if (pnlUe4 != null) pnlUe4.Visible = IsUe4Selected && !w && !tri;
+            if (pnlUe4 != null) { pnlUe4.Visible = IsUe4Selected && !w && !tri; lblUe4Dlss.Visible = ue4Dlss; }
             // the engine / Unity-version rows belong to the geo-11 group only (DX9 = dgVoodoo2 + plain geo-11, engine fixed)
             if (rowEngine != null) lblEngine.Visible = rowEngine.Visible = lblUnityVer.Visible = rowUnityVer.Visible = !IsUe4Selected && !IsDx9Selected && !w && !tri;
             if (pnlScope != null) { pnlScope.Visible = !w && !tri; lblGlInstall.Visible = gl; lblVkInstall.Visible = vk; lblDx12Install.Visible = dx12; lblTriInstall.Visible = tri; }
@@ -2313,6 +2318,7 @@ namespace GeoGamingHub
             if (bits == 32) rb32.Checked = true; else if (bits == 64) rb64.Checked = true;
             notes.Add(bits.HasValue ? bits.Value + Lang.T("비트") : Lang.T("비트 알 수 없음"));
             string uv = Util.UnityVersion(gameDir, exePath);
+            ue4Dlss = uv == null && Util.IsUe4(exePath) && Ue4Ops.HasDlss(exePath);
             if (uv != null)
             {
                 rbUnity.Checked = true;
@@ -2324,6 +2330,7 @@ namespace GeoGamingHub
             {
                 rbUe4.Checked = true; lblUnityDetected.Text = "";
                 notes.Add(Lang.T("Unreal Engine 4 (Universal Fix 2 패키지)"));
+                if (ue4Dlss) notes.Add(Lang.T("DLSS 있음 - 3D에서는 끄세요"));
             }
             else
             {
@@ -2733,6 +2740,20 @@ namespace GeoGamingHub
                     else if (ok != DialogResult.Yes) Log(Lang.T("  4GB 패치: 건너뜀 (사용자가 취소)"));
                 }
                 if (IsUe4Selected && chkEngineIni.Checked && !Ue4Ops.AaAoInstalled(gameExe)) Log(Ue4Ops.InstallAaAo(dir, gameExe, false));
+                // with DLSS on the game can die before its options menu opens (Lies of P: 11 s after the start), so ask here
+                string dlssOn = IsUe4Selected ? Ue4Ops.DlssMode(gameExe) : null;
+                if (dlssOn != null)
+                {
+                    var off = MessageBox.Show(this,
+                        Lang.T("게임 설정에서 DLSS가 켜져 있습니다 (DLSSMode=") + dlssOn + Lang.T(").\n\nDLSS를 켠 채 3D로 실행하면 게임이 GPU 오류(0x887A0006 HUNG)로 꺼질 수 있고, 게임 옵션을 열기 전에 꺼질 수도 있습니다.\n\n지금 DLSS를 끌까요? 원래 설정 파일은 GameUserSettings_backup.ini로 보관합니다. 3D 픽스를 제거해도 DLSS는 다시 켜지지 않으니 그때는 게임 옵션에서 켜세요."),
+                        Lang.T("DLSS 끄기"), MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
+                    if (off != DialogResult.Yes) Log(Lang.T("  DLSS: 켜 둠 (사용자가 선택)"));
+                    else
+                    {
+                        try { foreach (var l in Ue4Ops.TurnOffDlss(gameExe)) Log(l); }
+                        catch (Exception ex) { Log(Lang.T("오류: ") + ex.Message); }
+                    }
+                }
                 if (IsUe4Selected) foreach (var l in Launchers.ApplyDx11(gameExe, this)) Log(l);   // UF2: the game must start with -dx11
                 if (!useSr) RemoveSrFiles(dir, ourDll, true);
 
@@ -2809,7 +2830,11 @@ namespace GeoGamingHub
                 tabs.SelectedIndex = TabList;
                 Log(Lang.T("완료."));
                 Status(Lang.T("설정 완료: ") + Path.GetFileName(gameExe) + "  (" + dir + ")");
-                MessageBox.Show(this, Lang.T("설정을 적용했습니다.\n\n게임을 SR 패널에서 패널 해상도로 전체화면 또는 테두리 없는 창으로 실행하세요.\n자세한 내용은 [로그] 탭에 있습니다."), AppName, MessageBoxButtons.OK, MessageBoxIcon.Information);
+                bool dlss = IsUe4Selected && (ue4Dlss || dlssOn != null);
+                if (dlss) Log(Lang.T("  주의: DLSS가 있는 게임입니다. DLSS를 켜면 GPU 오류로 꺼질 수 있으니 게임 옵션에서 꺼 두세요."));
+                MessageBox.Show(this, Lang.T("설정을 적용했습니다.\n\n게임을 SR 패널에서 패널 해상도로 전체화면 또는 테두리 없는 창으로 실행하세요.\n자세한 내용은 [로그] 탭에 있습니다.")
+                    + (dlss ? Lang.T("\n\n주의: 이 게임에는 DLSS가 있습니다. DLSS를 켜면 게임이 GPU 오류(0x887A0006 HUNG)로 꺼질 수 있으니 3D로 플레이할 때는 게임 옵션에서 DLSS를 꺼 두세요.") : ""),
+                    AppName, MessageBoxButtons.OK, dlss ? MessageBoxIcon.Warning : MessageBoxIcon.Information);
             }
             catch (Exception ex)
             {

@@ -93,6 +93,7 @@ hand is at your own account risk.
 ## Known limits
 
 - **DX12_3D**: DLSS does not reach the right eye (grey image): use the game's render scale or FSR / XeSS. No auto convergence yet.
+- **Unreal Engine 4 (geo-11)**: DLSS can crash the game with a GPU error (0x887A0006 HUNG; seen in Lies of P). The app warns about games with DLSS, and when it finds DLSS on in the game's settings it offers to turn it off at [Finish] or in **UE4 settings**.
 - The **DXVK route** is experimental; games that work with geo-11 are better on geo-11.
 - Games that block third-party DLLs load none of these methods.
 

@@ -43,6 +43,85 @@ namespace GeoGamingHub
             return null;
         }
 
+        // DLSS in the game's files: nvngx_dlss.dll sits in the DLSS plugin (Engine\Plugins or <Project>\Plugins) or in
+        // <Project>\Binaries. Content is left out: it holds no DLLs and is most of a game's files.
+        public static bool HasDlss(string exe)
+        {
+            string project = Path.GetDirectoryName(Path.GetDirectoryName(Path.GetDirectoryName(exe)));
+            if (project == null) return false;
+            string root = Path.GetDirectoryName(project) ?? project;
+            foreach (var d in new[] { Path.Combine(project, "Binaries"), Path.Combine(project, "Plugins"), Path.Combine(root, "Engine", "Plugins"), Path.Combine(root, "Engine", "Binaries") })
+            {
+                try { if (Directory.Exists(d) && Directory.EnumerateFiles(d, "nvngx_dlss.dll", SearchOption.AllDirectories).Any()) return true; }
+                catch { }
+            }
+            return false;
+        }
+
+        // UE4's DLSS plugin names its modes like this (UDLSSMode) and Lies of P stores them as DLSSMode=Quality. Any other
+        // key or value (numbers, on/off flags) belongs to the game, so it is left alone rather than guessed at.
+        static readonly Regex DlssModeLine = new Regex(@"^([ \t]*DLSSMode[ \t]*=[ \t]*)(Off|Auto|DLAA|UltraQuality|Quality|Balanced|Performance|UltraPerformance)([ \t]*\r?)$", RegexOptions.Multiline | RegexOptions.IgnoreCase);
+
+        // %LOCALAPPDATA%\<Project>\Saved\Config like ConfigFolder, plus <Project>\Saved\Config: some games keep Saved in the game folder (Lies of P)
+        static IEnumerable<string> GameSettingsFiles(string exe)
+        {
+            string project = Path.GetDirectoryName(Path.GetDirectoryName(Path.GetDirectoryName(exe)));
+            if (project == null) yield break;
+            string local = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), Path.GetFileName(project));
+            foreach (var root in new[] { local, project })
+                foreach (var v in new[] { "WindowsNoEditor", "WindowsClient", "Windows" })
+                {
+                    string f = Path.Combine(root, "Saved", "Config", v, "GameUserSettings.ini");
+                    if (File.Exists(f)) yield return f;
+                }
+        }
+
+        // UTF-16 when the file has its BOM, else Latin-1, which gives every other byte back unchanged (UE4 writes UTF-8 or ANSI)
+        static Encoding SettingsEnc(byte[] b) { return b.Length >= 2 && b[0] == 0xFF && b[1] == 0xFE ? Encoding.Unicode : Encoding.GetEncoding(28591); }
+
+        static string DlssOnValue(string text)
+        {
+            return DlssModeLine.Matches(text).Cast<Match>().Select(m => m.Groups[2].Value).FirstOrDefault(v => !v.Equals("Off", StringComparison.OrdinalIgnoreCase));
+        }
+
+        // the DLSS mode turned on in the game's settings, null when it is off or not found
+        public static string DlssMode(string exe)
+        {
+            foreach (var f in GameSettingsFiles(exe))
+            {
+                try
+                {
+                    byte[] b = File.ReadAllBytes(f);
+                    string v = DlssOnValue(SettingsEnc(b).GetString(b));
+                    if (v != null) return v;
+                }
+                catch { }
+            }
+            return null;
+        }
+
+        // DLSSMode=Off in every settings file that has it on; each file goes to GameUserSettings_backup.ini first. Returns log lines.
+        public static List<string> TurnOffDlss(string exe)
+        {
+            var log = new List<string>();
+            foreach (var f in GameSettingsFiles(exe))
+            {
+                byte[] b = File.ReadAllBytes(f);
+                Encoding enc = SettingsEnc(b);
+                string text = enc.GetString(b), v = DlssOnValue(text);
+                if (v == null) continue;
+                string bak = Path.Combine(Path.GetDirectoryName(f), "GameUserSettings_backup.ini");
+                ClearReadOnly(bak);
+                File.Copy(f, bak, true);
+                var attrs = File.GetAttributes(f);
+                ClearReadOnly(f);
+                File.WriteAllBytes(f, enc.GetBytes(DlssModeLine.Replace(text, "$1Off$3")));
+                File.SetAttributes(f, attrs);
+                log.Add(Lang.T("  DLSS 끔: DLSSMode=") + v + " -> Off (" + f + ")");
+            }
+            return log;
+        }
+
         public static bool AaAoInstalled(string exe)
         {
             string f = ConfigFolder(exe);
@@ -191,7 +270,7 @@ namespace GeoGamingHub
         readonly Action<string> log;
         readonly float dpi;
         CheckBox chkAaAo; RadioButton rbAaOn, rbAaOff; Label lblAaState;
-        CheckBox chkFullscreen, chkOsd; ComboBox cbVsync, cbHud;
+        CheckBox chkFullscreen, chkOsd, chkDlssOff; ComboBox cbVsync, cbHud;
 
         int S(int v) { return (int)Math.Round(v * dpi); }
         Padding P(int l, int t, int r, int b) { return new Padding(S(l), S(t), S(r), S(b)); }
@@ -226,6 +305,16 @@ namespace GeoGamingHub
             Color accent = Color.FromArgb(0, 90, 170), muted = Color.FromArgb(110, 110, 110);
             Func<string, Label> head = t => new Label { Text = t, AutoSize = true, ForeColor = accent, Font = new Font(Lang.Face, 10.5f, FontStyle.Bold), Margin = P(0, 10, 0, 4) };
             Func<string, Label> note = t => new Label { Text = t, AutoSize = true, ForeColor = muted, Margin = P(0, 2, 0, 6), MaximumSize = new Size(S(590), 0) };
+
+            // DLSS: only while it is on. The way back when the game now dies before its options menu opens.
+            string dlssOn = Ue4Ops.DlssMode(exe);
+            if (dlssOn != null)
+            {
+                col.Controls.Add(head("DLSS"));
+                chkDlssOff = new CheckBox { Text = Lang.T("DLSS 끄기 (현재 DLSSMode=") + dlssOn + ")", AutoSize = true, Checked = true, Margin = P(0, 2, 0, 0) };
+                col.Controls.Add(chkDlssOff);
+                col.Controls.Add(note(Lang.T("DLSS를 켜면 게임이 GPU 오류(0x887A0006 HUNG)로 꺼질 수 있습니다. 원래 설정 파일은 GameUserSettings_backup.ini로 보관합니다.")));
+            }
 
             // AA/AO
             col.Controls.Add(head(Lang.T("AA/AO 개선 (Engine.ini · Scalability.ini)")));
@@ -296,6 +385,7 @@ namespace GeoGamingHub
             try
             {
                 log(Lang.T("UE4 설정 적용: ") + gameDir);
+                if (chkDlssOff != null && chkDlssOff.Checked) foreach (var l in Ue4Ops.TurnOffDlss(exe)) log(l);
                 bool installed = Ue4Ops.AaAoInstalled(exe);
                 bool? forced = Ue4Ops.AaForced(exe);
                 if (chkAaAo.Checked)
