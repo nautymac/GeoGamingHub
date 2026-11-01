@@ -163,7 +163,7 @@ static partial class HubTest
         var numSep = C<NumericUpDown>(form, "numSep");
         var numConv = C<NumericUpDown>(form, "numConv");
         var cbMode = C<ComboBox>(form, "cbGlMode");
-        Eq(form.Text, "Geo Gaming Hub", "window title");
+        Eq(form.Text, "Geo Gaming Hub v" + A.GetName().Version.ToString(3), "window title");
         Eq(tabs.TabPages[2].Text, "3D 방식", "step 1 is called 3D 방식");
         Eq(rb("rbCatGeo").Text + " / " + rb("rbCatWrap").Text, "geo-11 - DirectX 9 / 11 게임 / 자체 래퍼 - Vulkan / OpenGL / DirectX 12 게임", "two categories");
 

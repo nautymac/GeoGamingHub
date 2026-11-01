@@ -679,6 +679,9 @@ namespace GeoGamingHub
     sealed class MainForm : Form
     {
         public const string AppName = "Geo Gaming Hub";
+        // "0.1.0" from [assembly: AssemblyVersion] above: one place to bump. The window title shows "Geo Gaming Hub v0.1.0".
+        public static readonly string AppVersion = typeof(MainForm).Assembly.GetName().Version.ToString(3);
+        public static readonly string AppTitle = AppName + " v" + AppVersion;
         // ---- data ----
         readonly string root;   // folder that holds the package folders
         readonly Dictionary<string, string> pkgDirs;
@@ -782,7 +785,7 @@ namespace GeoGamingHub
             Report.LoadCache(exeDir);   // community 3D list (compat.json) from the last run; refreshed once the window is up
             Shown += (s, e) => FetchCommunity();
 
-            Text = AppName;
+            Text = AppTitle;
             try { Icon = Icon.ExtractAssociatedIcon(Application.ExecutablePath); } catch { }   // the exe's own icon (src\app.ico) in the title bar / taskbar
             Font = new Font(Lang.Face, 10f);
             // The exe is DPI-aware (manifest). Fonts scale by themselves (points); every pixel size below goes
@@ -919,7 +922,7 @@ namespace GeoGamingHub
             Controls.Clear();
             keyBoxes.Clear();
             wizardActive = false;
-            Text = AppName;
+            Text = AppTitle;
             Font = new Font(Lang.Face, 10f);
             BuildLayout();
             ApplyTheme();

@@ -472,15 +472,12 @@ namespace GeoGamingHub
     {
         float k;
         Image logo;
-        readonly string ver;   // "v0.1.0" from [assembly: AssemblyVersion] in GeoGamingHub.cs
         int S(int v) { return (int)Math.Round(v * k); }
         public Brand()
         {
             SetStyle(ControlStyles.UserPaint | ControlStyles.AllPaintingInWmPaint | ControlStyles.OptimizedDoubleBuffer | ControlStyles.SupportsTransparentBackColor, true);
             using (var g = CreateGraphics()) k = g.DpiX / 96f;
-            var v = typeof(Brand).Assembly.GetName().Version;
-            ver = "v" + v.Major + "." + v.Minor + "." + v.Build;
-            Size = new Size(S(310), S(40)); Margin = new Padding(0); BackColor = Color.Transparent;
+            Size = new Size(S(250), S(40)); Margin = new Padding(0); BackColor = Color.Transparent;
             try
             {
                 using (var st = typeof(Brand).Assembly.GetManifestResourceStream("GeoGamingHub.app.ico"))
@@ -493,16 +490,8 @@ namespace GeoGamingHub
             var g = e.Graphics;
             g.InterpolationMode = InterpolationMode.HighQualityBicubic;
             if (logo != null) g.DrawImage(logo, new Rectangle(0, S(4), S(32), S(32)));
-            const TextFormatFlags tf = TextFormatFlags.VerticalCenter | TextFormatFlags.Left | TextFormatFlags.NoPadding;
-            int x = S(42);
             using (var f = new Font("Segoe UI", 12.5f, FontStyle.Bold))
-            {
-                TextRenderer.DrawText(g, "GEO GAMING HUB", f, new Rectangle(x, 0, Width - x, Height), Theme.Text, tf);
-                x += TextRenderer.MeasureText(g, "GEO GAMING HUB", f, new Size(int.MaxValue, Height), tf).Width + S(8);
-            }
-            // the version, smaller and dimmer, on the same baseline area
-            using (var f = new Font("Segoe UI", 9f, FontStyle.Regular))
-                TextRenderer.DrawText(g, ver, f, new Rectangle(x, S(2), Math.Max(0, Width - x), Height), Theme.Muted, tf);
+                TextRenderer.DrawText(g, "GEO GAMING HUB", f, new Rectangle(S(42), 0, Width - S(42), Height), Theme.Text, TextFormatFlags.VerticalCenter | TextFormatFlags.Left | TextFormatFlags.NoPadding);
         }
         protected override void Dispose(bool disposing) { if (disposing && logo != null) logo.Dispose(); base.Dispose(disposing); }
     }
