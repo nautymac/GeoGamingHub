@@ -1,5 +1,33 @@
 {
  "version": 1,
  "source": "GitHub issues (community label) + PCGamingWiki (CC BY-NC-SA 3.0)",
- "games": []
+ "games": [
+  {
+   "game": "Avatar: Frontiers of Pandora",
+   "page": "Avatar: Frontiers of Pandora",
+   "key": "avatarfrontiersofpandora",
+   "program": "hub",
+   "method": "dx12",
+   "alts": [],
+   "engine": [
+    "Snowdrop"
+   ],
+   "api": "D3D 12",
+   "bits": "x64",
+   "status": "broken",
+   "works": 0,
+   "issues": 0,
+   "broken": 1,
+   "suggested": 0,
+   "steam": [
+    "2840770"
+   ],
+   "updated": "2026-11-05",
+   "note": "Game will not launch.",
+   "class_note": "",
+   "reports": [
+    1
+   ]
+  }
+ ]
 }

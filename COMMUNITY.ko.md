@@ -4,5 +4,13 @@
 
 ✅ 잘 됨 · ⚠️ 문제 있음 · ❌ 안 됨 · 💡 제안됨(아직 시험 안 함). 상태는 시험 보고의 다수결이고, 같으면 최근 보고를 따릅니다.
 
-게임 0개 · 보고 0건 · English: [COMMUNITY.md](COMMUNITY.md)
+게임 1개 · 보고 1건 · English: [COMMUNITY.md](COMMUNITY.md)
+
+## Geo Gaming Hub
+
+### DirectX 12 → DX12_3D
+
+| 게임 | 상태 | 보고 | 엔진 | API | 비트 | 최근 메모 | 이슈 |
+|---|---|---|---|---|---|---|---|
+| [Avatar: Frontiers of Pandora](https://www.pcgamingwiki.com/wiki/Avatar%3A_Frontiers_of_Pandora) | ❌ 안 됨 | ❌ 1 | Snowdrop | D3D 12 | x64 | Game will not launch. | [#1](https://github.com/nautymac/GeoGamingHub/issues/1) |
 
