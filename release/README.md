@@ -38,6 +38,7 @@ gets this method automatically when its exe is chosen.
 | `GeoGamingHub.exe` | the app |
 | `data\game_candidates.json` | per-game recommended method for the Candidates tab |
 | `data\tridef_profiles.txt` | TriDef 3D profile names (to recognise games on PCs without TriDef) |
+| `data\dx9fixes` | per-game shader fixes for DX9 games under dgVoodoo2 (e.g. the Beyond Good & Evil HUD), installed with the DX9 kind when the dgVoodoo2 version matches |
 | `Packages\Geo-11_Unity` | geo-11 0.6.109 + Unity Universal Fix + SRWeave |
 | `Packages\Geo-11_DX11` | geo-11 0.6.109 (Preferred) + SRWeave |
 | `Packages\Geo-11_UE4` | UE4 Universal Fix 2 + geo-11 0.6.109 + SRWeave |

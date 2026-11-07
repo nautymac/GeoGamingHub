@@ -545,6 +545,12 @@ namespace GeoGamingHub
             { "게임에 보고하는 비디오 메모리. 기본값 256MB면 패널 해상도에서 게임이 죽으므로 4GB(또는 2GB)로 둡니다.", "Video memory reported to the game. The default 256MB crashes games at panel resolution; keep 4GB (or 2GB)." },
             { "  dgVoodoo.conf 작성 (D3D11 출력, 워터마크 끔, VRAM ", "  dgVoodoo.conf written (D3D11 output, watermark off, VRAM " },
             { ", 해상도 ", ", resolution: " },
+            // DX9 per-game fixes and safe settings
+            { "  게임별 픽스: 이 게임의 픽스는 dgVoodoo2 ", "  Game fix: this game's fix is for dgVoodoo2 " },
+            { "용입니다. 다른 버전에서는 셰이더 해시가 달라 넣지 않았습니다.", ". Other versions generate different shader hashes, so it was not installed." },
+            { "  게임별 픽스: ", "  Game fix: " },
+            { "개 파일 설치 (dgVoodoo2 ", " files installed (dgVoodoo2 " },
+            { "  DX9 안전 설정: ", "  DX9 safe settings: " },
             // Unreal Engine 4 settings window (replaces the console config tool)
             { "AA/AO 개선 설치 (모션 블러·비네트·렌즈 플레어 끄기, 게임 AA 설정은 그대로)", "Install the AA/AO improvements (motion blur, vignette and lens flare off, game AA settings kept)" },
             { "게임의 설정 폴더(%LOCALAPPDATA%\\<프로젝트>\\Saved\\Config\\WindowsNoEditor)의 Engine.ini와 Scalability.ini 끝에 패키지의 권장 설정을 붙이고 원본은 *_backup.ini로 보관합니다. 게임을 한 번도 실행하지 않아 그 폴더가 없으면 건너뛰고 로그에 남깁니다.", "Appends the package's recommended settings to Engine.ini and Scalability.ini in the game's config folder (%LOCALAPPDATA%\\<Project>\\Saved\\Config\\WindowsNoEditor) and keeps the originals as *_backup.ini. If the game has never run and the folder does not exist, this is skipped and noted in the log." },

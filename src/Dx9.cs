@@ -133,6 +133,68 @@ namespace GeoGamingHub
             return log;
         }
 
+        // ---- per-game shader fixes for games under dgVoodoo2 ------------------------------------------------
+        // data\dx9fixes\<exe file name>\<dgVoodoo version>\ShaderFixesDM\*.txt  (and optionally ShaderFixes\*)
+        // geo-11 matches fixes by the hash of the vertex shaders dgVoodoo generates, so a fix only fits the dgVoodoo
+        // build it was made with; the version folder says which one. Uninstall.bat removes ShaderFixesDM / ShaderFixes.
+        public static string FixDir(string fixesRoot, string exeName)
+        {
+            if (string.IsNullOrEmpty(fixesRoot) || string.IsNullOrEmpty(exeName)) return null;
+            string d = Path.Combine(fixesRoot, exeName.ToLowerInvariant());
+            return Directory.Exists(d) ? d : null;
+        }
+
+        public static string[] FixVersions(string fixesRoot, string exeName)
+        {
+            string d = FixDir(fixesRoot, exeName);
+            if (d == null) return new string[0];
+            return Directory.GetDirectories(d).Select(Path.GetFileName).OrderBy(n => n, StringComparer.Ordinal).ToArray();
+        }
+
+        public static List<string> InstallFixes(string fixesRoot, string exeName, string version, string gameDir)
+        {
+            var log = new List<string>();
+            var vers = FixVersions(fixesRoot, exeName);
+            if (vers.Length == 0) return log;
+            if (!vers.Contains(version))
+            {
+                log.Add(Lang.T("  게임별 픽스: 이 게임의 픽스는 dgVoodoo2 ") + string.Join(", ", vers) + Lang.T("용입니다. 다른 버전에서는 셰이더 해시가 달라 넣지 않았습니다."));
+                return log;
+            }
+            string src = Path.Combine(FixDir(fixesRoot, exeName), version);
+            int n = 0;
+            foreach (var sub in new[] { "ShaderFixesDM", "ShaderFixes" })
+            {
+                string s = Path.Combine(src, sub);
+                if (!Directory.Exists(s)) continue;
+                string dst = Path.Combine(gameDir, sub);
+                Directory.CreateDirectory(dst);
+                foreach (var f in Directory.GetFiles(s)) { File.Copy(f, Path.Combine(dst, Path.GetFileName(f)), true); n++; }
+            }
+            log.Add(Lang.T("  게임별 픽스: ") + n + Lang.T("개 파일 설치 (dgVoodoo2 ") + version + ")");
+            return log;
+        }
+
+        // settings that break games under dgVoodoo: geo-11 0.6.109's HUD detection also marks world shaders as HUD
+        // (scene drawn flat), export_hlsl / export_shaders run every shader through decompile + recompile (broken
+        // transparent effects), and calls=1 logs every draw (hundreds of MB per session through dgVoodoo)
+        public static List<string> GuardSettings(string gameDir)
+        {
+            var log = new List<string>();
+            var changed = new List<string>();
+            string dx = Path.Combine(gameDir, "d3dx.ini"), dm = Path.Combine(gameDir, "d3dxdm.ini");
+            foreach (var k in new[] { new[] { dx, "export_hlsl", "Rendering" }, new[] { dx, "export_shaders", "Rendering" }, new[] { dx, "calls", "Logging" }, new[] { dm, "dm_hud_detection", "Stereo" } })
+            {
+                if (!File.Exists(k[0])) continue;
+                string v = Ini.Get(k[0], k[1]);
+                if (v == null || v.Trim() == "0") continue;
+                Ini.Set(k[0], k[1], "0", k[2]);
+                changed.Add(Path.GetFileName(k[0]) + " " + k[1] + "=0");
+            }
+            if (changed.Count > 0) log.Add(Lang.T("  DX9 안전 설정: ") + string.Join(", ", changed));
+            return log;
+        }
+
         public static List<string> Remove(string gameDir)
         {
             var log = new List<string>();

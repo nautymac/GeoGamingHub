@@ -1210,6 +1210,18 @@ namespace GeoGamingHub
 
         string CandidatesFile() { return DataFile("game_candidates.json"); }
 
+        // data\<name> folder next to the exe (release) or next to its folder (development)
+        internal static string DataPath(string name)
+        {
+            string exeDir = Path.GetDirectoryName(Application.ExecutablePath);
+            foreach (var d in new[] { exeDir, Path.GetDirectoryName(exeDir) })
+            {
+                string f = d == null ? null : Path.Combine(d, "data", name);
+                if (f != null && Directory.Exists(f)) return f;
+            }
+            return null;
+        }
+
         // data\<name> next to the exe (release) or next to its folder (development)
         static string DataFile(string name)
         {
@@ -2730,6 +2742,8 @@ namespace GeoGamingHub
                 if (IsDx9Selected)
                 {
                     foreach (var l in Dx9Ops.Install(pkgDirs["dx9"], (string)cbDx9Ver.SelectedItem, rb64.Checked ? 64 : 32, dir, chkDx9Desktop.Checked, (string)cbDx9Vram.SelectedItem)) Log(l);
+                    if (full) foreach (var l in Dx9Ops.InstallFixes(DataPath("dx9fixes"), Path.GetFileName(gameExe), (string)cbDx9Ver.SelectedItem, dir)) Log(l);
+                    foreach (var l in Dx9Ops.GuardSettings(dir)) Log(l);
                     Log(Lang.T("  DX9: 화면 오버레이(숫자패드 0)는 dgVoodoo 아래에서 표시되지 않습니다. 단축키(입체 값 조절·저장·3D 켜기/끄기·SRWeave 키)는 모두 동작합니다."));
                 }
                 if (IsDx9Selected && chkLaa.Enabled && chkLaa.Checked)

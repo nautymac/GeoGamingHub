@@ -36,6 +36,7 @@ TriDef 3D Ignition 창 대신 앱이 게임을 TriDef에 등록하고(게임 이
 | `GeoGamingHub.exe` | 앱 |
 | `data\game_candidates.json` | 후보 목록 탭의 게임별 추천 3D 방식 |
 | `data\tridef_profiles.txt` | TriDef 3D 프로필 이름(TriDef가 없는 PC에서 게임 확인용) |
+| `data\dx9fixes` | dgVoodoo2로 도는 DX9 게임의 게임별 셰이더 픽스(예: Beyond Good & Evil HUD). DX9 방식으로 설치할 때 dgVoodoo2 버전이 맞으면 함께 설치 |
 | `Packages\Geo-11_Unity` | geo-11 0.6.109 + Unity Universal Fix + SRWeave |
 | `Packages\Geo-11_DX11` | geo-11 0.6.109 (Preferred) + SRWeave |
 | `Packages\Geo-11_UE4` | UE4 Universal Fix 2 + geo-11 0.6.109 + SRWeave |
