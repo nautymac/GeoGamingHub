@@ -1,4 +1,4 @@
-# Geo Gaming Hub v0.1.0
+# Geo Gaming Hub v0.1.1
 
 **English** · [한국어](README.ko.md)
 

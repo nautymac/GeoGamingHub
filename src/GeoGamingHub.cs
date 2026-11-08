@@ -21,8 +21,8 @@ using System.Windows.Forms;
 
 [assembly: AssemblyTitle("Geo Gaming Hub")]
 [assembly: AssemblyProduct("Geo Gaming Hub")]
-[assembly: AssemblyVersion("0.1.0.0")]
-[assembly: AssemblyFileVersion("0.1.0.0")]
+[assembly: AssemblyVersion("0.1.1.0")]
+[assembly: AssemblyFileVersion("0.1.1.0")]
 
 namespace GeoGamingHub
 {
@@ -679,7 +679,7 @@ namespace GeoGamingHub
     sealed class MainForm : Form
     {
         public const string AppName = "Geo Gaming Hub";
-        // "0.1.0" from [assembly: AssemblyVersion] above: one place to bump. The window title shows "Geo Gaming Hub v0.1.0".
+        // "0.1.1" from [assembly: AssemblyVersion] above: one place to bump. The window title shows "Geo Gaming Hub v0.1.1".
         public static readonly string AppVersion = typeof(MainForm).Assembly.GetName().Version.ToString(3);
         public static readonly string AppTitle = AppName + " v" + AppVersion;
         // ---- data ----

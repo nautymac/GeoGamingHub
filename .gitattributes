@@ -1,0 +1,2 @@
+# geo-11 shader fixes: keep the bytes that were tested in game (LF)
+data/dx9fixes/** -text
