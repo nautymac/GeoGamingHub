@@ -15,3 +15,4 @@ data/private/
 __pycache__/
 # a locked exe replaced by the build leaves <guid>_GeoGamingHub.exe behind
 *_GeoGamingHub.exe
+fixes/

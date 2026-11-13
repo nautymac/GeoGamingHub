@@ -726,6 +726,9 @@ namespace GeoGamingHub
         Button btnLaunch;       // [실행]: accent colour while a game set up completely ('설정 완료') is selected
         readonly HashSet<string> completeGames = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
         Label lblGlInstall; FlowLayoutPanel pnlScope;   // install step: OGL3D note / geo-11 install scope (hidden for OpenGL)
+        // install step, geo-11 kinds except UE4: a community fix for this game (FixOps), merged at [완료]
+        FlowLayoutPanel pnlFix, rowFixDriver; Label lblFix; ComboBox cbFixDriver; Button btnFixRemove;
+        List<FixOps.Driver> fixDrivers; bool fixUiBusy;
         Label lblSrHead; FlowLayoutPanel pnlGeoMode, pnlGlMode; ComboBox cbGlMode; Label lblGlModeNote;   // display step: direct_mode (geo-11) / output (OGL3D)
         readonly List<Control> geoUpscaleControls = new List<Control>(); TableLayoutPanel gridUpAdv; CheckBox chkUpAdv; Label lblUpNoteGl;
         Label lblStereoHead, lblStereoGl; readonly List<Control> geoStereoNotes = new List<Control>();
@@ -780,6 +783,7 @@ namespace GeoGamingHub
                 { "dx12",  FindPkg(root, "DX12_3D") },      // DirectX 12 games: DX12_3D x64\d3d12.dll + DX12_3D.ini + DX12_3D\(DXC) + profiles\<exe>
             };
             gamesFile = Path.Combine(exeDir, "games.list");
+            FixOps.Root = Path.Combine(exeDir, "fixes");   // community fixes imported per game (fixes\<exe>\)
             Lang.Load(exeDir);   // settings.ini "lang=ko|en", else the Windows display language
             TriOps.BundledList = DataFile("tridef_profiles.txt");   // TriDef's profile names, for PCs without TriDef 3D
             Report.LoadCache(exeDir);   // community 3D list (compat.json) from the last run; refreshed once the window is up
@@ -1830,6 +1834,38 @@ namespace GeoGamingHub
             pnlScope.Controls.Add(Note(Lang.T("SBS만 설치: geo-11과 픽스만 넣고 SR 위빙(dxgi.dll, SRWeave.ini)은 넣지 않습니다. 3D TV나 일반(Non-SR) 모니터에서 좌우(SBS) 화면으로 봅니다. 출력 모드(상하 등)는 다음 단계에서 바꿀 수 있습니다. 'SR 위빙만 추가'는 게임 폴더에 이미 geo-11/3DMigoto 픽스(d3d11.dll)가 있을 때만 나타나며, dxgi.dll + SRWeave.ini만 넣고 d3dx.ini / ShaderFixes는 건드리지 않습니다.")));
             p.Controls.Add(pnlScope);
 
+            // community fix for this game (HelixMod and the like), merged into the hub's geo-11 install at [완료]
+            pnlFix = new FlowLayoutPanel { AutoSize = true, FlowDirection = FlowDirection.TopDown, WrapContents = false, Margin = new Padding(0), Padding = new Padding(0) };
+            pnlFix.Controls.Add(Head(Lang.T("커뮤니티 픽스 (이 게임 전용, 선택)")));
+            pnlFix.Controls.Add(Note(Lang.T("HelixMod 등에서 받은 이 게임 전용 geo-11 / 3DMigoto 픽스(zip, rar, 7z 또는 압축을 푼 폴더)를 불러오면, [완료] 때 허브의 geo-11 설치에 픽스의 게임 전용 부분(셰이더 수정, 단축키, 프리셋)을 합쳐 넣습니다. 허브의 SR 위빙·업스케일·오버레이 설정은 그대로 둡니다. 불러온 픽스는 허브 폴더의 fixes\\<실행 파일 이름>에 보관되어 다시 설치해도 유지됩니다.")));
+            var fixBtns = new FlowLayoutPanel { AutoSize = true, WrapContents = false, Margin = P(0, 2, 0, 4) };
+            var btnFixFile = MakeButton(Lang.T("픽스 불러오기 (압축 파일)..."), 200, false); btnFixFile.Height = S(32);
+            btnFixFile.Click += (s, e) => ImportFix(false);
+            var btnFixDir = MakeButton(Lang.T("폴더에서..."), 110, false); btnFixDir.Height = S(32);
+            btnFixDir.Click += (s, e) => ImportFix(true);
+            btnFixRemove = MakeButton(Lang.T("픽스 빼기"), 110, false); btnFixRemove.Height = S(32);
+            btnFixRemove.Click += (s, e) => RemoveFix();
+            fixBtns.Controls.Add(btnFixFile); fixBtns.Controls.Add(btnFixDir); fixBtns.Controls.Add(btnFixRemove);
+            pnlFix.Controls.Add(fixBtns);
+            lblFix = new Label { AutoSize = true, ForeColor = TextMain, Margin = P(0, 2, 0, 4), MaximumSize = Sz(1040, 0), Text = Lang.T("불러온 픽스 없음") };
+            pnlFix.Controls.Add(lblFix);
+            rowFixDriver = new FlowLayoutPanel { AutoSize = true, WrapContents = false, Margin = P(0, 2, 0, 0), Visible = false };
+            rowFixDriver.Controls.Add(new Label { Text = Lang.T("geo-11 드라이버:"), AutoSize = true, Margin = P(0, 7, 8, 0) });
+            cbFixDriver = Combo(520, new object[0], -1);
+            cbFixDriver.SelectedIndexChanged += (s, e) =>
+            {
+                if (fixUiBusy || fixDrivers == null || cbFixDriver.SelectedIndex < 0 || gameExe == null) return;
+                FixOps.SetChoice(gameExe, fixDrivers[cbFixDriver.SelectedIndex].Rel);
+                Log(Lang.T("커뮤니티 픽스: geo-11 드라이버 → ") + fixDrivers[cbFixDriver.SelectedIndex].Label);
+            };
+            rowFixDriver.Controls.Add(cbFixDriver);
+            var btnFixDrv = MakeButton(Lang.T("드라이버 추가..."), 120, false); btnFixDrv.Height = S(30);
+            btnFixDrv.Click += (s, e) => AddFixDriver();
+            rowFixDriver.Controls.Add(btnFixDrv);
+            pnlFix.Controls.Add(rowFixDriver);
+            pnlFix.Controls.Add(Note(Lang.T("드라이버는 이 게임에 넣을 geo-11(d3d11.dll)입니다. 기본은 허브와 픽스에 든 것 중 가장 새 버전입니다. 게임이 시작하자마자 꺼지면 다른 것을 고르고 [완료]를 다시 누르세요. [픽스 빼기]는 보관한 픽스를 지우며, 게임 폴더는 다음 [완료] 때 허브 기본 설치로 돌아갑니다.")));
+            p.Controls.Add(pnlFix);
+
             // UE4 only: Universal Fix 2 extras
             pnlUe4 = new Panel { AutoSize = true, AutoSizeMode = AutoSizeMode.GrowAndShrink, Margin = new Padding(0), Padding = new Padding(0), Visible = false };
             var ue4Col = new FlowLayoutPanel { AutoSize = true, FlowDirection = FlowDirection.TopDown, WrapContents = false, Margin = new Padding(0), Padding = new Padding(0) };
@@ -2192,6 +2228,7 @@ namespace GeoGamingHub
             // the engine / Unity-version rows belong to the geo-11 group only (DX9 = dgVoodoo2 + plain geo-11, engine fixed)
             if (rowEngine != null) lblEngine.Visible = rowEngine.Visible = lblUnityVer.Visible = rowUnityVer.Visible = !IsUe4Selected && !IsDx9Selected && !w && !tri;
             if (pnlScope != null) { pnlScope.Visible = !w && !tri; lblGlInstall.Visible = gl; lblVkInstall.Visible = vk; lblDx12Install.Visible = dx12; lblTriInstall.Visible = tri; }
+            if (pnlFix != null) pnlFix.Visible = !w && !tri && !IsUe4Selected;
             if (lblTriState != null) UpdateTriState();
             if (chkVkDxvk != null) { chkVkDxvk.Enabled = lblVkDxvk.Enabled = vk && vkDxvkPossible; if (!chkVkDxvk.Enabled) chkVkDxvk.Checked = false; }
             if (IsDx9Selected && rbPlain != null && !rbPlain.Checked) rbPlain.Checked = true;
@@ -2441,8 +2478,11 @@ namespace GeoGamingHub
                 if (v != null) notes.Add(Lang.T("OGL3D 설치됨 ") + v);
                 else if (File.Exists(Path.Combine(gameDir, GlOps.Dll))) notes.Add(Lang.T("다른 opengl32.dll 있음 → 설치 시 opengl32.dll.geo11sr_bak으로 보관"));
             }
+            var fixInfo = FixOps.Load(exePath);
+            if (fixInfo != null) notes.Add(Lang.T("커뮤니티 픽스 있음: ") + fixInfo.Name);
             lblDetect.Text = string.Join("  |  ", notes);
             UpdateEnabled();
+            UpdateFixUi();
             Log(Lang.T("게임: ") + exePath);
             Log("  " + string.Join(" | ", notes));
             Status(Path.GetFileName(exePath) + " - " + string.Join(", ", notes));
@@ -2641,6 +2681,86 @@ namespace GeoGamingHub
             else { File.Move(dx, bak); Log(Lang.T("  기존 dxgi.dll(ReShade?) → dxgi.dll.reshade_bak")); }
         }
 
+        // ---- community fix (FixOps) -----------------------------------------------------------------
+        void UpdateFixUi()
+        {
+            if (pnlFix == null) return;
+            fixUiBusy = true;
+            try
+            {
+                fixDrivers = null;
+                cbFixDriver.Items.Clear();
+                var fx = gameExe == null ? null : FixOps.Load(gameExe);
+                btnFixRemove.Enabled = fx != null;
+                if (fx == null) { lblFix.Text = Lang.T("불러온 픽스 없음"); rowFixDriver.Visible = false; return; }
+                lblFix.Text = fx.Name + "  -  " + Lang.T("셰이더 파일 ") + fx.Shaders + Lang.T("개, 게임 전용 섹션 ") + fx.Sections + Lang.T("개") +
+                    (fx.Sep != null || fx.Conv != null ? ", Sep " + (fx.Sep ?? "-") + " / Conv " + (fx.Conv ?? "-") : "");
+                int bits = Util.ExeBits(gameExe) ?? (rb64.Checked ? 64 : 32);
+                string hubPkg = Path.Combine(pkgDirs[rbUnity.Checked ? "unity" : "plain"], bits == 64 ? "x64" : "x32");
+                fixDrivers = FixOps.Drivers(fx, Path.Combine(hubPkg, "d3d11.dll"), bits);
+                foreach (var d in fixDrivers) cbFixDriver.Items.Add(d.Label);
+                var chosen = FixOps.Chosen(fx, fixDrivers);
+                cbFixDriver.SelectedIndex = chosen == null ? -1 : fixDrivers.IndexOf(chosen);
+                rowFixDriver.Visible = fixDrivers.Count > 0;
+            }
+            finally { fixUiBusy = false; }
+        }
+
+        void ImportFix(bool folder)
+        {
+            if (!RequireGame()) return;
+            string src = null;
+            if (folder)
+            {
+                using (var d = new FolderBrowserDialog { Description = Lang.T("압축을 푼 픽스 폴더를 고르세요 (d3dx.ini가 있는 폴더 또는 그 위)."), ShowNewFolderButton = false })
+                    if (d.ShowDialog(this) == DialogResult.OK) src = d.SelectedPath;
+            }
+            else
+            {
+                using (var d = new OpenFileDialog { Title = Lang.T("커뮤니티 픽스 압축 파일"), Filter = Lang.T("픽스 압축 파일") + " (*.zip;*.rar;*.7z)|*.zip;*.rar;*.7z|" + Lang.T("모든 파일") + " (*.*)|*.*" })
+                    if (d.ShowDialog(this) == DialogResult.OK) src = d.FileName;
+            }
+            if (src == null) return;
+            Cursor = Cursors.WaitCursor;
+            try
+            {
+                var fx = FixOps.Import(gameExe, src);
+                Log("----------------------------------------");
+                Log(Lang.T("커뮤니티 픽스 불러옴: ") + src);
+                Log(Lang.T("  보관: ") + fx.Dir);
+                decimal v;
+                if (fx.Sep != null && decimal.TryParse(fx.Sep.Trim(), NumberStyles.Any, CultureInfo.InvariantCulture, out v)) numSep.Value = Math.Min(numSep.Maximum, Math.Max(numSep.Minimum, v));
+                if (fx.Conv != null && decimal.TryParse(fx.Conv.Trim(), NumberStyles.Any, CultureInfo.InvariantCulture, out v)) numConv.Value = Math.Min(numConv.Maximum, Math.Max(numConv.Minimum, v));
+                if (fx.Sep != null || fx.Conv != null) Log(Lang.T("  픽스의 기본 입체 값을 입체 값 단계에 넣음: Sep ") + (fx.Sep ?? "-") + " / Conv " + (fx.Conv ?? "-"));
+                Status(Lang.T("커뮤니티 픽스 불러옴: ") + fx.Name + Lang.T(" - [완료]를 누르면 게임 폴더에 합쳐 넣습니다."));
+            }
+            catch (Exception ex)
+            {
+                Log(Lang.T("픽스 불러오기 실패: ") + ex.Message);
+                MessageBox.Show(this, ex.Message, Lang.T("오류"), MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            finally { Cursor = Cursors.Default; UpdateFixUi(); }
+        }
+
+        void AddFixDriver()
+        {
+            if (!RequireGame()) return;
+            string dll = null;
+            using (var d = new OpenFileDialog { Title = Lang.T("geo-11 드라이버 (d3d11.dll)"), Filter = "d3d11.dll|d3d11.dll|" + Lang.T("모든 파일") + " (*.*)|*.*" })
+                if (d.ShowDialog(this) == DialogResult.OK) dll = d.FileName;
+            if (dll == null) return;
+            try { string rel = FixOps.AddDriver(gameExe, dll); Log(Lang.T("커뮤니티 픽스: geo-11 드라이버 추가 ") + dll + " -> " + rel); }
+            catch (Exception ex) { Log(Lang.T("오류: ") + ex.Message); MessageBox.Show(this, ex.Message, Lang.T("오류"), MessageBoxButtons.OK, MessageBoxIcon.Error); }
+            UpdateFixUi();
+        }
+
+        void RemoveFix()
+        {
+            if (!RequireGame()) return;
+            if (FixOps.Remove(gameExe)) { Log(Lang.T("커뮤니티 픽스 뺌: ") + Path.GetFileName(gameExe) + Lang.T(" - 게임 폴더는 다음 [완료] 때 허브 기본 설치로 돌아갑니다.")); Status(Lang.T("커뮤니티 픽스를 뺐습니다.")); }
+            UpdateFixUi();
+        }
+
         // TriDef 3D: register the game with the chosen profile (TriDef 3D itself must be installed); nothing in the game folder
         void ApplyTri()
         {
@@ -2730,6 +2850,15 @@ namespace GeoGamingHub
                     int fixedBins = Util.FixShaderCacheTimes(Path.Combine(dir, "ShaderFixes"));
                     Log(Lang.T("  패키지 파일 복사 완료") + (fixedBins > 0 ? Lang.T(" (셰이더 캐시 시각 보정 ") + fixedBins + ")" : ""));
                     if (IsUe4Selected) Ue4PostInstall(dir);
+                    else
+                    {
+                        var fx = FixOps.Load(gameExe);
+                        if (fx != null)
+                        {
+                            foreach (var l in FixOps.Merge(fx, dir, src, rb64.Checked ? 64 : 32)) Log(l);
+                            Util.FixShaderCacheTimes(Path.Combine(dir, "ShaderFixes"));
+                        }
+                    }
                 }
                 else if (useSr)
                 {

@@ -77,6 +77,30 @@ Keep `Packages` next to `GeoGamingHub.exe`. Unzip everything first; don't run it
 
 A different DLL of the same name already in the game folder is kept as `.geo11sr_bak` and restored on uninstall.
 
+### Community fixes (geo-11 games)
+
+If there is a geo-11 / 3DMigoto fix made **for that game** (HelixMod and the like), import it on the **Install** step under
+**Community fix** with **[Import fix (archive)...]** (zip, rar, 7z) or **[From folder...]**, then click [Finish]. Archives
+inside a chosen folder are unpacked too (a fix archive next to another driver folder such as "If crash, use this DLL").
+rar and 7z are unpacked with 7-Zip or WinRAR when installed, otherwise with Windows' tar.
+
+At [Finish] the hub installs its own geo-11 first and then merges **only the game-specific part** of the fix:
+
+- `d3dx.ini`: the sections the hub's file lacks (`[ShaderOverride*]`, `[TextureOverride*]`, `[ShaderRegex*]`, `[Key*]`,
+  `[Preset*]`, `[CommandList*]`, `[Resource*]`, `[CustomShader*]` ...) are appended, and lines of `[Include]`,
+  `[Constants]` and `[Present]` the hub's file lacks are added. `[Logging]` `[System]` `[Device]` `[Stereo]` `[Rendering]`
+  `[Hunting]` `[Loader]` `[Profile]` are not taken, so SR weaving, upscaling and the overlay keep the hub's settings.
+- `ShaderFixes\`, `ShaderFixesDM\`: files whose name the hub's package does not have (the hub's upscale, mouse and hotkey
+  files stay).
+- geo-11 driver (`d3d11.dll`): the hub's or one inside the fix; the newest by default, and [Add driver...] adds another
+  `d3d11.dll`. If the game closes right after it starts, choose another driver and click [Finish] again. Example: Star
+  Wars Battlefront II (2017) dies in the NVIDIA driver with geo-11 0.6.109 (the hub's) and 0.6.56 (the fix's) and runs
+  with 0.6.198.
+- The fix's Sep / Conv become the starting values of the Stereo values step.
+
+An imported fix is kept in `fixes\<exe name>` in the hub's folder and is merged again whenever the game is set up.
+[Remove fix] deletes it; the game folder goes back to the hub's own install at the next [Finish]. Not used for UE4 (UF2).
+
 ## Hotkeys
 
 geo-11 games: see and change them on the **Hotkeys** tab. The own wrappers read `[Keys]` in their ini; defaults:
