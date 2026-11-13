@@ -331,6 +331,8 @@ namespace GeoGamingHub
             { " - Steam 게임이 아니어서 실행 파일로 직접 시작", " - not a Steam game, started from its exe" },
             { "  실행기 기록: ", "  launcher log: " },
             // community fixes (Fixes.cs)
+            { "TriDef 3D 업스케일: 따로 켤 것이 없습니다. SR 위빙이 켜져 있으면 SRWeave가 자동으로 합니다. 게임 안의 그래픽 옵션에서 해상도를 패널보다 낮게(예: 1920×1080, 2560×1440) 고르면 패널 해상도로 위빙해 보여 줍니다. 32비트 DirectX 9 게임은 확인했고, 64비트 DirectX 11 게임은 아직 게임에서 시험하지 않았습니다.\n", "TriDef 3D upscaling: nothing to turn on. With SR weaving on, SRWeave does it by itself: choose a resolution below the panel's (e.g. 1920×1080, 2560×1440) in the game's graphics options and it is weaved at the panel's resolution. Checked with 32-bit DirectX 9 games; 64-bit DirectX 11 games are not yet tried in a game.\n" },
+            { "끄려면 허브 폴더의 Packages\\TriDef\\sr\\x86\\SRWeave.ini(32비트) 또는 sr\\x64\\SRWeave.ini(64비트)에 upscale=0을 넣습니다.", "To turn it off, put upscale=0 into Packages\\TriDef\\sr\\x86\\SRWeave.ini (32-bit) or sr\\x64\\SRWeave.ini (64-bit) in the hub's folder." },
             { " (배포에 포함)", " (shipped with the hub)" },
             { "배포 픽스 다시 쓰기", "Use shipped fix again" },
             { "배포에 든 이 게임의 픽스를 꺼 두었습니다.", "The fix shipped for this game is turned off." },

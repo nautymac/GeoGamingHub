@@ -90,6 +90,7 @@ static partial class HubTest
         Ok(rb("rb32").Checked && !rb("rb32").Enabled, "32-bit from the exe, locked");
         Ok(Shown(ctl("lblTriInstall")) && !Shown(ctl("pnlScope")), "install step: TriDef note, no install scope");
         Ok(!Shown(ctl("pnlGeoMode")) && !Shown(ctl("pnlGlMode")) && !Shown(cb("chkLens")) && !Shown(cb("chkSwap")) && !Shown(cb("chkUpscale")) && Shown(cb("chkSr")), "display step: only SR weaving");
+        Ok(Shown(ctl("lblUpHead")) && Shown(ctl("lblUpNoteTri")) && !Shown(ctl("lblUpNoteDx12")) && !Shown(ctl("lblUpNoteGl")), "display step: TriDef upscaling note (automatic, no checkbox)");
         Eq(ctl("lblSrHead").Text, "SR 위빙 (TriDef + SRWeave)", "display heading");
         Ok(!Shown(ctl("gridStereo")) && Shown(ctl("lblStereoTri")) && !Shown(cb("chkAutoConv")), "stereo step: TriDef note only");
         for (int i = 2; i <= 5; i++) { tabs.SelectedIndex = i; Shot(form, "ko_tri_step" + (i - 1)); }

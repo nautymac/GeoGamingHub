@@ -736,6 +736,7 @@ namespace GeoGamingHub
         RadioButton lastGeoKind, lastWrapKind; bool syncingCategory;
         RadioButton rbKindVk; CheckBox chkVkDxvk; Label lblVkDxvk;
         RadioButton rbKindDx12; Label lblDx12Install, lblStereoDx12, lblUpNoteDx12;   // DirectX 12 games: DX12_3D (d3d12.dll proxy)
+        Label lblUpNoteTri;   // display step, TriDef 3D: upscaling is automatic (SRWeave)
         // TriDef 3D games (an installed TriDef 3D, registered here instead of in TriDef 3D Ignition, started by Tridef3D_Play)
         RadioButton rbCatTri, rbKindTri; FlowLayoutPanel pnlKindTri; ComboBox cbTriProfile; Label lblTriState, lblTriInstall, lblStereoTri;
         TableLayoutPanel gridStereo;
@@ -2015,6 +2016,11 @@ namespace GeoGamingHub
             lblUpNoteDx12 = Note(Lang.T("DX12_3D 업스케일: 게임은 낮은 해상도(200% 배율의 4K 패널에서는 1920×1080, 메뉴·글씨가 읽기 좋고 4K 문제를 피함)로 그리고, DX12_3D가 게임 창 위의 자체 창에 패널 해상도로 위빙해 보여 줍니다. 켠 뒤 게임 설정에서 1920×1080 테두리 없는 창(창 모드 전체 화면)을 고르세요. 마우스는 그대로 게임으로 가고, 전용 전체 화면은 창 모드로 유지되어 패널은 원래 해상도를 유지합니다. DX12_3D.ini [Display] upscale."));
             lblUpNoteDx12.Visible = false;
             p.Controls.Add(lblUpNoteDx12);
+            // TriDef 3D: nothing to set here - SRWeave weaves a game below the panel's resolution at the panel's by itself
+            lblUpNoteTri = Note(Lang.T("TriDef 3D 업스케일: 따로 켤 것이 없습니다. SR 위빙이 켜져 있으면 SRWeave가 자동으로 합니다. 게임 안의 그래픽 옵션에서 해상도를 패널보다 낮게(예: 1920×1080, 2560×1440) 고르면 패널 해상도로 위빙해 보여 줍니다. 32비트 DirectX 9 게임은 확인했고, 64비트 DirectX 11 게임은 아직 게임에서 시험하지 않았습니다.\n") +
+                Lang.T("끄려면 허브 폴더의 Packages\\TriDef\\sr\\x86\\SRWeave.ini(32비트) 또는 sr\\x64\\SRWeave.ini(64비트)에 upscale=0을 넣습니다."));
+            lblUpNoteTri.Visible = false;
+            p.Controls.Add(lblUpNoteTri);
             geoUpscaleControls.Add(lblUpNote);
 
             // the one choice worth showing: compatibility (mode 1, default) vs. performance (mode 0). Index == upscale_mode.
@@ -2259,7 +2265,9 @@ namespace GeoGamingHub
                 gridUpAdv.Visible = !w && !tri && chkUpAdv.Checked;
                 lblUpNoteGl.Visible = gl;
                 lblUpNoteDx12.Visible = dx12;
-                lblUpHead.Visible = chkUpscale.Visible = !vk && !tri;   // VK3D / TriDef have no upscaling here
+                lblUpHead.Visible = !vk;                     // VK3D has no upscaling
+                chkUpscale.Visible = !vk && !tri;            // TriDef: automatic (SRWeave), only the note
+                lblUpNoteTri.Visible = tri;
                 if (vk || tri) chkUpscale.Checked = false;
             }
             if (lblStereoGl != null)
