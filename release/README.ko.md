@@ -1,4 +1,4 @@
-# Geo Gaming Hub v0.1.2
+# Geo Gaming Hub v0.1.3
 
 [English](README.md) · **한국어**
 
@@ -50,6 +50,7 @@ SR 위빙을 켠 DirectX 9 게임은 패널보다 낮은 해상도로 실행해�
 | `Packages\DX12_3D` | DX12_3D 0.1.0 (x64) + DXC (Windows SDK) |
 | `Packages\DXVK` | DXVK 3.1.1 (x64) |
 | `Packages\TriDef` | Tridef3D_Play (tridef3d-win11-injector) + Inject32 + SRWeave DX9/DX11 - TriDef 파일 없음 |
+| `Packages\Fixes` | 함께 배포하는 커뮤니티 픽스(게임 실행 파일 이름별 폴더). 지금은 STAR WARS Battlefront II(2017) 픽스와 geo-11 0.6.198 |
 
 `Packages` 폴더는 `GeoGamingHub.exe` 옆에 있어야 합니다. zip을 모두 풀고 실행하세요(zip 안에서 바로 실행하지 마세요).
 
@@ -94,6 +95,11 @@ HelixMod 등에서 받은 **그 게임 전용** geo-11 / 3DMigoto 픽스가 있�
 불러온 픽스는 허브 폴더의 `fixes\<실행 파일 이름>`에 보관되어, 다시 설치해도 그대로 합쳐집니다. [픽스 빼기]는 보관한 픽스를
 지우고, 게임 폴더는 다음 [완료] 때 허브 기본 설치로 돌아갑니다. UE4(UF2) 방식에는 쓰지 않습니다.
 
+**함께 배포하는 픽스 (`Packages\Fixes`).** 픽스가 들어 있는 게임은 따로 불러오지 않아도 설치 단계에 "배포에 포함된 픽스"로 나오고
+[완료] 때 합쳐집니다. 지금은 STAR WARS Battlefront II(2017)이 들어 있습니다. 이 게임은 geo-11 0.6.198이 기본으로 골라집니다
+(0.6.109·0.6.56에서는 1분쯤 뒤 꺼짐). 직접 불러온 픽스가 있으면 그것을 쓰고, [픽스 빼기]를 누르면 그 게임에서 배포 픽스를 끕니다.
+다시 쓰려면 [배포 픽스 다시 쓰기]를 누릅니다. 픽스 제작자는 각 폴더의 `CREDITS.txt`에 있습니다.
+
 ## 단축키
 
 geo-11 게임은 **단축키** 탭에서 확인하고 바꿉니다. 자체 래퍼는 각 ini의 `[Keys]`에서 바꾸며 기본값은 다음과 같습니다.
@@ -137,4 +143,6 @@ geo-11 게임은 **단축키** 탭에서 확인하고 바꿉니다. 자체 래�
 - Tridef3D_Play / Inject32 / SRWeave (tridef3d-win11-injector): MIT (`Packages\TriDef\LICENSE`). TriDef 3D 자체는 포함되지 않으며
   DDD의 소프트웨어입니다.
 - geo-11 / 3DMigoto, Unity Universal Fix, UE4 Universal Fix 2, dgVoodoo2: 각 제작자의 조건 (각 패키지 폴더).
+- `Packages\Fixes`의 커뮤니티 픽스: 각 제작자의 작업이며 받은 그대로 넣었습니다. STAR WARS Battlefront II 픽스는 픽스 안에
+  "Frostbite3 ShaderRegex by DHR", "Pattern CS Lights and Reflections by DSS"로 표기된 DHR, DSS의 작업입니다(`CREDITS.txt`).
 - DXC (`dxcompiler.dll`, `dxil.dll`): Microsoft, Windows SDK 재배포 파일.

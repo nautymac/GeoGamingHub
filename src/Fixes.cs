@@ -26,7 +26,10 @@ namespace GeoGamingHub
 {
     static class FixOps
     {
-        public static string Root;                    // <hub>\fixes (set by the form)
+        public static string Root;                    // <hub>\fixes (set by the form): fixes the user imported, and the
+                                                      // settings (fix.ini) of the bundled ones
+        public static string BundledRoot;             // Packages\Fixes\<exe> (set by the form): fixes shipped with the hub,
+                                                      // used for that exe unless the user imported another or turned it off
         const string InfoFile = "fix.ini";
         static readonly Encoding Raw = Encoding.GetEncoding(28591);   // byte-exact round trip whatever the ini's encoding
         static readonly string[] CoreSections = { "logging", "system", "device", "stereo", "rendering", "hunting", "loader", "profile" };
@@ -50,7 +53,11 @@ namespace GeoGamingHub
             public string Choice;     // driver: "hub", a path relative to Dir, or "" (newest)
             public string Sep, Conv;  // the fix's d3dxdm.ini values, null when absent
             public int Shaders, Sections;
+            public bool Bundled;      // shipped in Packages\Fixes (Dir is there; the settings stay in fixes\<exe>\fix.ini)
+            public string UserDir;    // fixes\<exe> (settings, added drivers)
         }
+
+        const string UserPrefix = "user:";   // Rel of a driver the user added to a bundled fix (it lives in UserDir)
 
         public static string DirOf(string exe)
         {
@@ -58,14 +65,36 @@ namespace GeoGamingHub
             return System.IO.Path.Combine(Root, System.IO.Path.GetFileName(exe).ToLowerInvariant());
         }
 
-        public static Info Load(string exe)
+        public static string BundledDirOf(string exe)
+        {
+            if (string.IsNullOrEmpty(BundledRoot) || string.IsNullOrEmpty(exe)) return null;
+            string d = System.IO.Path.Combine(BundledRoot, System.IO.Path.GetFileName(exe).ToLowerInvariant());
+            return Directory.Exists(d) && FindFixRoot(d) != null ? d : null;
+        }
+
+        public static bool HasBundled(string exe) { return BundledDirOf(exe) != null; }
+
+        // the user turned the bundled fix off ([픽스 빼기] while no fix of their own is imported)
+        public static bool BundledOff(string exe)
         {
             string d = DirOf(exe);
-            if (d == null || !Directory.Exists(d)) return null;
-            string root = FindFixRoot(d);
+            return d != null && ReadValue(System.IO.Path.Combine(d, InfoFile), "bundled") == "off";
+        }
+
+        // the fix the user imported, else the bundled one (unless turned off), else null
+        public static Info Load(string exe)
+        {
+            string user = DirOf(exe);
+            if (user == null) return null;
+            string ini = System.IO.Path.Combine(user, InfoFile);
+            string d = null, root = null;
+            bool bundled = false;
+            if (Directory.Exists(user)) root = FindFixRoot(user);
+            if (root != null) d = user;
+            else if (!BundledOff(exe) && (d = BundledDirOf(exe)) != null) { root = FindFixRoot(d); bundled = true; }
             if (root == null) return null;
-            string ini = System.IO.Path.Combine(d, InfoFile);
-            var info = new Info { Dir = d, FixRoot = root, Name = ReadValue(ini, "name") ?? System.IO.Path.GetFileName(root), Choice = ReadValue(ini, "geo11") ?? "" };
+            string name = bundled ? ReadValue(System.IO.Path.Combine(d, InfoFile), "name") : ReadValue(ini, "name");
+            var info = new Info { Dir = d, UserDir = user, FixRoot = root, Bundled = bundled, Name = name ?? System.IO.Path.GetFileName(root), Choice = ReadValue(ini, "geo11") ?? "" };
             string dm = System.IO.Path.Combine(root, "d3dxdm.ini");
             info.Sep = Ini.Get(dm, "dm_separation");
             info.Conv = Ini.Get(dm, "dm_convergence");
@@ -144,23 +173,40 @@ namespace GeoGamingHub
         public static string AddDriver(string exe, string dll)
         {
             string d = DirOf(exe);
-            if (d == null || !Directory.Exists(d)) throw new Exception(Lang.T("먼저 픽스를 불러오세요."));
+            var fix = Load(exe);
+            if (d == null || fix == null) throw new Exception(Lang.T("먼저 픽스를 불러오세요."));
             string v = Geo11Version(dll);
             if (v == null) throw new Exception(Lang.T("geo-11 / 3DMigoto의 d3d11.dll이 아닙니다 (버전을 읽지 못함):\n") + dll);
             string to = System.IO.Path.Combine(d, "drivers", v + (Util.ExeBits(dll) == 32 ? "_x32" : ""));
             Directory.CreateDirectory(to);
             File.Copy(dll, System.IO.Path.Combine(to, "d3d11.dll"), true);
             string rel = System.IO.Path.Combine(to, "d3d11.dll").Substring(d.Length).TrimStart('\\');
+            if (fix.Bundled) rel = UserPrefix + rel;   // kept next to the settings, not in Packages
             SetChoice(exe, rel);
             return rel;
         }
 
+        // "no fix for this game": deletes an imported fix, and turns a bundled one off (fixes\<exe>\fix.ini bundled=off)
         public static bool Remove(string exe)
         {
             string d = DirOf(exe);
-            if (d == null || !Directory.Exists(d)) return false;
-            Directory.Delete(d, true);
-            return true;
+            if (d == null) return false;
+            bool changed = false;
+            if (Directory.Exists(d)) { Directory.Delete(d, true); changed = true; }
+            if (HasBundled(exe))
+            {
+                Directory.CreateDirectory(d);
+                File.WriteAllText(System.IO.Path.Combine(d, InfoFile), "[Fix]\r\nbundled=off\r\n", Encoding.UTF8);
+                changed = true;
+            }
+            return changed;
+        }
+
+        // the bundled fix again after Remove (an imported fix is not touched)
+        public static void UseBundled(string exe)
+        {
+            string d = DirOf(exe);
+            if (d != null && Directory.Exists(d) && FindFixRoot(d) == null) Directory.Delete(d, true);   // only settings there
         }
 
         // .zip with .NET; .rar / .7z with 7-Zip or WinRAR's UnRAR when installed, else Windows' own tar (libarchive)
@@ -208,6 +254,7 @@ namespace GeoGamingHub
 
         public static void SetChoice(string exe, string rel)
         {
+            Directory.CreateDirectory(DirOf(exe));
             string ini = System.IO.Path.Combine(DirOf(exe), InfoFile);
             var lines = File.Exists(ini) ? File.ReadAllLines(ini, Encoding.UTF8).ToList() : new List<string> { "[Fix]" };
             int at = lines.FindIndex(l => l.TrimStart().StartsWith("geo11", StringComparison.OrdinalIgnoreCase) && l.Contains("="));
@@ -251,14 +298,19 @@ namespace GeoGamingHub
                 string v = Geo11Version(hubDll);
                 list.Add(new Driver { Path = hubDll, Rel = "hub", Version = v, Hub = true, Label = Lang.T("허브 기본 geo-11 ") + (v ?? "?") });
             }
-            foreach (var f in Directory.GetFiles(fix.Dir, "d3d11.dll", SearchOption.AllDirectories).OrderBy(x => x, StringComparer.OrdinalIgnoreCase))
-            {
-                var b = Util.ExeBits(f);
-                if (b.HasValue && b.Value != bits) continue;
-                string rel = f.Substring(fix.Dir.Length).TrimStart('\\');
-                string v = Geo11Version(f);
-                list.Add(new Driver { Path = f, Rel = rel, Version = v, Label = Lang.T("픽스의 geo-11 ") + (v ?? "?") + "  (" + rel + ")" });
-            }
+            var places = new List<KeyValuePair<string, string>> { new KeyValuePair<string, string>(fix.Dir, "") };
+            // drivers the user added to a bundled fix live next to its settings: fixes\<exe>\drivers\
+            if (fix.Bundled && fix.UserDir != null && Directory.Exists(System.IO.Path.Combine(fix.UserDir, "drivers")))
+                places.Add(new KeyValuePair<string, string>(fix.UserDir, UserPrefix));
+            foreach (var place in places)
+                foreach (var f in Directory.GetFiles(place.Key, "d3d11.dll", SearchOption.AllDirectories).OrderBy(x => x, StringComparer.OrdinalIgnoreCase))
+                {
+                    var b = Util.ExeBits(f);
+                    if (b.HasValue && b.Value != bits) continue;
+                    string rel = f.Substring(place.Key.Length).TrimStart('\\');
+                    string v = Geo11Version(f);
+                    list.Add(new Driver { Path = f, Rel = place.Value + rel, Version = v, Label = Lang.T("픽스의 geo-11 ") + (v ?? "?") + "  (" + rel + ")" });
+                }
             return list;
         }
 

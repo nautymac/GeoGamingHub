@@ -1,4 +1,4 @@
-# Geo Gaming Hub v0.1.2
+# Geo Gaming Hub v0.1.3
 
 **English** · [한국어](README.ko.md)
 
@@ -54,6 +54,7 @@ With SR weaving a DirectX 9 game may run below the panel's resolution: SRWeave w
 | `Packages\DX12_3D` | DX12_3D 0.1.0 (x64) + DXC (Windows SDK) |
 | `Packages\DXVK` | DXVK 3.1.1 (x64) |
 | `Packages\TriDef` | Tridef3D_Play (tridef3d-win11-injector) + Inject32 + SRWeave DX9/DX11 - no TriDef files |
+| `Packages\Fixes` | Community fixes shipped with the hub, one folder per game exe. Now: the STAR WARS Battlefront II (2017) fix and geo-11 0.6.198 |
 
 Keep `Packages` next to `GeoGamingHub.exe`. Unzip everything first; don't run it from inside the zip.
 
@@ -101,6 +102,12 @@ At [Finish] the hub installs its own geo-11 first and then merges **only the gam
 An imported fix is kept in `fixes\<exe name>` in the hub's folder and is merged again whenever the game is set up.
 [Remove fix] deletes it; the game folder goes back to the hub's own install at the next [Finish]. Not used for UE4 (UF2).
 
+**Fixes shipped with the hub (`Packages\Fixes`).** A game with a fix there gets it without importing anything: the
+Install step shows it as "Shipped fix" and [Finish] merges it. Now it holds STAR WARS Battlefront II (2017), which gets
+geo-11 0.6.198 by default (with 0.6.109 and 0.6.56 the game closes about a minute in). A fix you import for the same game
+is used instead; [Remove fix] turns the shipped one off for that game and [Use shipped fix again] turns it back on. The
+fix authors are in `CREDITS.txt` in each folder.
+
 ## Hotkeys
 
 geo-11 games: see and change them on the **Hotkeys** tab. The own wrappers read `[Keys]` in their ini; defaults:
@@ -145,4 +152,7 @@ geo-11: `d3d11_log.txt`). Each wrapper's README is inside `Packages\<wrapper>`.
 - Tridef3D_Play / Inject32 / SRWeave (tridef3d-win11-injector): MIT (`Packages\TriDef\LICENSE`). TriDef 3D itself is not
   included and is DDD's software.
 - geo-11 / 3DMigoto, Unity Universal Fix, UE4 Universal Fix 2, dgVoodoo2: their authors' terms (in each package folder).
+- Community fixes in `Packages\Fixes`: their authors' work, included as distributed. The STAR WARS Battlefront II fix is
+  by DHR and DSS, as named in it ("Frostbite3 ShaderRegex by DHR", "Pattern CS Lights and Reflections by DSS");
+  see `CREDITS.txt`.
 - DXC (`dxcompiler.dll`, `dxil.dll`): Microsoft, Windows SDK redistributables.

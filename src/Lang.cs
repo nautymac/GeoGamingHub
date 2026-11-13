@@ -331,6 +331,13 @@ namespace GeoGamingHub
             { " - Steam 게임이 아니어서 실행 파일로 직접 시작", " - not a Steam game, started from its exe" },
             { "  실행기 기록: ", "  launcher log: " },
             // community fixes (Fixes.cs)
+            { " (배포에 포함)", " (shipped with the hub)" },
+            { "배포 픽스 다시 쓰기", "Use shipped fix again" },
+            { "배포에 든 이 게임의 픽스를 꺼 두었습니다.", "The fix shipped for this game is turned off." },
+            { "배포에 포함된 픽스: ", "Shipped fix: " },
+            { "배포에 든 픽스를 다시 씁니다: ", "Using the shipped fix again: " },
+            { " - 다음 [완료] 때 합쳐 넣습니다.", " - merged at the next [Finish]." },
+            { "배포에 든 픽스를 다시 씁니다.", "Using the shipped fix again." },
             { "먼저 픽스를 불러오세요.", "Import a fix first." },
             { "geo-11 / 3DMigoto의 d3d11.dll이 아닙니다 (버전을 읽지 못함):\n", "This is not a geo-11 / 3DMigoto d3d11.dll (no version in it):\n" },
             { "드라이버 추가...", "Add driver..." },

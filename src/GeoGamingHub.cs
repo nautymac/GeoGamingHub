@@ -21,8 +21,8 @@ using System.Windows.Forms;
 
 [assembly: AssemblyTitle("Geo Gaming Hub")]
 [assembly: AssemblyProduct("Geo Gaming Hub")]
-[assembly: AssemblyVersion("0.1.2.0")]
-[assembly: AssemblyFileVersion("0.1.2.0")]
+[assembly: AssemblyVersion("0.1.3.0")]
+[assembly: AssemblyFileVersion("0.1.3.0")]
 
 namespace GeoGamingHub
 {
@@ -679,7 +679,7 @@ namespace GeoGamingHub
     sealed class MainForm : Form
     {
         public const string AppName = "Geo Gaming Hub";
-        // "0.1.2" from [assembly: AssemblyVersion] above: one place to bump. The window title shows "Geo Gaming Hub v0.1.2".
+        // "0.1.3" from [assembly: AssemblyVersion] above: one place to bump. The window title shows "Geo Gaming Hub v0.1.3".
         public static readonly string AppVersion = typeof(MainForm).Assembly.GetName().Version.ToString(3);
         public static readonly string AppTitle = AppName + " v" + AppVersion;
         // ---- data ----
@@ -784,6 +784,7 @@ namespace GeoGamingHub
             };
             gamesFile = Path.Combine(exeDir, "games.list");
             FixOps.Root = Path.Combine(exeDir, "fixes");   // community fixes imported per game (fixes\<exe>\)
+            FixOps.BundledRoot = FindPkg(root, "Fixes");    // community fixes shipped with the hub (Packages\Fixes\<exe>\)
             Lang.Load(exeDir);   // settings.ini "lang=ko|en", else the Windows display language
             TriOps.BundledList = DataFile("tridef_profiles.txt");   // TriDef's profile names, for PCs without TriDef 3D
             Report.LoadCache(exeDir);   // community 3D list (compat.json) from the last run; refreshed once the window is up
@@ -2479,7 +2480,7 @@ namespace GeoGamingHub
                 else if (File.Exists(Path.Combine(gameDir, GlOps.Dll))) notes.Add(Lang.T("다른 opengl32.dll 있음 → 설치 시 opengl32.dll.geo11sr_bak으로 보관"));
             }
             var fixInfo = FixOps.Load(exePath);
-            if (fixInfo != null) notes.Add(Lang.T("커뮤니티 픽스 있음: ") + fixInfo.Name);
+            if (fixInfo != null) notes.Add(Lang.T("커뮤니티 픽스 있음: ") + fixInfo.Name + (fixInfo.Bundled ? Lang.T(" (배포에 포함)") : ""));
             lblDetect.Text = string.Join("  |  ", notes);
             UpdateEnabled();
             UpdateFixUi();
@@ -2691,9 +2692,16 @@ namespace GeoGamingHub
                 fixDrivers = null;
                 cbFixDriver.Items.Clear();
                 var fx = gameExe == null ? null : FixOps.Load(gameExe);
-                btnFixRemove.Enabled = fx != null;
-                if (fx == null) { lblFix.Text = Lang.T("불러온 픽스 없음"); rowFixDriver.Visible = false; return; }
-                lblFix.Text = fx.Name + "  -  " + Lang.T("셰이더 파일 ") + fx.Shaders + Lang.T("개, 게임 전용 섹션 ") + fx.Sections + Lang.T("개") +
+                bool offBundled = fx == null && gameExe != null && FixOps.HasBundled(gameExe) && FixOps.BundledOff(gameExe);
+                btnFixRemove.Text = offBundled ? Lang.T("배포 픽스 다시 쓰기") : Lang.T("픽스 빼기");
+                btnFixRemove.Enabled = fx != null || offBundled;
+                if (fx == null)
+                {
+                    lblFix.Text = offBundled ? Lang.T("배포에 든 이 게임의 픽스를 꺼 두었습니다.") : Lang.T("불러온 픽스 없음");
+                    rowFixDriver.Visible = false;
+                    return;
+                }
+                lblFix.Text = (fx.Bundled ? Lang.T("배포에 포함된 픽스: ") : "") + fx.Name + "  -  " + Lang.T("셰이더 파일 ") + fx.Shaders + Lang.T("개, 게임 전용 섹션 ") + fx.Sections + Lang.T("개") +
                     (fx.Sep != null || fx.Conv != null ? ", Sep " + (fx.Sep ?? "-") + " / Conv " + (fx.Conv ?? "-") : "");
                 int bits = Util.ExeBits(gameExe) ?? (rb64.Checked ? 64 : 32);
                 string hubPkg = Path.Combine(pkgDirs[rbUnity.Checked ? "unity" : "plain"], bits == 64 ? "x64" : "x32");
@@ -2757,7 +2765,13 @@ namespace GeoGamingHub
         void RemoveFix()
         {
             if (!RequireGame()) return;
-            if (FixOps.Remove(gameExe)) { Log(Lang.T("커뮤니티 픽스 뺌: ") + Path.GetFileName(gameExe) + Lang.T(" - 게임 폴더는 다음 [완료] 때 허브 기본 설치로 돌아갑니다.")); Status(Lang.T("커뮤니티 픽스를 뺐습니다.")); }
+            if (FixOps.Load(gameExe) == null && FixOps.HasBundled(gameExe) && FixOps.BundledOff(gameExe))
+            {
+                FixOps.UseBundled(gameExe);
+                Log(Lang.T("배포에 든 픽스를 다시 씁니다: ") + Path.GetFileName(gameExe) + Lang.T(" - 다음 [완료] 때 합쳐 넣습니다."));
+                Status(Lang.T("배포에 든 픽스를 다시 씁니다."));
+            }
+            else if (FixOps.Remove(gameExe)) { Log(Lang.T("커뮤니티 픽스 뺌: ") + Path.GetFileName(gameExe) + Lang.T(" - 게임 폴더는 다음 [완료] 때 허브 기본 설치로 돌아갑니다.")); Status(Lang.T("커뮤니티 픽스를 뺐습니다.")); }
             UpdateFixUi();
         }
 
