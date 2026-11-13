@@ -128,9 +128,13 @@ geo-11 games: see and change them on the **Hotkeys** tab. The own wrappers read 
 
 ## Anti-cheat
 
-The app refuses to install into a game folder with anti-cheat (EasyAntiCheat, BattlEye, GameGuard, ...): DLLs in the game
-folder can get the account banned. For example, Helldivers 2 (GameGuard) cannot be set up with the app. Installing by
-hand is at your own account risk.
+In a game folder with anti-cheat (EasyAntiCheat, BattlEye, GameGuard, ...) the app refuses to install its own wrappers
+(OGL3D, VK3D, DX12_3D) and TriDef 3D: DLLs in the game folder can get the account banned. For example, Helldivers 2
+(GameGuard) cannot be set up with the app.
+
+Only geo-11 (DirectX 9 / 11) is installed, and only after you answer [Yes] in a warning box (the default is [No]). The
+anti-cheat may block the DLLs, so the game may not start or may not be in 3D, and in an online game the account could be
+banned. Installing is at your own account risk.
 
 ## Known limits
 

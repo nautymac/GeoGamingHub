@@ -191,6 +191,15 @@ static partial class HubTest
         dl = TakeDialogs();
         Ok(dl.Count == 1 && dl[0].Contains("안티치트"), "anti-cheat game: Apply refused (" + string.Join(" || ", dl) + ")");
         Eq(Files(acDir), "dx12game.exe,GameGuard", "anti-cheat game: nothing written");
+        // geo-11 on the same folder: a warning that asks (the watcher answers Yes), then the install
+        rb("rbKindGeo").Checked = true; Pump();
+        Call(form, "Apply"); Pump();
+        dl = TakeDialogs();
+        Ok(dl.Count >= 1 && dl[0].Contains("안티치트") && dl[0].Contains("그래도 설치할까요?"), "anti-cheat game, geo-11: warning asks first (" + string.Join(" || ", dl) + ")");
+        Ok(File.Exists(Path.Combine(acDir, "d3d11.dll")), "anti-cheat game, geo-11: installed after Yes");
+        Call(form, "StartWizard", ac); Pump();
+        Call(form, "UninstallAll"); Pump(); TakeDialogs();
+        Ok(!File.Exists(Path.Combine(acDir, "d3d11.dll")), "anti-cheat game, geo-11: uninstalled again");
 
         // ---- English
         Ty("Lang").GetField("English").SetValue(null, true);

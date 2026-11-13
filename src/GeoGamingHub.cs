@@ -1286,7 +1286,7 @@ namespace GeoGamingHub
                 string method = c.Method == null ? Lang.T("확인 중...") : flato ? Library.FlatoRouteLabel(c.FlatoRoute) : Library.MethodLabel(c.Method);
                 string alts = flato ? Lang.T("(Hub: ") + Library.MethodLabel(c.Method) + Lang.T(", 깊이 거의 없음)") : string.Join(", ", c.Alts.Select(Library.MethodLabel));
                 string status = c.AntiCheat != null ? Lang.T("안티치트") : Library.StatusLabel(c);
-                string memo = c.AntiCheat != null ? Lang.T("안티치트(") + c.AntiCheat + Lang.T(") - 계정 정지 위험이 있어 설정하지 않습니다") + (string.IsNullOrEmpty(c.Note) ? "" : "; " + c.Note) : c.Note ?? "";
+                string memo = c.AntiCheat != null ? Lang.T("안티치트(") + c.AntiCheat + Lang.T(Library.IsGeoMethod(c.Method) ? ") - 계정 정지 위험: 경고 후 geo-11 설치 가능" : ") - 계정 정지 위험이 있어 설정하지 않습니다") + (string.IsNullOrEmpty(c.Note) ? "" : "; " + c.Note) : c.Note ?? "";
                 var it = new ListViewItem(new[] { c.Title, Library.ProductLabel(c.Product), method, alts, status, c.Installed != null ? c.Installed.Store : "", c.Engine ?? "", c.Api ?? "", c.Bits ?? "", memo }) { Tag = c };
                 bool verified = !c.FromExe && (flato ? c.FlatoStatus == "verified" || c.FlatoStatus == "working" : c.Status == "verified");
                 if (c.AntiCheat != null) it.ForeColor = Color.FromArgb(196, 43, 28);
@@ -1309,9 +1309,11 @@ namespace GeoGamingHub
             if (lvCands.SelectedItems.Count == 0) { Status(Lang.T("후보 목록에서 게임을 먼저 고르세요.")); return; }
             var c = (Candidate)lvCands.SelectedItems[0].Tag;
             if (c.Installed == null) { Status(Lang.T("이 PC에 설치되지 않은 게임입니다: ") + c.Title); return; }
-            if (c.AntiCheat != null || (c.AntiCheat = Library.AntiCheat(c.Installed.Dir)) != null)
+            // anti-cheat: only a geo-11 game goes on to the wizard (its [Finish] warns and asks); the own wrappers and
+            // TriDef 3D are refused here already
+            if ((c.AntiCheat != null || (c.AntiCheat = Library.AntiCheat(c.Installed.Dir)) != null) && !Library.IsGeoMethod(c.Method))
             {
-                Status(Lang.T("안티치트가 있는 게임은 설정하지 않습니다(계정 정지 위험): ") + c.Title + " (" + c.AntiCheat + ")");
+                Status(Lang.T("안티치트가 있는 게임은 geo-11만 설정할 수 있습니다(계정 정지 위험): ") + c.Title + " (" + c.AntiCheat + ")");
                 return;
             }
             if (c.Product == "flato3d")
@@ -2410,7 +2412,7 @@ namespace GeoGamingHub
             // OpenGL exe can still name d3d9.dll (Broken Age), which the DLL-name fallback below would take for DX9.
             lastGeoKind = lastWrapKind = null;
             string anti = Library.AntiCheat(gameDir);
-            if (anti != null) notes.Add(Lang.T("안티치트 있음(") + anti + Lang.T(") - 설치하지 않습니다"));
+            if (anti != null) notes.Add(Lang.T("안티치트 있음(") + anti + Lang.T(") - geo-11만 경고 후 설치 가능"));
             bool gl = GlOps.Installed(gameDir) || (uv == null && !rbUe4.Checked && GlOps.IsOpenGL(exePath));   // an existing install wins
             // Vulkan (imports vulkan-1.dll and no Direct3D) or an existing VK3D install (also DX games run through DXVK) -> the Vulkan kind
             bool vk = !gl && (VkOps.Installed(gameDir) || (uv == null && !rbUe4.Checked && VkOps.ImportsVulkan(exePath) && !VkOps.ImportsDirect3D(exePath)));
@@ -2854,9 +2856,20 @@ namespace GeoGamingHub
             string ac = Library.AntiCheat(gameDir);
             if (ac != null)
             {
-                Log(Lang.T("적용 안 함: 안티치트가 있는 게임입니다 - ") + ac);
-                MessageBox.Show(this, Lang.T("이 게임 폴더에 안티치트가 있습니다: ") + ac + Lang.T("\n\n게임 폴더에 DLL을 넣으면 계정이 정지될 수 있어 설치하지 않습니다."), AppName, MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return;
+                // anti-cheat: geo-11 (DirectX 9 / 11) installs after a warning the user must confirm (default button: No);
+                // the own wrappers (OGL3D, VK3D, DX12_3D) and TriDef 3D are still refused
+                if (IsTriSelected || IsGlSelected || IsVkSelected || IsDx12Selected)
+                {
+                    Log(Lang.T("적용 안 함: 안티치트가 있는 게임입니다 - ") + ac);
+                    MessageBox.Show(this, Lang.T("이 게임 폴더에 안티치트가 있습니다: ") + ac + Lang.T("\n\n게임 폴더에 DLL을 넣으면 계정이 정지될 수 있어 설치하지 않습니다. geo-11(DirectX 9 / 11)만 경고 후 설치할 수 있습니다."), AppName, MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return;
+                }
+                if (MessageBox.Show(this, Lang.T("이 게임 폴더에 안티치트가 있습니다: ") + ac + Lang.T("\n\ngeo-11은 게임 폴더에 DLL(d3d11.dll 등)을 넣습니다. 안티치트가 이를 막아 게임이 실행되지 않거나 3D가 되지 않을 수 있고, 온라인 게임에서는 계정이 정지될 수 있습니다. 이 위험은 본인이 감수하는 것입니다.\n\n그래도 설치할까요?"), AppName, MessageBoxButtons.YesNo, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button2) != DialogResult.Yes)
+                {
+                    Log(Lang.T("적용 안 함: 안티치트 경고에서 취소했습니다 - ") + ac);
+                    return;
+                }
+                Log(Lang.T("안티치트 경고를 확인하고 설치합니다(계정 정지 위험은 본인 부담) - ") + ac);
             }
             if (IsTriSelected) { ApplyTri(); return; }
             if (IsGlSelected || IsVkSelected || IsDx12Selected) { ApplyWrapper(); return; }

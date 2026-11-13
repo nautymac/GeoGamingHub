@@ -35,6 +35,9 @@ namespace GeoGamingHub
     {
         public static readonly string[] Methods = { "unity", "ue4", "dx11", "dx9", "opengl", "vulkan", "tridef", "dx12", "old", "none", "unknown" };
 
+        // the geo-11 methods (DirectX 9 / 11): the only ones offered, after a warning, for a game with anti-cheat
+        public static bool IsGeoMethod(string m) { return m == "unity" || m == "ue4" || m == "dx11" || m == "dx9"; }
+
         public static string MethodLabel(string m)
         {
             switch (m)
