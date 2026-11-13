@@ -3,11 +3,14 @@
 // Ignition's own window:
 //   - registering: HKCU\SOFTWARE\DDD\TriDefIgnition\Games\<name> with Path = the game exe, Profile = one of TriDef's
 //     .TriDefGame files (C:\ProgramData\DDD\TriDefGames), the same values Ignition writes when a game is added by exe;
-//   - starting: Tridef3D_Play.exe (tridef3d-win11-injector, MIT, the TriDef package of this app) launches the Steam game
-//     with steam:// and injects TriDef's DLLs into it (and SRWeave for an SR panel with --sr). It needs administrator
-//     rights, so the app starts it with "runas".
-// Nothing goes into the game folder. Steam games only (the launcher finds the app id from the exe's Steam folder);
-// 32-bit games get TriDef's DirectX 9 set, 64-bit games its DirectX 11 set.
+//   - starting: Tridef3D_Play.exe (tridef3d-win11-injector, MIT, the TriDef package of this app) starts the game and
+//     injects TriDef's DLLs into it (and SRWeave for an SR panel with --sr). A Steam game is started with steam:// (the
+//     launcher finds the app id from the exe's Steam folder) and the launcher is run with "runas", as before. Any other
+//     game (GOG, EA app, Epic, a disc install) is started from its exe, and the launcher is run with the user's normal
+//     rights so that the game gets them too; if the exe hands over to its store's launcher and comes back as a new
+//     process, the launcher injects that one as well.
+// Nothing goes into the game folder. 32-bit games get TriDef's DirectX 9 set, 64-bit games its DirectX 11 set. With SR
+// weaving a DirectX 9 game below the panel's resolution is weaved at the panel's resolution (SRWeaveDX9 "upscale").
 // The profile list comes from TriDef's own folder, or without TriDef from data\tridef_profiles.txt (names only), so a
 // game with a profile is recognised either way and the user is told that TriDef 3D has to be installed.
 using System;
@@ -219,15 +222,23 @@ namespace GeoGamingHub
             return log;
         }
 
-        // starts the game through the launcher (elevated: injection needs administrator rights). The launcher is a console
-        // program; its window is hidden (it only asks for input when no game name is given, and the name is always passed).
-        public static void Launch(string pkgDir, string name, bool sr)
+        // starts the game through the launcher. "--console" with a name makes the (windowed) launcher run without any
+        // window and write its output to launcher.log in the package folder. A Steam game: elevated, as it always was.
+        // Any other game: the user's own rights - the launcher starts the game itself, and an elevated launcher would
+        // make the game run as administrator.
+        public static void Launch(string pkgDir, string name, bool sr, bool steam)
         {
             string exe = Path.Combine(pkgDir, Launcher);
             if (!File.Exists(exe)) throw new FileNotFoundException(Lang.T("TriDef 실행기가 패키지에 없습니다: ") + exe);
-            Process.Start(new ProcessStartInfo(exe, "\"" + name + "\"" + (sr ? " --sr" : ""))
-            { UseShellExecute = true, Verb = "runas", WorkingDirectory = pkgDir, WindowStyle = ProcessWindowStyle.Hidden });
+            var psi = new ProcessStartInfo(exe, LaunchArgs(name, sr))
+            { UseShellExecute = true, WorkingDirectory = pkgDir, WindowStyle = ProcessWindowStyle.Hidden };
+            if (steam) psi.Verb = "runas";
+            Process.Start(psi);
         }
+
+        public static string LaunchArgs(string name, bool sr) { return "\"" + name + "\"" + (sr ? " --sr" : "") + " --console"; }
+
+        public static string LauncherLog(string pkgDir) { return Path.Combine(pkgDir, "launcher.log"); }
 
         public static string SrLog(string pkgDir, string exe)
         {

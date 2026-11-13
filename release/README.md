@@ -1,4 +1,4 @@
-# Geo Gaming Hub v0.1.1
+# Geo Gaming Hub v0.1.2
 
 **English** · [한국어](README.ko.md)
 
@@ -17,7 +17,7 @@ side-by-side / top-and-bottom.
 | OpenGL | OGL3D (`opengl32.dll`) | 32 / 64 |
 | Vulkan | VK3D (`vulkan-1.dll`) | 64 |
 | DirectX 12 | DX12_3D (`d3d12.dll`) | 64 |
-| Games with a TriDef 3D profile | an installed TriDef 3D + Tridef3D_Play (Steam games) | 32 (DX9) / 64 (DX11) |
+| Games with a TriDef 3D profile | an installed TriDef 3D + Tridef3D_Play (Steam games and others) | 32 (DX9) / 64 (DX11) |
 
 geo-11 games are woven by SRWeave (`dxgi.dll`); the own wrappers (OGL3D / VK3D / DX12_3D) weave by themselves.
 A DirectX 9 / 11 game can also be run as Vulkan through DXVK and use VK3D (experimental, 64-bit).
@@ -26,10 +26,16 @@ A DirectX 9 / 11 game can also be run as Vulkan through DXVK and use VK3D (exper
 
 **TriDef 3D must be installed.** TriDef 3D (DDD, discontinued in 2017) has to be on the PC; this app contains none of its
 files (they may not be redistributed). Instead of TriDef 3D Ignition's window, the app registers the game with TriDef (the
-TriDef profile is picked by the game's name), and **[Run]** starts it through `Tridef3D_Play`, which injects TriDef's DLLs
-(an administrator prompt appears). Nothing goes into the game folder. Steam games only; started directly from Steam the
-game is not in 3D, so use the app's [Run]. Depth is adjusted in game with TriDef's hotkeys. A game with a TriDef profile
-gets this method automatically when its exe is chosen.
+TriDef profile is picked by the game's name), and **[Run]** starts it through `Tridef3D_Play`, which injects TriDef's DLLs.
+A Steam game is started through Steam (an administrator prompt appears); any other game (GOG, EA app, Epic, a disc install)
+is started from its exe, and if that exe hands over to its own launcher (the EA app, for one) and comes back as a new
+process, that process is injected too. Nothing goes into the game folder. Started directly from Steam or another launcher
+the game is not in 3D, so use the app's [Run]. Depth is adjusted in game with TriDef's hotkeys. A game with a TriDef
+profile gets this method automatically when its exe is chosen.
+
+With SR weaving a DirectX 9 game may run below the panel's resolution: SRWeave weaves it at the panel's resolution
+(upscaling), so an old game need not be run at 4K with tiny text. To turn that off, put `upscale=0` into
+`Packages\TriDef\sr\x86\SRWeave.ini`.
 
 ## Contents
 

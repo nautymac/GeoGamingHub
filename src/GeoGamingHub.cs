@@ -21,8 +21,8 @@ using System.Windows.Forms;
 
 [assembly: AssemblyTitle("Geo Gaming Hub")]
 [assembly: AssemblyProduct("Geo Gaming Hub")]
-[assembly: AssemblyVersion("0.1.1.0")]
-[assembly: AssemblyFileVersion("0.1.1.0")]
+[assembly: AssemblyVersion("0.1.2.0")]
+[assembly: AssemblyFileVersion("0.1.2.0")]
 
 namespace GeoGamingHub
 {
@@ -679,7 +679,7 @@ namespace GeoGamingHub
     sealed class MainForm : Form
     {
         public const string AppName = "Geo Gaming Hub";
-        // "0.1.1" from [assembly: AssemblyVersion] above: one place to bump. The window title shows "Geo Gaming Hub v0.1.1".
+        // "0.1.2" from [assembly: AssemblyVersion] above: one place to bump. The window title shows "Geo Gaming Hub v0.1.2".
         public static readonly string AppVersion = typeof(MainForm).Assembly.GetName().Version.ToString(3);
         public static readonly string AppTitle = AppName + " v" + AppVersion;
         // ---- data ----
@@ -1569,11 +1569,14 @@ namespace GeoGamingHub
             string tn = TriOf(exe);
             if (tn != null)
             {
-                // TriDef 3D: Tridef3D_Play starts the game through Steam and injects TriDef (administrator rights)
+                // TriDef 3D: Tridef3D_Play starts the game and injects TriDef - through Steam (administrator rights) for a
+                // Steam game, from the exe itself for any other game
                 try
                 {
-                    TriOps.Launch(pkgDirs["tridef"], tn, TriOps.Sr(tn));
-                    Log(Lang.T("TriDef 실행기로 실행: ") + tn + (TriOps.Sr(tn) ? " (--sr)" : ""));
+                    bool triSteam = Util.FindSteamApp(dir, out appId, out nm);
+                    TriOps.Launch(pkgDirs["tridef"], tn, TriOps.Sr(tn), triSteam);
+                    Log(Lang.T("TriDef 실행기로 실행: ") + tn + (TriOps.Sr(tn) ? " (--sr)" : "") + (triSteam ? "" : Lang.T(" - Steam 게임이 아니어서 실행 파일로 직접 시작")));
+                    Log(Lang.T("  실행기 기록: ") + TriOps.LauncherLog(pkgDirs["tridef"]));
                     Status(Lang.T("TriDef 실행기로 실행: ") + tn);
                 }
                 catch (System.ComponentModel.Win32Exception ex) { Log(Lang.T("실행 취소 또는 실패: ") + ex.Message); Status(Lang.T("실행 취소 또는 실패: ") + ex.Message); }
@@ -1723,13 +1726,13 @@ namespace GeoGamingHub
             p.Controls.Add(kindCol);
             // TriDef 3D: the user's own TriDef install does the 3D; this app registers the game and starts it
             pnlKindTri = new FlowLayoutPanel { AutoSize = true, FlowDirection = FlowDirection.TopDown, WrapContents = false, Margin = new Padding(0), Visible = false };
-            rbKindTri = Radio(Lang.T("TriDef 3D 프로필로 실행 (Steam 게임, 32비트 DX9 / 64비트 DX11)"), false);
+            rbKindTri = Radio(Lang.T("TriDef 3D 프로필로 실행 (32비트 DX9 / 64비트 DX11)"), false);
             rbKindTri.Font = new Font(Font, FontStyle.Bold);
             pnlKindTri.Controls.Add(rbKindTri);
             var triMust = new Label { AutoSize = true, ForeColor = Color.FromArgb(196, 43, 28), Font = new Font(Font, FontStyle.Bold), Margin = P(0, 4, 0, 4), MaximumSize = Sz(1040, 0),
                 Text = Lang.T("TriDef 3D 설치 필수: 이 방식은 PC에 설치된 TriDef 3D(DDD)가 3D를 만듭니다. 이 앱에는 TriDef 파일이 들어 있지 않으며(재배포 불가), TriDef 3D가 없으면 동작하지 않습니다.") };
             pnlKindTri.Controls.Add(triMust);
-            pnlKindTri.Controls.Add(Note(Lang.T("TriDef 3D Ignition 창 대신 이 앱이 게임을 TriDef에 등록하고(프로필 지정), [실행]은 Tridef3D_Play로 게임을 시작해 TriDef DLL을 주입합니다(관리자 권한 확인 창이 뜹니다). 게임 폴더에는 아무것도 넣지 않습니다. Steam에서 바로 실행하면 3D가 되지 않으니 이 앱의 [실행]으로 시작하세요. 깊이는 TriDef 단축키로 조절합니다.")));
+            pnlKindTri.Controls.Add(Note(Lang.T("TriDef 3D Ignition 창 대신 이 앱이 게임을 TriDef에 등록하고(프로필 지정), [실행]은 Tridef3D_Play로 게임을 시작해 TriDef DLL을 주입합니다. Steam 게임은 Steam으로 시작하고(관리자 권한 확인 창이 뜹니다), 그 밖의 게임(GOG, EA 앱, Epic 등)은 실행 파일로 직접 시작합니다. 게임 폴더에는 아무것도 넣지 않습니다. Steam이나 다른 런처에서 바로 실행하면 3D가 되지 않으니 이 앱의 [실행]으로 시작하세요. 깊이는 TriDef 단축키로 조절합니다.")));
             lblTriState = new Label { AutoSize = true, Margin = P(0, 2, 0, 6), MaximumSize = Sz(1040, 0) };
             pnlKindTri.Controls.Add(lblTriState);
             var triRow = new FlowLayoutPanel { AutoSize = true, WrapContents = false, Margin = P(0, 2, 0, 0) };
@@ -2125,7 +2128,7 @@ namespace GeoGamingHub
                 Lang.T("     UF2는 게임을 -dx11 인자로 실행해야 합니다. [완료] 때 Steam 시작 옵션(Steam을 잠시 종료했다가 다시 시작) 또는 Heroic(Epic/GOG)의 게임 설정에 -dx11을 넣고, 설치기의 [실행]도 -dx11을 붙입니다."),
                 Lang.T("  4. 3단계 [디스플레이]: SR 위빙 사용 여부(SR 패널이 아니면 끄고 3D 출력 모드 선택), 필요하면 업스케일. [다음]."),
                 Lang.T("     OpenGL 게임(게임 유형 'OpenGL - OGL3D')은 opengl32.dll + OGL3D.ini만 설치하고, 디스플레이·입체 값 단계의 항목을 OGL3D.ini에 씁니다(output, swap_eyes, upscale, separation, convergence)."),
-                Lang.T("     TriDef 3D(카테고리 'TriDef 3D')는 TriDef 3D가 설치돼 있어야 합니다. 게임을 TriDef에 등록만 하고(게임 폴더는 그대로), [실행]은 Tridef3D_Play로 시작합니다(Steam 게임, 관리자 권한)."),
+                Lang.T("     TriDef 3D(카테고리 'TriDef 3D')는 TriDef 3D가 설치돼 있어야 합니다. 게임을 TriDef에 등록만 하고(게임 폴더는 그대로), [실행]은 Tridef3D_Play로 시작합니다(Steam 게임은 관리자 권한 확인, 그 밖의 게임은 실행 파일로 직접 시작)."),
                 Lang.T("     Vulkan 게임(게임 유형 'Vulkan - VK3D')은 vulkan-1.dll + VK3D.ini(+ 게임 전용 픽스)를 설치하고, 디스플레이·입체 값 단계의 항목을 VK3D.ini에 씁니다(output, swap_eyes, separation, convergence)."),
                 Lang.T("  5. 4단계 [입체 값]: Separation / Convergence. [완료]를 누르면 게임 폴더에 모두 적용되고 목록이 '설정 완료'로 바뀝니다."),
                 Lang.T("     중간에 [취소]하면 게임 폴더는 바뀌지 않고 목록에 '재설정 필요'로 남습니다. [완료] 전에는 아무것도 적용되지 않으므로, [설정 바꾸기]로 1단계부터 다시 하면 됩니다."),
@@ -2237,7 +2240,7 @@ namespace GeoGamingHub
                 cbUpscaleFs.Enabled = cbUpscaleMode.Enabled = numUpW.Enabled = numUpH.Enabled = chkUpscale.Checked;
         }
 
-        // TriDef 3D: installed or not (required), and whether the launcher can start this game (Steam only)
+        // TriDef 3D: installed or not (required), and how the launcher will start this game
         void UpdateTriState()
         {
             string drv = TriOps.Installed() ? TriOps.DriverDir() : null;
@@ -2245,9 +2248,9 @@ namespace GeoGamingHub
             bool steam = gameDir != null && Util.FindSteamApp(gameDir, out appId, out nm);
             var lines = new List<string>();
             lines.Add(drv != null ? Lang.T("TriDef 3D 설치됨: ") + drv : Lang.T("이 PC에 TriDef 3D가 설치돼 있지 않습니다. TriDef 3D를 설치해야 이 방식으로 3D가 됩니다."));
-            if (gameDir != null && !steam) lines.Add(Lang.T("Steam 게임이 아닙니다: TriDef 실행기는 Steam 게임만 시작할 수 있습니다."));
+            if (gameDir != null && !steam) lines.Add(Lang.T("Steam 게임이 아닙니다: [실행]이 실행 파일로 직접 시작합니다."));
             lblTriState.Text = string.Join("\n", lines);
-            lblTriState.ForeColor = drv != null && (gameDir == null || steam) ? Color.FromArgb(16, 124, 16) : Color.FromArgb(196, 43, 28);
+            lblTriState.ForeColor = drv != null ? Color.FromArgb(16, 124, 16) : Color.FromArgb(196, 43, 28);
         }
 
         // output choices of the wrapper kinds (OGL3D: sbs/tab/left/right, VK3D: sbs/tab); keeps the choice when possible
@@ -2648,12 +2651,7 @@ namespace GeoGamingHub
                 return;
             }
             string appId, nm;
-            if (!Util.FindSteamApp(gameDir, out appId, out nm))
-            {
-                Log(Lang.T("적용 안 함: Steam 게임이 아닙니다 (TriDef 실행기는 Steam 게임만 시작합니다)."));
-                MessageBox.Show(this, Lang.T("Steam 게임이 아닙니다.\n\nTriDef 실행기(Tridef3D_Play)는 Steam으로 게임을 시작한 뒤 주입하므로 Steam 게임만 됩니다."), AppName, MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return;
-            }
+            if (!Util.FindSteamApp(gameDir, out appId, out nm)) nm = null;   // not a Steam game: named after its folder / exe, started from its exe
             string profile = cbTriProfile.SelectedIndex > 0 ? (string)cbTriProfile.SelectedItem : null;
             if (profile == null)
             {
@@ -2672,7 +2670,7 @@ namespace GeoGamingHub
                 tabs.SelectedIndex = TabList;
                 Log(Lang.T("완료."));
                 Status(Lang.T("설정 완료: ") + Path.GetFileName(gameExe) + "  (TriDef 3D)");
-                MessageBox.Show(this, Lang.T("TriDef 3D에 등록했습니다.\n\n[게임 목록]의 [실행]으로 시작하세요(관리자 권한 확인 창이 뜹니다). Steam에서 바로 실행하면 3D가 되지 않습니다. 깊이는 게임 안에서 TriDef 단축키로 조절합니다."), AppName, MessageBoxButtons.OK, MessageBoxIcon.Information);
+                MessageBox.Show(this, Lang.T("TriDef 3D에 등록했습니다.\n\n[게임 목록]의 [실행]으로 시작하세요(Steam 게임은 관리자 권한 확인 창이 뜹니다). Steam이나 다른 런처에서 바로 실행하면 3D가 되지 않습니다. 깊이는 게임 안에서 TriDef 단축키로 조절합니다."), AppName, MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
             catch (Exception ex)
             {

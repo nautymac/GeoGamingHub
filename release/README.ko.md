@@ -1,4 +1,4 @@
-# Geo Gaming Hub v0.1.1
+# Geo Gaming Hub v0.1.2
 
 [English](README.md) · **한국어**
 
@@ -16,7 +16,7 @@ SR 디스플레이(Acer SpatialLabs / Leia SR)에서는 SR 위빙, 그 밖의 3D
 | OpenGL | OGL3D (`opengl32.dll`) | 32 / 64 |
 | Vulkan | VK3D (`vulkan-1.dll`) | 64 |
 | DirectX 12 | DX12_3D (`d3d12.dll`) | 64 |
-| TriDef 3D 프로필이 있는 게임 | 설치된 TriDef 3D + Tridef3D_Play (Steam 게임) | 32 (DX9) / 64 (DX11) |
+| TriDef 3D 프로필이 있는 게임 | 설치된 TriDef 3D + Tridef3D_Play (Steam 게임과 그 밖의 게임) | 32 (DX9) / 64 (DX11) |
 
 geo-11 게임의 SR 위빙은 SRWeave(`dxgi.dll`)가, 자체 래퍼(OGL3D / VK3D / DX12_3D)는 래퍼가 직접 합니다.
 DXVK로 DirectX 9 / 11 게임을 Vulkan으로 바꿔 VK3D로 실행하는 방법도 있습니다(실험적, 64비트).
@@ -25,9 +25,13 @@ DXVK로 DirectX 9 / 11 게임을 Vulkan으로 바꿔 VK3D로 실행하는 방법
 
 **TriDef 3D 설치 필수.** TriDef 3D(DDD, 2017년 단종)가 PC에 설치돼 있어야 합니다. 이 앱에는 TriDef 파일이 들어 있지 않습니다(재배포 불가).
 TriDef 3D Ignition 창 대신 앱이 게임을 TriDef에 등록하고(게임 이름으로 TriDef 프로필 자동 선택), **[실행]**은 `Tridef3D_Play`로
-게임을 시작해 TriDef DLL을 주입합니다(관리자 권한 확인 창). 게임 폴더에는 아무것도 넣지 않습니다. Steam 게임만 되고, Steam에서
-바로 실행하면 3D가 되지 않으니 앱의 [실행]으로 시작하세요. 깊이는 게임 안에서 TriDef 단축키로 조절합니다. 실행 파일을 고르면 TriDef
-프로필이 있는 게임은 자동으로 이 방식이 선택됩니다.
+게임을 시작해 TriDef DLL을 주입합니다. Steam 게임은 Steam으로 시작하고(관리자 권한 확인 창), 그 밖의 게임(GOG, EA 앱, Epic,
+디스크 설치본)은 실행 파일로 직접 시작합니다. 실행 파일이 자기 런처(EA 앱 등)에 넘겼다가 새 프로세스로 다시 뜨면 그 프로세스에도
+주입합니다. 게임 폴더에는 아무것도 넣지 않습니다. Steam이나 다른 런처에서 바로 실행하면 3D가 되지 않으니 앱의 [실행]으로 시작하세요.
+깊이는 게임 안에서 TriDef 단축키로 조절합니다. 실행 파일을 고르면 TriDef 프로필이 있는 게임은 자동으로 이 방식이 선택됩니다.
+
+SR 위빙을 켠 DirectX 9 게임은 패널보다 낮은 해상도로 실행해도 됩니다. SRWeave가 패널 해상도에서 위빙해 내보내므로(업스케일),
+오래된 게임을 4K로 돌려 글자가 작아지는 일을 피할 수 있습니다. 끄려면 `Packages\TriDef\sr\x86\SRWeave.ini`에 `upscale=0`을 넣습니다.
 
 ## 들어 있는 것
 

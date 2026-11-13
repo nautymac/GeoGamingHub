@@ -351,7 +351,7 @@ namespace GeoGamingHub
                 var cards = new FlowLayoutPanel { AutoSize = true, WrapContents = true, Margin = new Padding(0, S(2), 0, S(2)), Padding = new Padding(0) };
                 cards.Controls.Add(new CatCard(cats[0], "", Accent, "geo-11 3D", Lang.T("DirectX 9 / 11 게임"), Lang.T("커뮤니티 픽스 · Unity · DX11 · UE4 · DX9"), Muted));
                 cards.Controls.Add(new CatCard(cats[1], "", Blue, Lang.T("자체 래퍼"), Lang.T("OpenGL · Vulkan · DirectX 12 게임"), "OGL3D · VK3D · DX12_3D (+ DXVK)", Muted));
-                cards.Controls.Add(new CatCard(cats[2], "", Purple, "TriDef 3D", Lang.T("TriDef 프로필이 있는 Steam 게임"), Lang.T("TriDef 3D 설치 필수"), Red));
+                cards.Controls.Add(new CatCard(cats[2], "", Purple, "TriDef 3D", Lang.T("TriDef 프로필이 있는 게임"), Lang.T("TriDef 3D 설치 필수"), Red));
                 foreach (var r in cats) r.Visible = false;
                 cats[0].Parent.Controls.Add(cards);
             }
