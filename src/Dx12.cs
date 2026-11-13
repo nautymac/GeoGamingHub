@@ -30,6 +30,7 @@ namespace GeoGamingHub
             public bool Swap;                   // [Stereo] swap_eyes
             public decimal Separation = 25;     // [Stereo] separation (percent of max_separation)
             public decimal Convergence = 100;   // [Stereo] convergence (game units)
+            public bool Upscale;                // [Display] upscale: the game at its own resolution, woven at the panel's in DX12_3D's window
         }
 
         public static readonly string[] Modes = { "sbs", "tab" };
@@ -133,6 +134,7 @@ namespace GeoGamingHub
             if (s != null && s.Trim().Equals("auto", StringComparison.OrdinalIgnoreCase)) d = Num(get("Stereo", "auto_start"));
             else d = Num(s);
             if (d.HasValue && d.Value > 0) o.Convergence = d.Value;
+            s = get("Display", "upscale"); if (s != null) o.Upscale = s.Trim() != "0";
             return o;
         }
 
@@ -142,11 +144,12 @@ namespace GeoGamingHub
             GlOps.Set(ini, "Stereo", "swap_eyes", o.Swap ? "1" : "0");
             GlOps.Set(ini, "Stereo", "separation", o.Separation.ToString("0.##", CultureInfo.InvariantCulture));
             GlOps.Set(ini, "Stereo", "convergence", o.Convergence.ToString("0.####", CultureInfo.InvariantCulture));
+            GlOps.Set(ini, "Display", "upscale", o.Upscale ? "1" : "0");
         }
 
         public static string Describe(Options o)
         {
-            return "output=" + (o.Sr ? "auto" : o.Mode) + " swap_eyes=" + (o.Swap ? 1 : 0) +
+            return "output=" + (o.Sr ? "auto" : o.Mode) + " swap_eyes=" + (o.Swap ? 1 : 0) + " upscale=" + (o.Upscale ? 1 : 0) +
                    " separation=" + o.Separation.ToString("0.##", CultureInfo.InvariantCulture) +
                    " convergence=" + o.Convergence.ToString("0.####", CultureInfo.InvariantCulture);
         }

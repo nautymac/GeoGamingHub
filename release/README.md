@@ -21,6 +21,9 @@ side-by-side / top-and-bottom.
 
 geo-11 games are woven by SRWeave (`dxgi.dll`); the own wrappers (OGL3D / VK3D / DX12_3D) weave by themselves.
 A DirectX 9 / 11 game can also be run as Vulkan through DXVK and use VK3D (experimental, 64-bit).
+OGL3D and DX12_3D games can run below the panel's resolution: tick **Upscale** in the Display step. The game then
+renders at 1920×1080 (on a 4K panel at 200 % scaling: readable menus and text) and the wrapper weaves it at the
+panel's resolution in its own window over the game window; choose 1920×1080 borderless in the game.
 
 ### TriDef 3D
 

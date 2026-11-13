@@ -735,7 +735,7 @@ namespace GeoGamingHub
         RadioButton rbCatGeo, rbCatWrap; FlowLayoutPanel pnlKindGeo, pnlKindWrap;   // 3D method step: category, then the game types in it
         RadioButton lastGeoKind, lastWrapKind; bool syncingCategory;
         RadioButton rbKindVk; CheckBox chkVkDxvk; Label lblVkDxvk;
-        RadioButton rbKindDx12; Label lblDx12Install, lblStereoDx12;   // DirectX 12 games: DX12_3D (d3d12.dll proxy)
+        RadioButton rbKindDx12; Label lblDx12Install, lblStereoDx12, lblUpNoteDx12;   // DirectX 12 games: DX12_3D (d3d12.dll proxy)
         // TriDef 3D games (an installed TriDef 3D, registered here instead of in TriDef 3D Ignition, started by Tridef3D_Play)
         RadioButton rbCatTri, rbKindTri; FlowLayoutPanel pnlKindTri; ComboBox cbTriProfile; Label lblTriState, lblTriInstall, lblStereoTri;
         TableLayoutPanel gridStereo;
@@ -1471,7 +1471,7 @@ namespace GeoGamingHub
                 }
                 if (hasDx12)
                 {
-                    up = "-";   // DX12_3D: the game's own render scale
+                    up = d12o.Upscale ? Lang.T("켬") : Lang.T("끔");   // DX12_3D.ini [Display] upscale
                     sep = d12o.Separation.ToString(CultureInfo.InvariantCulture);
                     conv = d12o.Convergence.ToString(CultureInfo.InvariantCulture);
                 }
@@ -2012,6 +2012,9 @@ namespace GeoGamingHub
             lblUpNoteGl = Note(Lang.T("OGL3D 업스케일: 게임은 자기 해상도(예: 1920×1080, 메뉴·글씨가 읽기 좋음)로 그리고, OGL3D가 게임 위의 자체 창에 패널 해상도로 위빙해 보여 줍니다. 켠 뒤 게임 설정에서 1920×1080을 고르세요. 해상도 변경은 막혀 패널은 원래 해상도를 유지합니다."));
             lblUpNoteGl.Visible = false;
             p.Controls.Add(lblUpNoteGl);
+            lblUpNoteDx12 = Note(Lang.T("DX12_3D 업스케일: 게임은 낮은 해상도(200% 배율의 4K 패널에서는 1920×1080, 메뉴·글씨가 읽기 좋고 4K 문제를 피함)로 그리고, DX12_3D가 게임 창 위의 자체 창에 패널 해상도로 위빙해 보여 줍니다. 켠 뒤 게임 설정에서 1920×1080 테두리 없는 창(창 모드 전체 화면)을 고르세요. 마우스는 그대로 게임으로 가고, 전용 전체 화면은 창 모드로 유지되어 패널은 원래 해상도를 유지합니다. DX12_3D.ini [Display] upscale."));
+            lblUpNoteDx12.Visible = false;
+            p.Controls.Add(lblUpNoteDx12);
             geoUpscaleControls.Add(lblUpNote);
 
             // the one choice worth showing: compatibility (mode 1, default) vs. performance (mode 0). Index == upscale_mode.
@@ -2167,6 +2170,7 @@ namespace GeoGamingHub
                 Lang.T("     OpenGL 게임(게임 유형 'OpenGL - OGL3D')은 opengl32.dll + OGL3D.ini만 설치하고, 디스플레이·입체 값 단계의 항목을 OGL3D.ini에 씁니다(output, swap_eyes, upscale, separation, convergence)."),
                 Lang.T("     TriDef 3D(카테고리 'TriDef 3D')는 TriDef 3D가 설치돼 있어야 합니다. 게임을 TriDef에 등록만 하고(게임 폴더는 그대로), [실행]은 Tridef3D_Play로 시작합니다(Steam 게임은 관리자 권한 확인, 그 밖의 게임은 실행 파일로 직접 시작)."),
                 Lang.T("     Vulkan 게임(게임 유형 'Vulkan - VK3D')은 vulkan-1.dll + VK3D.ini(+ 게임 전용 픽스)를 설치하고, 디스플레이·입체 값 단계의 항목을 VK3D.ini에 씁니다(output, swap_eyes, separation, convergence)."),
+                Lang.T("     DirectX 12 게임(게임 유형 'DirectX 12 - DX12_3D')은 d3d12.dll + DX12_3D.ini + DX12_3D 폴더(DXC)를 설치하고, 디스플레이·입체 값 단계의 항목을 DX12_3D.ini에 씁니다(output, swap_eyes, upscale, separation, convergence)."),
                 Lang.T("  5. 4단계 [입체 값]: Separation / Convergence. [완료]를 누르면 게임 폴더에 모두 적용되고 목록이 '설정 완료'로 바뀝니다."),
                 Lang.T("     중간에 [취소]하면 게임 폴더는 바뀌지 않고 목록에 '재설정 필요'로 남습니다. [완료] 전에는 아무것도 적용되지 않으므로, [설정 바꾸기]로 1단계부터 다시 하면 됩니다."),
                 Lang.T("  6. [게임 목록]에서 실행(Steam 게임은 Steam으로), 설정 바꾸기, 폴더 열기, SR 위빙만 제거, 3D 픽스 제거를 할 수 있습니다."),
@@ -2254,8 +2258,9 @@ namespace GeoGamingHub
                 foreach (var c in geoUpscaleControls) c.Visible = !w && !tri;
                 gridUpAdv.Visible = !w && !tri && chkUpAdv.Checked;
                 lblUpNoteGl.Visible = gl;
-                lblUpHead.Visible = chkUpscale.Visible = !vk && !dx12 && !tri;   // VK3D / DX12_3D / TriDef have no upscaling here
-                if (vk || dx12 || tri) chkUpscale.Checked = false;
+                lblUpNoteDx12.Visible = dx12;
+                lblUpHead.Visible = chkUpscale.Visible = !vk && !tri;   // VK3D / TriDef have no upscaling here
+                if (vk || tri) chkUpscale.Checked = false;
             }
             if (lblStereoGl != null)
             {
@@ -2525,7 +2530,7 @@ namespace GeoGamingHub
                 SetWrapperModes(Dx12Ops.Modes);
                 cbGlMode.SelectedItem = d.Mode;
                 chkSwap.Checked = d.Swap;
-                chkUpscale.Checked = false;
+                chkUpscale.Checked = d.Upscale;
                 numSep.Value = Math.Min(numSep.Maximum, Math.Max(numSep.Minimum, d.Separation));
                 numConv.Value = Math.Min(numConv.Maximum, Math.Max(numConv.Minimum, d.Convergence));
                 chkAutoConv.Checked = false;
@@ -2639,7 +2644,7 @@ namespace GeoGamingHub
                 string dir = gameDir;
                 var o = new Dx12Ops.Options
                 {
-                    Sr = chkSr.Checked, Mode = (string)cbGlMode.SelectedItem ?? "sbs", Swap = chkSwap.Checked,
+                    Sr = chkSr.Checked, Mode = (string)cbGlMode.SelectedItem ?? "sbs", Swap = chkSwap.Checked, Upscale = chkUpscale.Checked,
                     Separation = numSep.Value, Convergence = numConv.Value
                 };
                 Log("----------------------------------------");
@@ -2654,7 +2659,9 @@ namespace GeoGamingHub
                 tabs.SelectedIndex = TabList;
                 Log(Lang.T("완료."));
                 Status(Lang.T("설정 완료: ") + Path.GetFileName(gameExe) + "  (" + dir + ")");
-                MessageBox.Show(this, Lang.T("DX12_3D를 설치했습니다.\n\n게임을 SR 패널에서 패널 해상도로 전체화면 또는 테두리 없는 창으로 실행하세요. DLSS 대신 게임의 렌더 스케일이나 FSR / XeSS를 쓰세요. 게임 폴더의 DX12_3D.log에 동작 기록이 남습니다.\n자세한 내용은 [로그] 탭에 있습니다."), AppName, MessageBoxButtons.OK, MessageBoxIcon.Information);
+                MessageBox.Show(this, o.Upscale
+                    ? Lang.T("DX12_3D를 설치했습니다 (업스케일 켬).\n\n게임 설정에서 1920×1080 테두리 없는 창(창 모드 전체 화면)을 고르세요. DX12_3D가 패널 해상도로 위빙합니다. DLSS 대신 게임의 렌더 스케일이나 FSR / XeSS를 쓰세요. 게임 폴더의 DX12_3D.log에 동작 기록이 남습니다.\n자세한 내용은 [로그] 탭에 있습니다.")
+                    : Lang.T("DX12_3D를 설치했습니다.\n\n게임을 SR 패널에서 패널 해상도로 전체화면 또는 테두리 없는 창으로 실행하세요. DLSS 대신 게임의 렌더 스케일이나 FSR / XeSS를 쓰세요. 게임 폴더의 DX12_3D.log에 동작 기록이 남습니다.\n자세한 내용은 [로그] 탭에 있습니다."), AppName, MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
             catch (Exception ex)
             {
