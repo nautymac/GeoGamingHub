@@ -1,4 +1,4 @@
-# Geo Gaming Hub v0.1.3
+# Geo Gaming Hub v0.1.4
 
 [English](README.md) · **한국어**
 
@@ -35,6 +35,8 @@ TriDef 3D Ignition 창 대신 앱이 게임을 TriDef에 등록하고(게임 이
 
 SR 위빙을 켠 DirectX 9 게임은 패널보다 낮은 해상도로 실행해도 됩니다. SRWeave가 패널 해상도에서 위빙해 내보내므로(업스케일),
 오래된 게임을 4K로 돌려 글자가 작아지는 일을 피할 수 있습니다. 끄려면 `Packages\TriDef\sr\x86\SRWeave.ini`에 `upscale=0`을 넣습니다.
+64비트 DirectX 11 게임(`sr\x64\SRWeaveDX11.dll`)에도 같은 업스케일이 들어갔지만, 아직 게임에서 시험하지 않았습니다(프리릴리스).
+끄려면 `Packages\TriDef\sr\x64\SRWeave.ini`에 `upscale=0`을 넣습니다.
 
 ## 들어 있는 것
 

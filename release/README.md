@@ -1,4 +1,4 @@
-# Geo Gaming Hub v0.1.3
+# Geo Gaming Hub v0.1.4
 
 **English** · [한국어](README.ko.md)
 
@@ -38,7 +38,8 @@ profile gets this method automatically when its exe is chosen.
 
 With SR weaving a DirectX 9 game may run below the panel's resolution: SRWeave weaves it at the panel's resolution
 (upscaling), so an old game need not be run at 4K with tiny text. To turn that off, put `upscale=0` into
-`Packages\TriDef\sr\x86\SRWeave.ini`.
+`Packages\TriDef\sr\x86\SRWeave.ini`. 64-bit DirectX 11 games (`sr\x64\SRWeaveDX11.dll`) have the same upscaling now,
+not yet tried in a game (pre-release); turn it off with `upscale=0` in `Packages\TriDef\sr\x64\SRWeave.ini`.
 
 ## Contents
 
