@@ -142,6 +142,9 @@ banned. Installing is at your own account risk.
 - **Unreal Engine 4 (geo-11)**: DLSS can crash the game with a GPU error (0x887A0006 HUNG; seen in Lies of P). The app warns about games with DLSS, and when it finds DLSS on in the game's settings it offers to turn it off at [Finish] or in **UE4 settings**.
 - The **DXVK route** is experimental; games that work with geo-11 are better on geo-11.
 - Games that block third-party DLLs load none of these methods.
+- **Burnout Paradise Remastered** (geo-11, 32-bit): the game's webcam code (licence photo, Mugshots) sometimes runs on two threads at once
+  and the game closes about 13 s into the intro. SRWeave turns the game's camera off (`hide_cameras=auto` in `SRWeave.ini`), so the
+  game runs as on a PC without a webcam. `hide_cameras=1` hides the webcams (DirectShow) from any game whose webcam code crashes.
 
 ## Community reports
 

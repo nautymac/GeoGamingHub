@@ -133,6 +133,9 @@ geo-11(DirectX 9 / 11)만 경고 창에서 [예]를 눌러야 설치됩니다(�
 - **Unreal Engine 4 (geo-11)**: DLSS를 켜면 게임이 GPU 오류(0x887A0006 HUNG)로 꺼질 수 있습니다(Lies of P에서 확인). 앱이 DLSS가 있는 게임을 경고하고, 게임 설정에서 DLSS가 켜진 것을 찾으면 [완료]나 **UE4 설정**에서 끌 수 있습니다.
 - **DXVK 경로**는 실험적입니다. geo-11이 되는 게임은 geo-11이 더 낫습니다.
 - 제3자 DLL을 막는 게임에서는 어느 방식도 로드되지 않습니다.
+- **Burnout Paradise Remastered** (geo-11, 32비트): 게임의 웹캠 코드(면허 사진, 머그샷)가 가끔 두 스레드에서 동시에 돌아서 인트로
+  약 13초 만에 게임이 꺼집니다. SRWeave가 게임의 카메라 기능을 끄므로(`SRWeave.ini`의 `hide_cameras=auto`) 웹캠 없는 PC처럼
+  실행됩니다. `hide_cameras=1`은 웹캠 코드에서 죽는 다른 게임에도 웹캠(DirectShow)을 숨깁니다.
 
 ## 커뮤니티 보고
 
