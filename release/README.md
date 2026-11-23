@@ -1,4 +1,4 @@
-# Geo Gaming Hub v0.1.3
+# Geo Gaming Hub v0.1.4
 
 **English** · [한국어](README.ko.md)
 
@@ -21,6 +21,9 @@ side-by-side / top-and-bottom.
 
 geo-11 games are woven by SRWeave (`dxgi.dll`); the own wrappers (OGL3D / VK3D / DX12_3D) weave by themselves.
 A DirectX 9 / 11 game can also be run as Vulkan through DXVK and use VK3D (experimental, 64-bit).
+OGL3D and DX12_3D games can run below the panel's resolution: tick **Upscale** in the Display step. The game then
+renders at 1920×1080 (on a 4K panel at 200 % scaling: readable menus and text) and the wrapper weaves it at the
+panel's resolution in its own window over the game window; choose 1920×1080 borderless in the game.
 
 ### TriDef 3D
 
@@ -47,7 +50,8 @@ with TriDef; GTA V Legacy (DirectX 11) does. Don't use this for modes with anti-
 
 With SR weaving a DirectX 9 game may run below the panel's resolution: SRWeave weaves it at the panel's resolution
 (upscaling), so an old game need not be run at 4K with tiny text. To turn that off, put `upscale=0` into
-`Packages\TriDef\sr\x86\SRWeave.ini`.
+`Packages\TriDef\sr\x86\SRWeave.ini`. 64-bit DirectX 11 games (`sr\x64\SRWeaveDX11.dll`) have the same upscaling now,
+not yet tried in a game (pre-release); turn it off with `upscale=0` in `Packages\TriDef\sr\x64\SRWeave.ini`.
 
 ## Contents
 
@@ -136,9 +140,13 @@ geo-11 games: see and change them on the **Hotkeys** tab. The own wrappers read 
 
 ## Anti-cheat
 
-The app refuses to install into a game folder with anti-cheat (EasyAntiCheat, BattlEye, GameGuard, ...): DLLs in the game
-folder can get the account banned. For example, Helldivers 2 (GameGuard) cannot be set up with the app. Installing by
-hand is at your own account risk.
+In a game folder with anti-cheat (EasyAntiCheat, BattlEye, GameGuard, ...) the app refuses to install its own wrappers
+(OGL3D, VK3D, DX12_3D) and TriDef 3D: DLLs in the game folder can get the account banned. For example, Helldivers 2
+(GameGuard) cannot be set up with the app.
+
+Only geo-11 (DirectX 9 / 11) is installed, and only after you answer [Yes] in a warning box (the default is [No]). The
+anti-cheat may block the DLLs, so the game may not start or may not be in 3D, and in an online game the account could be
+banned. Installing is at your own account risk.
 
 ## Known limits
 
@@ -146,6 +154,9 @@ hand is at your own account risk.
 - **Unreal Engine 4 (geo-11)**: DLSS can crash the game with a GPU error (0x887A0006 HUNG; seen in Lies of P). The app warns about games with DLSS, and when it finds DLSS on in the game's settings it offers to turn it off at [Finish] or in **UE4 settings**.
 - The **DXVK route** is experimental; games that work with geo-11 are better on geo-11.
 - Games that block third-party DLLs load none of these methods.
+- **Burnout Paradise Remastered** (geo-11, 32-bit): the game's webcam code (licence photo, Mugshots) sometimes runs on two threads at once
+  and the game closes about 13 s into the intro. SRWeave turns the game's camera off (`hide_cameras=auto` in `SRWeave.ini`), so the
+  game runs as on a PC without a webcam. `hide_cameras=1` hides the webcams (DirectShow) from any game whose webcam code crashes.
 
 ## Community reports
 

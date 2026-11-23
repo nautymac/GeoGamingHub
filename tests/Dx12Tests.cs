@@ -46,8 +46,8 @@ static partial class HubTest
         string prof = (string)S("Dx12Ops", "Profile", pk, Hd2);
         Ok(prof != null && File.Exists(Path.Combine(prof, "preset.ini")), "profile for helldivers2.exe: " + prof);
         Ok(S("Dx12Ops", "Profile", pk, SteelRats) == null, "no profile for Steel Rats");
-        Eq(DDesc(S("Dx12Ops", "Read", Path.Combine(pk, "DX12_3D.ini"), null)), "output=auto swap_eyes=0 separation=25 convergence=100", "Read package defaults");
-        Eq(DDesc(S("Dx12Ops", "Read", Path.Combine(pk, "DX12_3D.ini"), prof)), "output=auto swap_eyes=0 separation=12 convergence=4.7", "Read package defaults + Helldivers 2 preset");
+        Eq(DDesc(S("Dx12Ops", "Read", Path.Combine(pk, "DX12_3D.ini"), null)), "output=auto swap_eyes=0 upscale=0 separation=25 convergence=100", "Read package defaults");
+        Eq(DDesc(S("Dx12Ops", "Read", Path.Combine(pk, "DX12_3D.ini"), prof)), "output=auto swap_eyes=0 upscale=0 separation=12 convergence=4.7", "Read package defaults + Helldivers 2 preset");
 
         // Helldivers 2 copy: DX12_3D + DXC + preset
         string dH = Fresh("dxH");
@@ -59,14 +59,19 @@ static partial class HubTest
         string iniH = Path.Combine(dH, "DX12_3D.ini");
         Ok((bool)S("Dx12Ops", "IsDx12_3d", Path.Combine(dH, "d3d12.dll")) && SameBytes(Path.Combine(dH, "d3d12.dll"), dll), "install: DX12_3D d3d12.dll");
         Ok(SameBytes(Path.Combine(dH, @"DX12_3D\dxcompiler.dll"), Path.Combine(pk, @"DX12_3D\dxcompiler.dll")) && File.Exists(Path.Combine(dH, @"DX12_3D\dxil.dll")), "install: DXC in DX12_3D\\");
-        Eq(DDesc(S("Dx12Ops", "Read", iniH, null)), "output=auto swap_eyes=0 separation=12 convergence=4.7", "install: DX12_3D.ini with the preset values");
+        Eq(DDesc(S("Dx12Ops", "Read", iniH, null)), "output=auto swap_eyes=0 upscale=0 separation=12 convergence=4.7", "install: DX12_3D.ini with the preset values");
         Ok((bool)S("Dx12Ops", "Installed", dH), "Installed true");
         Eq(Get(iniH, "Matrices", "enable"), "0", "install: camera matrix fix stays off (package default)");
         // reinstall: ini kept, only the wizard's keys change
         S("GlOps", "Set", iniH, "Generic", "min_width", "32");
         S("Dx12Ops", "Install", pk, h, dH, DOpt(false, "tab", true, 9.5m, 6m));
-        Eq(DDesc(S("Dx12Ops", "Read", iniH, null)), "output=tab swap_eyes=1 separation=9.5 convergence=6", "reinstall: new values in the kept ini");
+        Eq(DDesc(S("Dx12Ops", "Read", iniH, null)), "output=tab swap_eyes=1 upscale=0 separation=9.5 convergence=6", "reinstall: new values in the kept ini");
         Eq(Get(iniH, "Generic", "min_width"), "32", "reinstall: other keys kept");
+        var oUp = DOpt(true, "sbs", false, 12m, 4.7m);
+        Ty("Dx12Ops+Options").GetField("Upscale").SetValue(oUp, true);
+        S("Dx12Ops", "Install", pk, h, dH, oUp);
+        Eq(Get(iniH, "Display", "upscale"), "1", "upscale on: [Display] upscale = 1");
+        Eq(DDesc(S("Dx12Ops", "Read", iniH, null)), "output=auto swap_eyes=0 upscale=1 separation=12 convergence=4.7", "upscale on: read back");
         File.WriteAllText(Path.Combine(dH, "DX12_3D.log"), "x");
         File.WriteAllText(Path.Combine(dH, "DX12_3D_frame00300.bmp"), "x");
         File.WriteAllText(Path.Combine(dH, "DX12_3D_pass_00300_00_001d_L.bmp"), "x");
@@ -131,7 +136,8 @@ static partial class HubTest
         Ok(rb("rbCatWrap").Checked && Shown(ctl("pnlKindWrap")) && !Shown(ctl("pnlKindGeo")), "DX12 app: own-wrapper category");
         Ok(rb("rb64").Checked && !rb("rb32").Enabled && !rb("rb64").Enabled, "DX12 app: 64-bit, bits locked");
         Ok(Shown(ctl("lblDx12Install")) && !Shown(ctl("lblVkInstall")) && !Shown(ctl("lblGlInstall")) && !Shown(ctl("pnlScope")) && !cb("chkVkDxvk").Enabled, "install step: DX12_3D note only, DXVK option off");
-        Ok(Shown(ctl("pnlGlMode")) && !Shown(ctl("pnlGeoMode")) && !Shown(cb("chkLens")) && !Shown(cb("chkUpscale")) && !Shown(ctl("lblUpHead")), "display step: DX12_3D output, no lens / upscale");
+        Ok(Shown(ctl("pnlGlMode")) && !Shown(ctl("pnlGeoMode")) && !Shown(cb("chkLens")) && Shown(cb("chkUpscale")) && Shown(ctl("lblUpHead")) && Shown(ctl("lblUpNoteDx12")) && !Shown(ctl("lblUpNoteGl")) && !cb("chkUpscale").Checked,
+           "display step: DX12_3D output and upscale (off), no lens");
         Eq(string.Join(",", cbMode.Items.Cast<object>()), "sbs,tab", "display step: DX12_3D output choices");
         Eq(ctl("lblSrHead").Text, "SR 위빙 (DX12_3D)", "display heading");
         Eq(ctl("lblStereoHead").Text, "기본 입체 값 (DX12_3D.ini [Stereo])", "stereo heading");
@@ -144,14 +150,15 @@ static partial class HubTest
         cb("chkSr").Checked = false; Pump();
         cbMode.SelectedItem = "tab";
         numSep.Value = 15m;
+        cb("chkUpscale").Checked = true; Pump();
         Call(form, "Apply");
         Pump();
         var dl = TakeDialogs();
-        Ok(dl.Count == 1 && dl[0].Contains("DX12_3D를 설치했습니다"), "Apply: one info box (" + string.Join(" || ", dl) + ")");
-        Eq(DDesc(S("Dx12Ops", "Read", Path.Combine(hDir, "DX12_3D.ini"), null)), "output=tab swap_eyes=0 separation=15 convergence=4.7", "Apply: DX12_3D.ini");
+        Ok(dl.Count == 1 && dl[0].Contains("DX12_3D를 설치했습니다 (업스케일 켬)"), "Apply: one info box, upscale (" + string.Join(" || ", dl) + ")");
+        Eq(DDesc(S("Dx12Ops", "Read", Path.Combine(hDir, "DX12_3D.ini"), null)), "output=tab swap_eyes=0 upscale=1 separation=15 convergence=4.7", "Apply: DX12_3D.ini");
         Ok((bool)S("Dx12Ops", "Installed", hDir) && File.Exists(Path.Combine(hDir, @"DX12_3D\dxil.dll")), "Apply: d3d12.dll + DXC");
         var row = Row(form, h);
-        if (row != null) { Console.WriteLine("  row: " + string.Join(" | ", row)); Eq(row[1], "설정 완료", "list: state"); Eq(row[3], "DX12", "list: engine"); Eq(row[5], "끔", "list: SR"); Eq(row[6], "-", "list: upscale"); Eq(row[7], "15", "list: Sep"); Eq(row[8], "4.7", "list: Conv"); }
+        if (row != null) { Console.WriteLine("  row: " + string.Join(" | ", row)); Eq(row[1], "설정 완료", "list: state"); Eq(row[3], "DX12", "list: engine"); Eq(row[5], "끔", "list: SR"); Eq(row[6], "켬", "list: upscale"); Eq(row[7], "15", "list: Sep"); Eq(row[8], "4.7", "list: Conv"); }
         else Ok(false, "DX12 app listed");
         var lv = C<ListView>(form, "lvGames");
         foreach (ListViewItem it in lv.Items) it.Selected = string.Equals((string)it.Tag, h, StringComparison.OrdinalIgnoreCase);
@@ -159,7 +166,7 @@ static partial class HubTest
         Eq(C<Button>(form, "bLogGame").Text, "DX12_3D.log", "log button: DX12_3D.log");
         Call(form, "StartWizard", h);   // re-edit
         Pump();
-        Ok(rb("rbKindDx12").Checked && !cb("chkSr").Checked && (string)cbMode.SelectedItem == "tab" && numSep.Value == 15m && numConv.Value == 4.7m, "re-edit: values from the game's DX12_3D.ini");
+        Ok(rb("rbKindDx12").Checked && !cb("chkSr").Checked && (string)cbMode.SelectedItem == "tab" && numSep.Value == 15m && numConv.Value == 4.7m && cb("chkUpscale").Checked, "re-edit: values from the game's DX12_3D.ini");
         Ok(ctl("lblDetect").Text.Contains("DX12_3D 설치됨"), "re-edit: installed version noted");
         Call(form, "ApplyHotkeysOnly");
         Ok(!File.Exists(Path.Combine(hDir, "d3dxdm.ini")) && !File.Exists(Path.Combine(hDir, "SRWeave.ini")), "hotkeys-only writes nothing into a DX12_3D game");
@@ -184,6 +191,15 @@ static partial class HubTest
         dl = TakeDialogs();
         Ok(dl.Count == 1 && dl[0].Contains("안티치트"), "anti-cheat game: Apply refused (" + string.Join(" || ", dl) + ")");
         Eq(Files(acDir), "dx12game.exe,GameGuard", "anti-cheat game: nothing written");
+        // geo-11 on the same folder: a warning that asks (the watcher answers Yes), then the install
+        rb("rbKindGeo").Checked = true; Pump();
+        Call(form, "Apply"); Pump();
+        dl = TakeDialogs();
+        Ok(dl.Count >= 1 && dl[0].Contains("안티치트") && dl[0].Contains("그래도 설치할까요?"), "anti-cheat game, geo-11: warning asks first (" + string.Join(" || ", dl) + ")");
+        Ok(File.Exists(Path.Combine(acDir, "d3d11.dll")), "anti-cheat game, geo-11: installed after Yes");
+        Call(form, "StartWizard", ac); Pump();
+        Call(form, "UninstallAll"); Pump(); TakeDialogs();
+        Ok(!File.Exists(Path.Combine(acDir, "d3d11.dll")), "anti-cheat game, geo-11: uninstalled again");
 
         // ---- English
         Ty("Lang").GetField("English").SetValue(null, true);

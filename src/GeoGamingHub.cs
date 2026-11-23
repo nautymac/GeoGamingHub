@@ -21,8 +21,8 @@ using System.Windows.Forms;
 
 [assembly: AssemblyTitle("Geo Gaming Hub")]
 [assembly: AssemblyProduct("Geo Gaming Hub")]
-[assembly: AssemblyVersion("0.1.3.0")]
-[assembly: AssemblyFileVersion("0.1.3.0")]
+[assembly: AssemblyVersion("0.1.4.0")]
+[assembly: AssemblyFileVersion("0.1.4.0")]
 
 namespace GeoGamingHub
 {
@@ -679,7 +679,7 @@ namespace GeoGamingHub
     sealed class MainForm : Form
     {
         public const string AppName = "Geo Gaming Hub";
-        // "0.1.3" from [assembly: AssemblyVersion] above: one place to bump. The window title shows "Geo Gaming Hub v0.1.3".
+        // "0.1.4" from [assembly: AssemblyVersion] above: one place to bump. The window title shows "Geo Gaming Hub v0.1.4".
         public static readonly string AppVersion = typeof(MainForm).Assembly.GetName().Version.ToString(3);
         public static readonly string AppTitle = AppName + " v" + AppVersion;
         // ---- data ----
@@ -735,7 +735,8 @@ namespace GeoGamingHub
         RadioButton rbCatGeo, rbCatWrap; FlowLayoutPanel pnlKindGeo, pnlKindWrap;   // 3D method step: category, then the game types in it
         RadioButton lastGeoKind, lastWrapKind; bool syncingCategory;
         RadioButton rbKindVk; CheckBox chkVkDxvk; Label lblVkDxvk;
-        RadioButton rbKindDx12; Label lblDx12Install, lblStereoDx12;   // DirectX 12 games: DX12_3D (d3d12.dll proxy)
+        RadioButton rbKindDx12; Label lblDx12Install, lblStereoDx12, lblUpNoteDx12;   // DirectX 12 games: DX12_3D (d3d12.dll proxy)
+        Label lblUpNoteTri;   // display step, TriDef 3D: upscaling is automatic (SRWeave)
         // TriDef 3D games (an installed TriDef 3D, registered here instead of in TriDef 3D Ignition, started by Tridef3D_Play)
         RadioButton rbCatTri, rbKindTri; FlowLayoutPanel pnlKindTri; ComboBox cbTriProfile; Label lblTriState, lblTriInstall, lblStereoTri;
         ComboBox cbTriLaunch; TextBox tbTriLauncher, tbTriLauncherArgs; Button btnTriLauncher; FlowLayoutPanel pnlTriLauncher;
@@ -1287,7 +1288,7 @@ namespace GeoGamingHub
                 string method = c.Method == null ? Lang.T("확인 중...") : flato ? Library.FlatoRouteLabel(c.FlatoRoute) : Library.MethodLabel(c.Method);
                 string alts = flato ? Lang.T("(Hub: ") + Library.MethodLabel(c.Method) + Lang.T(", 깊이 거의 없음)") : string.Join(", ", c.Alts.Select(Library.MethodLabel));
                 string status = c.AntiCheat != null ? Lang.T("안티치트") : Library.StatusLabel(c);
-                string memo = c.AntiCheat != null ? Lang.T("안티치트(") + c.AntiCheat + Lang.T(") - 계정 정지 위험이 있어 설정하지 않습니다") + (string.IsNullOrEmpty(c.Note) ? "" : "; " + c.Note) : c.Note ?? "";
+                string memo = c.AntiCheat != null ? Lang.T("안티치트(") + c.AntiCheat + Lang.T(Library.IsGeoMethod(c.Method) ? ") - 계정 정지 위험: 경고 후 geo-11 설치 가능" : ") - 계정 정지 위험이 있어 설정하지 않습니다") + (string.IsNullOrEmpty(c.Note) ? "" : "; " + c.Note) : c.Note ?? "";
                 var it = new ListViewItem(new[] { c.Title, Library.ProductLabel(c.Product), method, alts, status, c.Installed != null ? c.Installed.Store : "", c.Engine ?? "", c.Api ?? "", c.Bits ?? "", memo }) { Tag = c };
                 bool verified = !c.FromExe && (flato ? c.FlatoStatus == "verified" || c.FlatoStatus == "working" : c.Status == "verified");
                 if (c.AntiCheat != null) it.ForeColor = Color.FromArgb(196, 43, 28);
@@ -1310,9 +1311,11 @@ namespace GeoGamingHub
             if (lvCands.SelectedItems.Count == 0) { Status(Lang.T("후보 목록에서 게임을 먼저 고르세요.")); return; }
             var c = (Candidate)lvCands.SelectedItems[0].Tag;
             if (c.Installed == null) { Status(Lang.T("이 PC에 설치되지 않은 게임입니다: ") + c.Title); return; }
-            if (c.AntiCheat != null || (c.AntiCheat = Library.AntiCheat(c.Installed.Dir)) != null)
+            // anti-cheat: only a geo-11 game goes on to the wizard (its [Finish] warns and asks); the own wrappers and
+            // TriDef 3D are refused here already
+            if ((c.AntiCheat != null || (c.AntiCheat = Library.AntiCheat(c.Installed.Dir)) != null) && !Library.IsGeoMethod(c.Method))
             {
-                Status(Lang.T("안티치트가 있는 게임은 설정하지 않습니다(계정 정지 위험): ") + c.Title + " (" + c.AntiCheat + ")");
+                Status(Lang.T("안티치트가 있는 게임은 geo-11만 설정할 수 있습니다(계정 정지 위험): ") + c.Title + " (" + c.AntiCheat + ")");
                 return;
             }
             if (c.Product == "flato3d")
@@ -1473,7 +1476,7 @@ namespace GeoGamingHub
                 }
                 if (hasDx12)
                 {
-                    up = "-";   // DX12_3D: the game's own render scale
+                    up = d12o.Upscale ? Lang.T("켬") : Lang.T("끔");   // DX12_3D.ini [Display] upscale
                     sep = d12o.Separation.ToString(CultureInfo.InvariantCulture);
                     conv = d12o.Convergence.ToString(CultureInfo.InvariantCulture);
                 }
@@ -2045,6 +2048,14 @@ namespace GeoGamingHub
             lblUpNoteGl = Note(Lang.T("OGL3D 업스케일: 게임은 자기 해상도(예: 1920×1080, 메뉴·글씨가 읽기 좋음)로 그리고, OGL3D가 게임 위의 자체 창에 패널 해상도로 위빙해 보여 줍니다. 켠 뒤 게임 설정에서 1920×1080을 고르세요. 해상도 변경은 막혀 패널은 원래 해상도를 유지합니다."));
             lblUpNoteGl.Visible = false;
             p.Controls.Add(lblUpNoteGl);
+            lblUpNoteDx12 = Note(Lang.T("DX12_3D 업스케일: 게임은 낮은 해상도(200% 배율의 4K 패널에서는 1920×1080, 메뉴·글씨가 읽기 좋고 4K 문제를 피함)로 그리고, DX12_3D가 게임 창 위의 자체 창에 패널 해상도로 위빙해 보여 줍니다. 켠 뒤 게임 설정에서 1920×1080 테두리 없는 창(창 모드 전체 화면)을 고르세요. 마우스는 그대로 게임으로 가고, 전용 전체 화면은 창 모드로 유지되어 패널은 원래 해상도를 유지합니다. DX12_3D.ini [Display] upscale."));
+            lblUpNoteDx12.Visible = false;
+            p.Controls.Add(lblUpNoteDx12);
+            // TriDef 3D: nothing to set here - SRWeave weaves a game below the panel's resolution at the panel's by itself
+            lblUpNoteTri = Note(Lang.T("TriDef 3D 업스케일: 따로 켤 것이 없습니다. SR 위빙이 켜져 있으면 SRWeave가 자동으로 합니다. 게임 안의 그래픽 옵션에서 해상도를 패널보다 낮게(예: 1920×1080, 2560×1440) 고르면 패널 해상도로 위빙해 보여 줍니다. 32비트 DirectX 9 게임은 확인했고, 64비트 DirectX 11 게임은 아직 게임에서 시험하지 않았습니다.\n") +
+                Lang.T("끄려면 허브 폴더의 Packages\\TriDef\\sr\\x86\\SRWeave.ini(32비트) 또는 sr\\x64\\SRWeave.ini(64비트)에 upscale=0을 넣습니다."));
+            lblUpNoteTri.Visible = false;
+            p.Controls.Add(lblUpNoteTri);
             geoUpscaleControls.Add(lblUpNote);
 
             // the one choice worth showing: compatibility (mode 1, default) vs. performance (mode 0). Index == upscale_mode.
@@ -2200,6 +2211,7 @@ namespace GeoGamingHub
                 Lang.T("     OpenGL 게임(게임 유형 'OpenGL - OGL3D')은 opengl32.dll + OGL3D.ini만 설치하고, 디스플레이·입체 값 단계의 항목을 OGL3D.ini에 씁니다(output, swap_eyes, upscale, separation, convergence)."),
                 Lang.T("     TriDef 3D(카테고리 'TriDef 3D')는 TriDef 3D가 설치돼 있어야 합니다. 게임을 TriDef에 등록만 하고(게임 폴더는 그대로), [실행]은 Tridef3D_Play로 시작합니다(Steam 게임은 관리자 권한 확인, 그 밖의 게임은 실행 파일로 직접 시작)."),
                 Lang.T("     Vulkan 게임(게임 유형 'Vulkan - VK3D')은 vulkan-1.dll + VK3D.ini(+ 게임 전용 픽스)를 설치하고, 디스플레이·입체 값 단계의 항목을 VK3D.ini에 씁니다(output, swap_eyes, separation, convergence)."),
+                Lang.T("     DirectX 12 게임(게임 유형 'DirectX 12 - DX12_3D')은 d3d12.dll + DX12_3D.ini + DX12_3D 폴더(DXC)를 설치하고, 디스플레이·입체 값 단계의 항목을 DX12_3D.ini에 씁니다(output, swap_eyes, upscale, separation, convergence)."),
                 Lang.T("  5. 4단계 [입체 값]: Separation / Convergence. [완료]를 누르면 게임 폴더에 모두 적용되고 목록이 '설정 완료'로 바뀝니다."),
                 Lang.T("     중간에 [취소]하면 게임 폴더는 바뀌지 않고 목록에 '재설정 필요'로 남습니다. [완료] 전에는 아무것도 적용되지 않으므로, [설정 바꾸기]로 1단계부터 다시 하면 됩니다."),
                 Lang.T("  6. [게임 목록]에서 실행(Steam 게임은 Steam으로), 설정 바꾸기, 폴더 열기, SR 위빙만 제거, 3D 픽스 제거를 할 수 있습니다."),
@@ -2287,8 +2299,11 @@ namespace GeoGamingHub
                 foreach (var c in geoUpscaleControls) c.Visible = !w && !tri;
                 gridUpAdv.Visible = !w && !tri && chkUpAdv.Checked;
                 lblUpNoteGl.Visible = gl;
-                lblUpHead.Visible = chkUpscale.Visible = !vk && !dx12 && !tri;   // VK3D / DX12_3D / TriDef have no upscaling here
-                if (vk || dx12 || tri) chkUpscale.Checked = false;
+                lblUpNoteDx12.Visible = dx12;
+                lblUpHead.Visible = !vk;                     // VK3D has no upscaling
+                chkUpscale.Visible = !vk && !tri;            // TriDef: automatic (SRWeave), only the note
+                lblUpNoteTri.Visible = tri;
+                if (vk || tri) chkUpscale.Checked = false;
             }
             if (lblStereoGl != null)
             {
@@ -2430,7 +2445,7 @@ namespace GeoGamingHub
             // OpenGL exe can still name d3d9.dll (Broken Age), which the DLL-name fallback below would take for DX9.
             lastGeoKind = lastWrapKind = null;
             string anti = Library.AntiCheat(gameDir);
-            if (anti != null) notes.Add(Lang.T("안티치트 있음(") + anti + Lang.T(") - 설치하지 않습니다"));
+            if (anti != null) notes.Add(Lang.T("안티치트 있음(") + anti + Lang.T(") - geo-11만 경고 후 설치 가능"));
             bool gl = GlOps.Installed(gameDir) || (uv == null && !rbUe4.Checked && GlOps.IsOpenGL(exePath));   // an existing install wins
             // Vulkan (imports vulkan-1.dll and no Direct3D) or an existing VK3D install (also DX games run through DXVK) -> the Vulkan kind
             bool vk = !gl && (VkOps.Installed(gameDir) || (uv == null && !rbUe4.Checked && VkOps.ImportsVulkan(exePath) && !VkOps.ImportsDirect3D(exePath)));
@@ -2594,7 +2609,7 @@ namespace GeoGamingHub
                 SetWrapperModes(Dx12Ops.Modes);
                 cbGlMode.SelectedItem = d.Mode;
                 chkSwap.Checked = d.Swap;
-                chkUpscale.Checked = false;
+                chkUpscale.Checked = d.Upscale;
                 numSep.Value = Math.Min(numSep.Maximum, Math.Max(numSep.Minimum, d.Separation));
                 numConv.Value = Math.Min(numConv.Maximum, Math.Max(numConv.Minimum, d.Convergence));
                 chkAutoConv.Checked = false;
@@ -2708,7 +2723,7 @@ namespace GeoGamingHub
                 string dir = gameDir;
                 var o = new Dx12Ops.Options
                 {
-                    Sr = chkSr.Checked, Mode = (string)cbGlMode.SelectedItem ?? "sbs", Swap = chkSwap.Checked,
+                    Sr = chkSr.Checked, Mode = (string)cbGlMode.SelectedItem ?? "sbs", Swap = chkSwap.Checked, Upscale = chkUpscale.Checked,
                     Separation = numSep.Value, Convergence = numConv.Value
                 };
                 Log("----------------------------------------");
@@ -2723,7 +2738,9 @@ namespace GeoGamingHub
                 tabs.SelectedIndex = TabList;
                 Log(Lang.T("완료."));
                 Status(Lang.T("설정 완료: ") + Path.GetFileName(gameExe) + "  (" + dir + ")");
-                MessageBox.Show(this, Lang.T("DX12_3D를 설치했습니다.\n\n게임을 SR 패널에서 패널 해상도로 전체화면 또는 테두리 없는 창으로 실행하세요. DLSS 대신 게임의 렌더 스케일이나 FSR / XeSS를 쓰세요. 게임 폴더의 DX12_3D.log에 동작 기록이 남습니다.\n자세한 내용은 [로그] 탭에 있습니다."), AppName, MessageBoxButtons.OK, MessageBoxIcon.Information);
+                MessageBox.Show(this, o.Upscale
+                    ? Lang.T("DX12_3D를 설치했습니다 (업스케일 켬).\n\n게임 설정에서 1920×1080 테두리 없는 창(창 모드 전체 화면)을 고르세요. DX12_3D가 패널 해상도로 위빙합니다. DLSS 대신 게임의 렌더 스케일이나 FSR / XeSS를 쓰세요. 게임 폴더의 DX12_3D.log에 동작 기록이 남습니다.\n자세한 내용은 [로그] 탭에 있습니다.")
+                    : Lang.T("DX12_3D를 설치했습니다.\n\n게임을 SR 패널에서 패널 해상도로 전체화면 또는 테두리 없는 창으로 실행하세요. DLSS 대신 게임의 렌더 스케일이나 FSR / XeSS를 쓰세요. 게임 폴더의 DX12_3D.log에 동작 기록이 남습니다.\n자세한 내용은 [로그] 탭에 있습니다."), AppName, MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
             catch (Exception ex)
             {
@@ -2931,9 +2948,20 @@ namespace GeoGamingHub
             string ac = Library.AntiCheat(gameDir);
             if (ac != null)
             {
-                Log(Lang.T("적용 안 함: 안티치트가 있는 게임입니다 - ") + ac);
-                MessageBox.Show(this, Lang.T("이 게임 폴더에 안티치트가 있습니다: ") + ac + Lang.T("\n\n게임 폴더에 DLL을 넣으면 계정이 정지될 수 있어 설치하지 않습니다."), AppName, MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return;
+                // anti-cheat: geo-11 (DirectX 9 / 11) installs after a warning the user must confirm (default button: No);
+                // the own wrappers (OGL3D, VK3D, DX12_3D) and TriDef 3D are still refused
+                if (IsTriSelected || IsGlSelected || IsVkSelected || IsDx12Selected)
+                {
+                    Log(Lang.T("적용 안 함: 안티치트가 있는 게임입니다 - ") + ac);
+                    MessageBox.Show(this, Lang.T("이 게임 폴더에 안티치트가 있습니다: ") + ac + Lang.T("\n\n게임 폴더에 DLL을 넣으면 계정이 정지될 수 있어 설치하지 않습니다. geo-11(DirectX 9 / 11)만 경고 후 설치할 수 있습니다."), AppName, MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return;
+                }
+                if (MessageBox.Show(this, Lang.T("이 게임 폴더에 안티치트가 있습니다: ") + ac + Lang.T("\n\ngeo-11은 게임 폴더에 DLL(d3d11.dll 등)을 넣습니다. 안티치트가 이를 막아 게임이 실행되지 않거나 3D가 되지 않을 수 있고, 온라인 게임에서는 계정이 정지될 수 있습니다. 이 위험은 본인이 감수하는 것입니다.\n\n그래도 설치할까요?"), AppName, MessageBoxButtons.YesNo, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button2) != DialogResult.Yes)
+                {
+                    Log(Lang.T("적용 안 함: 안티치트 경고에서 취소했습니다 - ") + ac);
+                    return;
+                }
+                Log(Lang.T("안티치트 경고를 확인하고 설치합니다(계정 정지 위험은 본인 부담) - ") + ac);
             }
             if (IsTriSelected) { ApplyTri(); return; }
             if (IsGlSelected || IsVkSelected || IsDx12Selected) { ApplyWrapper(); return; }

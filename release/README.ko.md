@@ -1,4 +1,4 @@
-# Geo Gaming Hub v0.1.3
+# Geo Gaming Hub v0.1.4
 
 [English](README.md) · **한국어**
 
@@ -20,6 +20,9 @@ SR 디스플레이(Acer SpatialLabs / Leia SR)에서는 SR 위빙, 그 밖의 3D
 
 geo-11 게임의 SR 위빙은 SRWeave(`dxgi.dll`)가, 자체 래퍼(OGL3D / VK3D / DX12_3D)는 래퍼가 직접 합니다.
 DXVK로 DirectX 9 / 11 게임을 Vulkan으로 바꿔 VK3D로 실행하는 방법도 있습니다(실험적, 64비트).
+OGL3D와 DX12_3D 게임은 패널보다 낮은 해상도로 실행할 수 있습니다. 디스플레이 단계에서 **업스케일 사용**을 켜면 게임은
+1920×1080(200% 배율의 4K 패널: 메뉴·글씨가 읽기 좋음)으로 그리고, 래퍼가 게임 창 위의 자체 창에 패널 해상도로 위빙합니다.
+게임에서는 1920×1080 테두리 없는 창을 고르세요.
 
 ### TriDef 3D
 
@@ -42,6 +45,8 @@ GTA Online처럼 안티치트(BattlEye)가 있는 모드에서는 쓰지 마세�
 
 SR 위빙을 켠 DirectX 9 게임은 패널보다 낮은 해상도로 실행해도 됩니다. SRWeave가 패널 해상도에서 위빙해 내보내므로(업스케일),
 오래된 게임을 4K로 돌려 글자가 작아지는 일을 피할 수 있습니다. 끄려면 `Packages\TriDef\sr\x86\SRWeave.ini`에 `upscale=0`을 넣습니다.
+64비트 DirectX 11 게임(`sr\x64\SRWeaveDX11.dll`)에도 같은 업스케일이 들어갔지만, 아직 게임에서 시험하지 않았습니다(프리릴리스).
+끄려면 `Packages\TriDef\sr\x64\SRWeave.ini`에 `upscale=0`을 넣습니다.
 
 ## 들어 있는 것
 
@@ -126,8 +131,11 @@ geo-11 게임은 **단축키** 탭에서 확인하고 바꿉니다. 자체 래�
 
 ## 안티치트
 
-게임 폴더에 안티치트(EasyAntiCheat, BattlEye, GameGuard 등)가 있으면 앱이 설치하지 않습니다. 게임 폴더에 DLL을 넣으면 계정이
-정지될 수 있기 때문입니다. 예: Helldivers 2(GameGuard)는 앱으로 설치되지 않습니다. 직접 설치는 본인 계정의 위험을 감수하는 것입니다.
+게임 폴더에 안티치트(EasyAntiCheat, BattlEye, GameGuard 등)가 있으면 자체 래퍼(OGL3D, VK3D, DX12_3D)와 TriDef 3D는 앱이
+설치하지 않습니다. 게임 폴더에 DLL을 넣으면 계정이 정지될 수 있기 때문입니다. 예: Helldivers 2(GameGuard)는 앱으로 설치되지 않습니다.
+
+geo-11(DirectX 9 / 11)만 경고 창에서 [예]를 눌러야 설치됩니다(기본 선택은 [아니요]). 안티치트가 DLL을 막아 게임이 실행되지 않거나
+3D가 되지 않을 수 있고, 온라인 게임에서는 계정이 정지될 수 있습니다. 설치는 본인 계정의 위험을 감수하는 것입니다.
 
 ## 알려진 제한
 
@@ -135,6 +143,9 @@ geo-11 게임은 **단축키** 탭에서 확인하고 바꿉니다. 자체 래�
 - **Unreal Engine 4 (geo-11)**: DLSS를 켜면 게임이 GPU 오류(0x887A0006 HUNG)로 꺼질 수 있습니다(Lies of P에서 확인). 앱이 DLSS가 있는 게임을 경고하고, 게임 설정에서 DLSS가 켜진 것을 찾으면 [완료]나 **UE4 설정**에서 끌 수 있습니다.
 - **DXVK 경로**는 실험적입니다. geo-11이 되는 게임은 geo-11이 더 낫습니다.
 - 제3자 DLL을 막는 게임에서는 어느 방식도 로드되지 않습니다.
+- **Burnout Paradise Remastered** (geo-11, 32비트): 게임의 웹캠 코드(면허 사진, 머그샷)가 가끔 두 스레드에서 동시에 돌아서 인트로
+  약 13초 만에 게임이 꺼집니다. SRWeave가 게임의 카메라 기능을 끄므로(`SRWeave.ini`의 `hide_cameras=auto`) 웹캠 없는 PC처럼
+  실행됩니다. `hide_cameras=1`은 웹캠 코드에서 죽는 다른 게임에도 웹캠(DirectShow)을 숨깁니다.
 
 ## 커뮤니티 보고
 
