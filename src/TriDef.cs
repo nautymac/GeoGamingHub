@@ -9,6 +9,9 @@
 //     game (GOG, EA app, Epic, a disc install) is started from its exe, and the launcher is run with the user's normal
 //     rights so that the game gets them too; if the exe hands over to its store's launcher and comes back as a new
 //     process, the launcher injects that one as well.
+//   - launch method (per game, see Mode): for a game that only runs when its own launcher starts it (GTA5.exe via
+//     PlayGTAV.exe, GP4.exe via CSM) the launcher is started with --wait and never starts the game exe itself: it
+//     waits for it and injects it. "launcher": this app then starts the game's launcher; "wait": the user does.
 // Nothing goes into the game folder. 32-bit games get TriDef's DirectX 9 set, 64-bit games its DirectX 11 set. With SR
 // weaving a DirectX 9 game below the panel's resolution is weaved at the panel's resolution (SRWeaveDX9 "upscale").
 // The profile list comes from TriDef's own folder, or without TriDef from data\tridef_profiles.txt (names only), so a
@@ -222,21 +225,159 @@ namespace GeoGamingHub
             return log;
         }
 
+        // ---- launch method (the same values Tridef3D_Play's "Launch method" dialog writes, play3d.py)
+        //   Play3DMode     "auto" (or absent): Steam games via steam://, any other game from its exe
+        //                  "launcher": start Play3DLauncher, then wait for the registered exe (GTA5.exe via PlayGTAV.exe)
+        //                  "wait": start nothing - the user starts the game from its launcher / a shortcut
+        //   Play3DLauncher an exe, a shortcut or a URI (steam://...);  Play3DLauncherArgs: its arguments
+        // Path stays the game's own exe either way: it picks the DLL set and is the process that gets injected.
+        public const string ModeAuto = "auto", ModeLauncher = "launcher", ModeWait = "wait";
+        const string ModeValue = "Play3DMode", LauncherValue = "Play3DLauncher", LauncherArgsValue = "Play3DLauncherArgs";
+        // the line Tridef3D_Play writes to launcher.log once it is watching (injector.py poll_launch_and_inject)
+        const string WaitingLine = "WAITING for ";
+
+        public static string Mode(string name)
+        {
+            string m = ((Value(name, ModeValue) as string) ?? "").Trim().ToLowerInvariant();
+            if (m == ModeLauncher && string.IsNullOrWhiteSpace(LauncherOf(name))) return ModeAuto;
+            return m == ModeLauncher || m == ModeWait ? m : ModeAuto;
+        }
+
+        public static string LauncherOf(string name) { return ((Value(name, LauncherValue) as string) ?? "").Trim(); }
+        public static string LauncherArgsOf(string name) { return ((Value(name, LauncherArgsValue) as string) ?? "").Trim(); }
+
+        // "auto" removes the values (the key is Ignition's own again)
+        public static void SetLaunch(string name, string mode, string launcher, string args)
+        {
+            using (var g = Registry.CurrentUser.OpenSubKey(GamesKey + "\\" + name, true))
+            {
+                if (g == null) return;
+                if (mode != ModeLauncher && mode != ModeWait)
+                {
+                    foreach (var v in new[] { ModeValue, LauncherValue, LauncherArgsValue }) g.DeleteValue(v, false);
+                    return;
+                }
+                g.SetValue(ModeValue, mode, RegistryValueKind.String);
+                g.SetValue(LauncherValue, mode == ModeLauncher ? (launcher ?? "").Trim().Trim('"') : "", RegistryValueKind.String);
+                g.SetValue(LauncherArgsValue, mode == ModeLauncher ? (args ?? "").Trim() : "", RegistryValueKind.String);
+            }
+        }
+
+        // 0 = most likely the game's launcher, -1 = not one: play*.exe (PlayGTAV.exe), csm*.exe (GP4's CSM), *launcher*.exe
+        static int LauncherRank(string file)
+        {
+            string low = Path.GetFileName(file).ToLowerInvariant();
+            if (!low.EndsWith(".exe") || low.Contains("crash") || low.Contains("unins")) return -1;
+            if (low.StartsWith("play")) return 0;
+            if (low.StartsWith("csm")) return 1;
+            if (low.Contains("launcher")) return 2;
+            return -1;
+        }
+
+        // a guess at what starts this game, to pre-fill the launcher: a launcher-looking exe in the game's folder or
+        // the one above it, else the Steam address of a Steam game, else ""
+        public static string SuggestLauncher(string exe, string steamAppId)
+        {
+            string best = null; int bestScore = int.MaxValue;
+            try
+            {
+                string here = Path.GetDirectoryName(exe);
+                var dirs = new[] { here, Path.GetDirectoryName(here) };
+                for (int depth = 0; depth < dirs.Length; depth++)
+                {
+                    if (string.IsNullOrEmpty(dirs[depth]) || !Directory.Exists(dirs[depth])) continue;
+                    foreach (var f in Directory.GetFiles(dirs[depth], "*.exe").OrderBy(x => x, StringComparer.OrdinalIgnoreCase))
+                    {
+                        int r = LauncherRank(f);
+                        if (r < 0 || string.Equals(Path.GetFileName(f), Path.GetFileName(exe), StringComparison.OrdinalIgnoreCase)) continue;
+                        int score = depth * 10 + r;
+                        if (score < bestScore) { bestScore = score; best = f; }
+                    }
+                }
+            }
+            catch { }
+            if (best != null) return best;
+            return string.IsNullOrEmpty(steamAppId) ? "" : "steam://rungameid/" + steamAppId;
+        }
+
         // starts the game through the launcher. "--console" with a name makes the (windowed) launcher run without any
         // window and write its output to launcher.log in the package folder. A Steam game: elevated, as it always was.
         // Any other game: the user's own rights - the launcher starts the game itself, and an elevated launcher would
         // make the game run as administrator.
-        public static void Launch(string pkgDir, string name, bool sr, bool steam)
+        // Launch method "wait" / "launcher": Tridef3D_Play only waits (--wait) and never starts the game, so it runs
+        // elevated - it can then inject into a game its launcher runs as administrator too. For "launcher" this app
+        // starts the game's launcher itself, with the user's own rights, once launcher.log says Tridef3D_Play is
+        // watching (so the game can't appear before it does). Returns the started Tridef3D_Play process (may be null).
+        public static Process Launch(string pkgDir, string name, bool sr, bool steam)
         {
             string exe = Path.Combine(pkgDir, Launcher);
             if (!File.Exists(exe)) throw new FileNotFoundException(Lang.T("TriDef 실행기가 패키지에 없습니다: ") + exe);
-            var psi = new ProcessStartInfo(exe, LaunchArgs(name, sr))
+            string mode = Mode(name);
+            bool wait = mode != ModeAuto;
+            if (wait) try { File.Delete(LauncherLog(pkgDir)); } catch { }   // only this run's "WAITING" line counts
+            launchedUtc = DateTime.UtcNow;
+            var psi = new ProcessStartInfo(exe, LaunchArgs(name, sr, wait))
             { UseShellExecute = true, WorkingDirectory = pkgDir, WindowStyle = ProcessWindowStyle.Hidden };
-            if (steam) psi.Verb = "runas";
-            Process.Start(psi);
+            if (steam || wait) psi.Verb = "runas";
+            return Process.Start(psi);
         }
 
-        public static string LaunchArgs(string name, bool sr) { return "\"" + name + "\"" + (sr ? " --sr" : "") + " --console"; }
+        public static string LaunchArgs(string name, bool sr) { return LaunchArgs(name, sr, false); }
+        public static string LaunchArgs(string name, bool sr, bool wait)
+        {
+            return "\"" + name + "\"" + (sr ? " --sr" : "") + (wait ? " --wait" : "") + " --console";
+        }
+
+        // launch method "launcher": waits (on a background thread) until Tridef3D_Play is watching, then starts the game's
+        // launcher with this app's (the user's) rights. done gets a log line; it runs on the background thread.
+        public static void StartLauncherWhenReady(string pkgDir, Process play, string name, Action<string> done, int timeoutMs = 180000)
+        {
+            string launcher = LauncherOf(name), args = LauncherArgsOf(name), log = LauncherLog(pkgDir);
+            new System.Threading.Thread(() =>
+            {
+                var sw = Stopwatch.StartNew();
+                while (sw.ElapsedMilliseconds < timeoutMs)
+                {
+                    if (LogSaysWaiting(log)) break;
+                    bool exited = false;
+                    try { exited = play != null && play.HasExited; } catch { }
+                    if (exited) { done(Lang.T("  TriDef 실행기가 기다리기 전에 끝났습니다. 런처를 실행하지 않습니다: ") + log); return; }
+                    System.Threading.Thread.Sleep(200);
+                }
+                if (!LogSaysWaiting(log)) { done(Lang.T("  TriDef 실행기가 준비되지 않아 런처를 실행하지 않습니다: ") + log); return; }
+                try
+                {
+                    StartLauncher(launcher, args);
+                    done(Lang.T("  게임 런처 실행: ") + launcher + (args.Length > 0 ? " " + args : ""));
+                }
+                catch (Exception ex) { done(Lang.T("  게임 런처를 실행하지 못했습니다: ") + launcher + " - " + ex.Message); }
+            }) { IsBackground = true }.Start();
+        }
+
+        static DateTime launchedUtc = DateTime.MinValue;
+
+        // launcher.log of this run (written after Launch started it - a log that couldn't be deleted is older) says it waits
+        static bool LogSaysWaiting(string log)
+        {
+            try
+            {
+                if (!File.Exists(log) || File.GetLastWriteTimeUtc(log) < launchedUtc.AddSeconds(-1)) return false;
+                using (var fs = new FileStream(log, FileMode.Open, FileAccess.Read, FileShare.ReadWrite | FileShare.Delete))
+                using (var r = new StreamReader(fs, Encoding.UTF8))
+                    return r.ReadToEnd().Contains(WaitingLine);
+            }
+            catch { return false; }
+        }
+
+        // an exe in its own folder; a shortcut or an address (steam://...) through the shell
+        public static void StartLauncher(string launcher, string args)
+        {
+            var psi = new ProcessStartInfo(launcher) { UseShellExecute = true };
+            if (!string.IsNullOrEmpty(args)) psi.Arguments = args;
+            if (launcher.EndsWith(".exe", StringComparison.OrdinalIgnoreCase) && File.Exists(launcher))
+                psi.WorkingDirectory = Path.GetDirectoryName(launcher);
+            Process.Start(psi);
+        }
 
         public static string LauncherLog(string pkgDir) { return Path.Combine(pkgDir, "launcher.log"); }
 

@@ -33,6 +33,18 @@ process, that process is injected too. Nothing goes into the game folder. Starte
 the game is not in 3D, so use the app's [Run]. Depth is adjusted in game with TriDef's hotkeys. A game with a TriDef
 profile gets this method automatically when its exe is chosen.
 
+Some games only run when their own launcher starts them: GTA V's `GTA5.exe` needs `PlayGTAV.exe`, and GP4 may be started
+through CSM. For these, change the **launch method** in the 3D method step. The game stays registered by its own exe
+(`GTA5.exe`).
+- **Via launcher**: [Run] starts the launcher you set (an exe, a shortcut or a `steam://` address) with your normal rights,
+  and the game is injected the moment the launcher starts it. A `Play*.exe`, `CSM*.exe` or `*Launcher*.exe` in the game's
+  folder is filled in automatically.
+- **Wait only**: [Run] starts nothing. Start the game as usual, from its launcher or a shortcut, and it is injected.
+
+Either way `Tridef3D_Play` never starts the game exe itself. It waits up to 10 minutes and asks for administrator rights,
+so it can inject even when the launcher runs the game as administrator. GTA V Enhanced (DirectX 12 only) does not work
+with TriDef; GTA V Legacy (DirectX 11) does. Don't use this for modes with anti-cheat (BattlEye), such as GTA Online.
+
 With SR weaving a DirectX 9 game may run below the panel's resolution: SRWeave weaves it at the panel's resolution
 (upscaling), so an old game need not be run at 4K with tiny text. To turn that off, put `upscale=0` into
 `Packages\TriDef\sr\x86\SRWeave.ini`.

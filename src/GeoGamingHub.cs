@@ -738,6 +738,8 @@ namespace GeoGamingHub
         RadioButton rbKindDx12; Label lblDx12Install, lblStereoDx12;   // DirectX 12 games: DX12_3D (d3d12.dll proxy)
         // TriDef 3D games (an installed TriDef 3D, registered here instead of in TriDef 3D Ignition, started by Tridef3D_Play)
         RadioButton rbCatTri, rbKindTri; FlowLayoutPanel pnlKindTri; ComboBox cbTriProfile; Label lblTriState, lblTriInstall, lblStereoTri;
+        ComboBox cbTriLaunch; TextBox tbTriLauncher, tbTriLauncherArgs; Button btnTriLauncher; FlowLayoutPanel pnlTriLauncher;
+        static readonly string[] TriLaunchModes = { TriOps.ModeAuto, TriOps.ModeLauncher, TriOps.ModeWait };   // cbTriLaunch order
         TableLayoutPanel gridStereo;
         // candidate list tab: data\game_candidates.json + the installed games of this PC
         ListView lvCands; TextBox tbCandSearch; ComboBox cbCandMethod, cbCandProduct; CheckBox chkCandInstalled; Label lblCandInfo;
@@ -1476,7 +1478,8 @@ namespace GeoGamingHub
                     conv = d12o.Convergence.ToString(CultureInfo.InvariantCulture);
                 }
                 sep = Trim1(sep); conv = Trim1(conv);
-                string launch = !exists ? "-" : hasTri ? Lang.T("TriDef 실행기") : Launchers.LaunchLabel(exe, Util.IsUe4(exe));
+                string triMode = hasTri ? TriOps.Mode(triName) : TriOps.ModeAuto;
+                string launch = !exists ? "-" : hasTri ? Lang.T("TriDef 실행기") + (triMode == TriOps.ModeLauncher ? Lang.T(" (런처)") : triMode == TriOps.ModeWait ? Lang.T(" (기다리기)") : "") : Launchers.LaunchLabel(exe, Util.IsUe4(exe));
                 if (hasTri) { up = "-"; sep = conv = "TriDef"; }
                 bool installed = hasGeo || hasGl || hasVk || hasDx12 || hasTri;
                 bool complete = rec.Done && installed;
@@ -1579,10 +1582,19 @@ namespace GeoGamingHub
                 try
                 {
                     bool triSteam = Util.FindSteamApp(dir, out appId, out nm);
-                    TriOps.Launch(pkgDirs["tridef"], tn, TriOps.Sr(tn), triSteam);
-                    Log(Lang.T("TriDef 실행기로 실행: ") + tn + (TriOps.Sr(tn) ? " (--sr)" : "") + (triSteam ? "" : Lang.T(" - Steam 게임이 아니어서 실행 파일로 직접 시작")));
+                    string mode = TriOps.Mode(tn);
+                    var play = TriOps.Launch(pkgDirs["tridef"], tn, TriOps.Sr(tn), triSteam);
+                    string how = mode == TriOps.ModeLauncher ? Lang.T(" - 런처를 실행하고 게임이 뜨기를 기다림")
+                        : mode == TriOps.ModeWait ? Lang.T(" - 게임이 뜨기를 기다림 (런처나 바로 가기로 직접 시작하세요)")
+                        : triSteam ? "" : Lang.T(" - Steam 게임이 아니어서 실행 파일로 직접 시작");
+                    Log(Lang.T("TriDef 실행기로 실행: ") + tn + (TriOps.Sr(tn) ? " (--sr)" : "") + how);
                     Log(Lang.T("  실행기 기록: ") + TriOps.LauncherLog(pkgDirs["tridef"]));
-                    Status(Lang.T("TriDef 실행기로 실행: ") + tn);
+                    if (mode == TriOps.ModeLauncher)
+                        TriOps.StartLauncherWhenReady(pkgDirs["tridef"], play, tn, msg =>
+                        {
+                            if (IsHandleCreated && !IsDisposed) try { BeginInvoke((Action)(() => Log(msg))); } catch { }
+                        });
+                    Status(Lang.T("TriDef 실행기로 실행: ") + tn + (mode == TriOps.ModeWait ? Lang.T(" - 이제 게임을 런처로 시작하세요") : ""));
                 }
                 catch (System.ComponentModel.Win32Exception ex) { Log(Lang.T("실행 취소 또는 실패: ") + ex.Message); Status(Lang.T("실행 취소 또는 실패: ") + ex.Message); }
                 catch (Exception ex) { Log(Lang.T("실행 실패: ") + ex.Message); Status(Lang.T("실행 실패: ") + ex.Message); }
@@ -1748,6 +1760,27 @@ namespace GeoGamingHub
             triRow.Controls.Add(cbTriProfile);
             pnlKindTri.Controls.Add(triRow);
             pnlKindTri.Controls.Add(Note(Lang.T("실행 파일을 고르면 게임 이름(Steam 이름, 폴더, exe 이름)으로 TriDef 프로필을 찾아 자동으로 고릅니다. 프로필이 없는 게임은 화면만 좌우로 나뉘고 깊이가 없습니다.")));
+            // launch method: games that only run when their own launcher starts them (GTA5.exe via PlayGTAV.exe, GP4.exe via CSM)
+            var launchRow = new FlowLayoutPanel { AutoSize = true, WrapContents = false, Margin = P(0, 6, 0, 0) };
+            launchRow.Controls.Add(Lbl(Lang.T("실행 방법:")));
+            cbTriLaunch = Combo(420, new object[] { Lang.T("자동 - Steam 게임은 Steam으로, 그 밖의 게임은 실행 파일로"), Lang.T("런처로 실행 - 런처를 실행하고 게임이 뜨면 주입"), Lang.T("기다리기만 - 직접 런처나 바로 가기로 시작하면 주입") }, 0);
+            launchRow.Controls.Add(cbTriLaunch);
+            pnlKindTri.Controls.Add(launchRow);
+            pnlTriLauncher = new FlowLayoutPanel { AutoSize = true, WrapContents = false, Margin = P(0, 2, 0, 0) };
+            pnlTriLauncher.Controls.Add(Lbl(Lang.T("런처:")));
+            tbTriLauncher = Field(460);
+            pnlTriLauncher.Controls.Add(tbTriLauncher);
+            btnTriLauncher = MakeButton(Lang.T("찾아보기..."), 90, false);
+            btnTriLauncher.Margin = P(6, 2, 12, 2);
+            btnTriLauncher.Click += (s, e) => BrowseTriLauncher();
+            pnlTriLauncher.Controls.Add(btnTriLauncher);
+            pnlTriLauncher.Controls.Add(Lbl(Lang.T("인수:")));
+            tbTriLauncherArgs = Field(140);
+            pnlTriLauncher.Controls.Add(tbTriLauncherArgs);
+            pnlKindTri.Controls.Add(pnlTriLauncher);
+            pnlKindTri.Controls.Add(Note(Lang.T("GTA V(PlayGTAV.exe)처럼 자기 런처가 실행해야만 뜨는 게임은 '런처로 실행'이나 '기다리기만'을 고르세요. 등록은 게임 자신의 실행 파일(GTA5.exe)로 하고, TriDef 실행기는 그 실행 파일을 직접 띄우지 않고 뜨기를 최대 10분 기다렸다가 주입합니다. 런처는 게임 폴더에 있으면 자동으로 채웁니다. 두 방식 모두 [실행] 때 관리자 권한 확인 창이 뜹니다. GTA Online처럼 안티치트가 있는 모드에서는 쓰지 마세요.")));
+            cbTriLaunch.SelectedIndexChanged += (s, e) => UpdateTriLaunchUi();
+            UpdateTriLaunchUi();
             p.Controls.Add(pnlKindTri);
             p.Controls.Add(Note(Lang.T("3D 방식에 따라 다음 단계의 항목이 달라집니다. 방식마다 다른 패키지이므로 한 게임에 두 가지를 같이 설치하지 마세요.")));
             rbCatGeo.CheckedChanged += (s, e) => { if (rbCatGeo.Checked) CategoryPicked(0); };
@@ -2286,7 +2319,7 @@ namespace GeoGamingHub
             bool steam = gameDir != null && Util.FindSteamApp(gameDir, out appId, out nm);
             var lines = new List<string>();
             lines.Add(drv != null ? Lang.T("TriDef 3D 설치됨: ") + drv : Lang.T("이 PC에 TriDef 3D가 설치돼 있지 않습니다. TriDef 3D를 설치해야 이 방식으로 3D가 됩니다."));
-            if (gameDir != null && !steam) lines.Add(Lang.T("Steam 게임이 아닙니다: [실행]이 실행 파일로 직접 시작합니다."));
+            if (gameDir != null && !steam && TriLaunchMode == TriOps.ModeAuto) lines.Add(Lang.T("Steam 게임이 아닙니다: [실행]이 실행 파일로 직접 시작합니다."));
             lblTriState.Text = string.Join("\n", lines);
             lblTriState.ForeColor = drv != null ? Color.FromArgb(16, 124, 16) : Color.FromArgb(196, 43, 28);
         }
@@ -2502,10 +2535,46 @@ namespace GeoGamingHub
             return UnityDefaultIndex;
         }
 
+        string TriLaunchMode { get { return cbTriLaunch == null || cbTriLaunch.SelectedIndex < 0 ? TriOps.ModeAuto : TriLaunchModes[cbTriLaunch.SelectedIndex]; } }
+
+        void UpdateTriLaunchUi()
+        {
+            if (pnlTriLauncher == null) return;
+            bool on = TriLaunchMode == TriOps.ModeLauncher;
+            foreach (Control c in pnlTriLauncher.Controls) c.Enabled = on;
+            if (lblTriState != null) UpdateTriState();
+        }
+
+        void BrowseTriLauncher()
+        {
+            using (var d = new OpenFileDialog { Title = Lang.T("게임 런처 고르기"), Filter = Lang.T("프로그램 / 바로 가기") + " (*.exe;*.lnk;*.url;*.bat;*.cmd)|*.exe;*.lnk;*.url;*.bat;*.cmd|" + Lang.T("모든 파일") + " (*.*)|*.*", DereferenceLinks = false })
+            {
+                string cur = tbTriLauncher.Text.Trim().Trim('"');
+                string start = cur.Length > 0 && !cur.Contains("://") ? Path.GetDirectoryName(cur) : (gameDir ?? "");
+                if (!string.IsNullOrEmpty(start) && Directory.Exists(start)) d.InitialDirectory = start;
+                if (d.ShowDialog(this) == DialogResult.OK) tbTriLauncher.Text = d.FileName;
+            }
+        }
+
+        // launch method as registered, else automatic with a suggested launcher filled in (used when switched to "launcher")
+        void LoadTriLaunch(string reg)
+        {
+            if (cbTriLaunch == null) return;
+            string mode = reg != null ? TriOps.Mode(reg) : TriOps.ModeAuto;
+            cbTriLaunch.SelectedIndex = Array.IndexOf(TriLaunchModes, mode);
+            string sid, snm;
+            string launcher = reg != null ? TriOps.LauncherOf(reg) : "";
+            if (launcher.Length == 0) launcher = TriOps.SuggestLauncher(gameExe, Util.FindSteamApp(gameDir, out sid, out snm) ? sid : null);
+            tbTriLauncher.Text = launcher;
+            tbTriLauncherArgs.Text = reg != null ? TriOps.LauncherArgsOf(reg) : "";
+            UpdateTriLaunchUi();
+        }
+
         // TriDef 3D: SR weaving as registered (on for a new game); bitness from the exe
         void LoadTri()
         {
             string reg = TriOps.RegisteredName(gameExe);
+            LoadTriLaunch(reg);
             chkSr.Checked = reg == null || TriOps.Sr(reg);
             chkUpscale.Checked = false;
             chkAutoConv.Checked = false;
@@ -2792,19 +2861,32 @@ namespace GeoGamingHub
                 MessageBox.Show(this, Lang.T("TriDef 프로필을 고르세요. 프로필이 없으면 화면만 좌우로 나뉘고 깊이가 없습니다."), AppName, MessageBoxButtons.OK, MessageBoxIcon.Information);
                 return;
             }
+            string launchMode = TriLaunchMode, launcher = tbTriLauncher == null ? "" : tbTriLauncher.Text.Trim().Trim('"');
+            if (launchMode == TriOps.ModeLauncher && launcher.Length == 0)
+            {
+                MessageBox.Show(this, Lang.T("'런처로 실행'에는 게임 런처를 지정해야 합니다 (예: PlayGTAV.exe)."), AppName, MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
             try
             {
                 string name = TriOps.RegisteredName(gameExe) ?? TriOps.KeyName(nm ?? Util.GameDisplayName(gameExe));
                 Log("----------------------------------------");
                 Log(Lang.T("적용: ") + "TriDef 3D / " + (Util.ExeBits(gameExe) == 64 ? "x64 (DX11)" : "x86 (DX9)") + " / SR " + (chkSr.Checked ? Lang.T("사용") : Lang.T("사용 안 함")));
                 foreach (var l in TriOps.Register(name, gameExe, profile, chkSr.Checked)) Log(l);
+                TriOps.SetLaunch(name, launchMode, launcher, tbTriLauncherArgs == null ? "" : tbTriLauncherArgs.Text);
+                Log(Lang.T("  실행 방법: ") + TriLaunchLabel(name));
                 AddGameToList(gameExe, true);
                 wizardActive = false;
                 RefreshGameList();
                 tabs.SelectedIndex = TabList;
                 Log(Lang.T("완료."));
                 Status(Lang.T("설정 완료: ") + Path.GetFileName(gameExe) + "  (TriDef 3D)");
-                MessageBox.Show(this, Lang.T("TriDef 3D에 등록했습니다.\n\n[게임 목록]의 [실행]으로 시작하세요(Steam 게임은 관리자 권한 확인 창이 뜹니다). Steam이나 다른 런처에서 바로 실행하면 3D가 되지 않습니다. 깊이는 게임 안에서 TriDef 단축키로 조절합니다."), AppName, MessageBoxButtons.OK, MessageBoxIcon.Information);
+                string done = launchMode == TriOps.ModeWait
+                    ? Lang.T("TriDef 3D에 등록했습니다 (기다리기만).\n\n[게임 목록]의 [실행]을 누르고(관리자 권한 확인 창이 뜹니다) 10분 안에 게임을 런처나 바로 가기로 시작하세요. 게임 실행 파일이 뜨는 순간 TriDef를 주입합니다. 깊이는 게임 안에서 TriDef 단축키로 조절합니다.")
+                    : launchMode == TriOps.ModeLauncher
+                    ? Lang.T("TriDef 3D에 등록했습니다 (런처로 실행).\n\n[게임 목록]의 [실행]을 누르면(관리자 권한 확인 창이 뜹니다) 이 앱이 게임 런처를 실행하고, 런처가 게임을 띄우는 순간 TriDef를 주입합니다. 런처에서 게임 시작 버튼을 눌러야 하면 누르세요. 깊이는 게임 안에서 TriDef 단축키로 조절합니다.")
+                    : Lang.T("TriDef 3D에 등록했습니다.\n\n[게임 목록]의 [실행]으로 시작하세요(Steam 게임은 관리자 권한 확인 창이 뜹니다). Steam이나 다른 런처에서 바로 실행하면 3D가 되지 않습니다. 깊이는 게임 안에서 TriDef 단축키로 조절합니다.");
+                MessageBox.Show(this, done, AppName, MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
             catch (Exception ex)
             {
@@ -2812,6 +2894,16 @@ namespace GeoGamingHub
                 Status(Lang.T("오류: ") + ex.Message);
                 MessageBox.Show(this, ex.Message, Lang.T("오류"), MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
+        }
+
+        // "자동" / "런처로 실행 (PlayGTAV.exe)" / "기다리기만"
+        static string TriLaunchLabel(string name)
+        {
+            string m = TriOps.Mode(name);
+            if (m == TriOps.ModeWait) return Lang.T("기다리기만");
+            if (m != TriOps.ModeLauncher) return Lang.T("자동");
+            string l = TriOps.LauncherOf(name);
+            return Lang.T("런처로 실행") + " (" + (l.Contains("://") ? l : Path.GetFileName(l)) + ")";
         }
 
         // a TriDef registration counts when no other 3D of this app is in the game folder
