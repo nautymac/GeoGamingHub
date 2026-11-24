@@ -1981,6 +1981,12 @@ namespace GeoGamingHub
                 Ini.Set(dx, "get_resolution_from", "large_2d_depth_stencil_if_swap_chain_native", "Device");
                 Ini.SetInclude(dx, "ShaderFixes\\3dvision2sbs.ini", false);
                 Log(Lang.T("  UF2: d3dx.ini force_stereo=2, get_resolution_from, 3dvision2sbs include 끔"));
+                string gpu;
+                if (Ue4Ops.OverlayIncludesUnsafe(out gpu))
+                {
+                    foreach (var inc in Ue4Ops.OverlayIncludes) Ini.SetInclude(dx, inc, false);
+                    Log(Lang.T("  UF2: NVIDIA가 아닌 GPU(") + gpu + Lang.T(") - overlay.ini / help.ini include 끔 (켜면 첫 프레임에 GPU 장치가 사라져 게임이 종료됨)"));
+                }
             }
             foreach (var junk in new[] { "PathTemp", "LinkPathStorage", "GiveInstallState.txt", "z_RestoreTemp", "NewVersion" })
             { string p = Path.Combine(dir, junk); if (File.Exists(p)) File.Delete(p); }
