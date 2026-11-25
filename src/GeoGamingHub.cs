@@ -2220,6 +2220,8 @@ namespace GeoGamingHub
                 Lang.T("■ 기본 단축키 ([단축키] 탭에서 입력란을 클릭하고 키를 눌러 바꿀 수 있습니다)"),
                 Lang.T("  geo-11      Ctrl+T 3D 켜기/끄기 | Ctrl+F3 / Ctrl+F4 Separation 감소/증가 | Ctrl+F5 / Ctrl+F6 Convergence 감소/증가"),
                 Lang.T("              Ctrl+F7 현재 값 저장 | Ctrl+F1 입체 값 오버레이"),
+                Lang.T("  게임패드    L1+R1+십자키 위/아래 Separation 증가/감소 | L1+R1+십자키 오른쪽/왼쪽 Convergence 증가/감소 (XInput 패드)"),
+                Lang.T("              조절 키(키보드·패드)를 놓으면 0.5초 뒤 값이 자동으로 저장됩니다 (Ctrl+F7을 누르지 않아도 다음 실행에 유지)"),
                 Lang.T("  오버레이    숫자패드 0 오버레이(3DMigoto Hunting: 셰이더 정보·조작 안내) 표시/숨김 (오버레이 모드가 1 또는 2일 때)"),
                 Lang.T("              F10 설정/픽스 다시 읽기 | F9 (누르는 동안) 픽스 끄기"),
                 Lang.T("  SRWeave     Ctrl+Alt+W 위빙 켜기/끄기 | Ctrl+Alt+S 좌우 눈 바꾸기 | Ctrl+Alt+L 렌즈 켜기/끄기 | Ctrl+Alt+T 테스트 무늬(왼눈 빨강/오른눈 파랑)"),
@@ -3178,6 +3180,78 @@ namespace GeoGamingHub
             return changed;
         }
 
+        // Controller adjustment and auto-save, in hotkeys.ini (Unity / Preferred) or UF2's d3dxdm.ini:
+        //   L1+R1+D-pad up/down = separation up/down, L1+R1+D-pad right/left = convergence up/down
+        //   (a second "Key = XB_..." line in the same [Key*] section, after the keyboard one, which stays the first
+        //   so Ini.GetSectionKey / SetSectionKey keep working on it), and
+        //   0.5 s after any adjustment key (keyboard or controller) is released, CommandListSaveSettings runs by itself,
+        //   so the last value is kept without pressing Ctrl+F7. Every step is skipped when already there.
+        public static readonly string[][] PadKeys = {
+            new[] { "KeyIncreaseSeparation",  "XB_LEFT_SHOULDER XB_RIGHT_SHOULDER XB_DPAD_UP",    "CommandListIncreaseSeparationStop" },
+            new[] { "KeyDecreaseSeparation",  "XB_LEFT_SHOULDER XB_RIGHT_SHOULDER XB_DPAD_DOWN",  "CommandListDecreaseSeparationStop" },
+            new[] { "KeyIncreaseConvergence", "XB_LEFT_SHOULDER XB_RIGHT_SHOULDER XB_DPAD_RIGHT", "CommandListIncreaseConvergenceStop" },
+            new[] { "KeyDecreaseConvergence", "XB_LEFT_SHOULDER XB_RIGHT_SHOULDER XB_DPAD_LEFT",  "CommandListDecreaseConvergenceStop" },
+        };
+        const string AutoSaveVar = "$stereo_autosave_time";
+
+        public static bool EnsureGamepadAndAutoSave(string file)
+        {
+            if (!File.Exists(file)) return false;
+            var lines = File.ReadAllLines(file, Encoding.Default).ToList();
+            bool changed = false;
+            Func<string, int> section = n => lines.FindIndex(l => l.Trim().Equals("[" + n + "]", StringComparison.OrdinalIgnoreCase));
+            Func<int, int> sectionEnd = start => { int i = start + 1; while (i < lines.Count && !lines[i].TrimStart().StartsWith("[")) i++; return i; };
+            // end of the section's content, before the blank / comment lines that lead into the next section
+            Func<int, int> contentEnd = start => { int i = sectionEnd(start); while (i > start + 1 && (lines[i - 1].Trim().Length == 0 || lines[i - 1].TrimStart().StartsWith(";"))) i--; return i; };
+            Func<int, string, bool> sectionHas = (start, rx) => { int end = sectionEnd(start); for (int i = start + 1; i < end; i++) if (Regex.IsMatch(lines[i], rx, RegexOptions.IgnoreCase)) return true; return false; };
+
+            int cl = section("CommandListSaveSettings");
+            if (cl < 0) return false;   // no save command list: nothing to auto-run (not a geo-11 DirectMode key file)
+
+            foreach (var pk in PadKeys)
+            {
+                int s = section(pk[0]);
+                if (s < 0 || sectionHas(s, @"^\s*Key\s*=.*\bXB\d?_")) continue;
+                int end = sectionEnd(s), at = s + 1;
+                for (int i = s + 1; i < end; i++) if (Regex.IsMatch(lines[i], @"^\s*Key\s*=", RegexOptions.IgnoreCase)) { at = i + 1; break; }
+                lines.Insert(at, "Key = " + pk[1]);
+                changed = true;
+            }
+
+            int c = section("Constants");
+            if (c >= 0 && !sectionHas(c, @"^\s*global\s+" + Regex.Escape(AutoSaveVar) + @"\b"))
+            {
+                lines.InsertRange(c + 1, new[] { "; time the last stereo adjustment key was released, -1 = nothing to save (auto-save, Geo Gaming Hub)", "global " + AutoSaveVar + " = -1" });
+                changed = true;
+            }
+            if (c < 0) return changed ? WriteIniLines(file, lines) : false;   // cannot declare the variable: keep the keys only
+
+            foreach (var pk in PadKeys)
+            {
+                int s = section(pk[2]);
+                if (s < 0 || sectionHas(s, @"^\s*" + Regex.Escape(AutoSaveVar) + @"\s*=\s*time\s*$")) continue;
+                lines.Insert(contentEnd(s), AutoSaveVar + " = time");
+                changed = true;
+            }
+
+            int p = section("Present");
+            if (p >= 0 && !sectionHas(p, Regex.Escape(AutoSaveVar) + @"\s*!=\s*-1"))
+            {
+                lines.InsertRange(contentEnd(p), new[] {
+                    "",
+                    "; auto-save the stereo values 0.5 s after an adjustment key (keyboard or L1+R1+D-pad) is released (Geo Gaming Hub)",
+                    "if " + AutoSaveVar + " != -1 && time - " + AutoSaveVar + " > 0.5",
+                    "\t" + AutoSaveVar + " = -1",
+                    "\trun = CommandListSaveSettings",
+                    "endif",
+                });
+                changed = true;
+            }
+            return changed ? WriteIniLines(file, lines) : false;
+        }
+
+        static bool WriteIniLines(string file, List<string> lines) { File.WriteAllLines(file, lines, Encoding.Default); return true; }
+
         // The save key needs geo-11 0.6.109 in the game folder. An existing UF2 install still on 0.6.40 (SR-only re-apply
         // does not copy the package) gets the driver from the package's ShaderFixes\Geo11.
         void Ue4EnsureDriver(string dir)
@@ -3231,6 +3305,7 @@ namespace GeoGamingHub
                     if (EnsureUe4KeySections(hk)) Log(Lang.T("  d3dxdm.ini: 3D 켜기/끄기·현재 값 저장 키 섹션 추가 (UF2에는 없던 것)"));
                     Ue4EnsureDriver(dir);
                 }
+                if (EnsureGamepadAndAutoSave(hk)) Log("  " + Path.GetFileName(hk) + Lang.T(": 게임패드 조절(L1+R1+십자키)·조절 후 자동 저장 추가"));
                 var written = new List<string>();
                 foreach (var k in GeoKeys)
                 {
