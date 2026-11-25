@@ -1,4 +1,4 @@
-# Geo Gaming Hub v0.1.4
+# Geo Gaming Hub v0.1.5
 
 [English](README.md) · **한국어**
 
@@ -141,6 +141,7 @@ geo-11(DirectX 9 / 11)만 경고 창에서 [예]를 눌러야 설치됩니다(�
 
 - **DX12_3D**: DLSS는 오른쪽 눈에 적용되지 않습니다(회색 화면). 게임의 렌더 스케일이나 FSR / XeSS를 쓰세요. 자동 Convergence는 아직 없습니다.
 - **Unreal Engine 4 (geo-11)**: DLSS를 켜면 게임이 GPU 오류(0x887A0006 HUNG)로 꺼질 수 있습니다(Lies of P에서 확인). 앱이 DLSS가 있는 게임을 경고하고, 게임 설정에서 DLSS가 켜진 것을 찾으면 [완료]나 **UE4 설정**에서 끌 수 있습니다.
+- **Unreal Engine 4 (geo-11), AMD GPU**: UF2의 `overlay.ini`와 `help.ini`가 첫 프레임에 드라이버의 GPU 장치를 잃게 해 게임이 꺼집니다(0x887A0020 / 0x887A0005, Radeon RX 7600M XT의 Samurai Bringer에서 확인). NVIDIA가 아닌 GPU에서는(Intel은 시험하지 않음) 앱이 `d3dx.ini`에서 이 두 include를 끄므로, UF2의 게임 내 오버레이와 도움말 화면은 나오지 않습니다.
 - **DXVK 경로**는 실험적입니다. geo-11이 되는 게임은 geo-11이 더 낫습니다.
 - 제3자 DLL을 막는 게임에서는 어느 방식도 로드되지 않습니다.
 - **Burnout Paradise Remastered** (geo-11, 32비트): 게임의 웹캠 코드(면허 사진, 머그샷)가 가끔 두 스레드에서 동시에 돌아서 인트로

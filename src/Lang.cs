@@ -685,6 +685,8 @@ namespace GeoGamingHub
             { "  UF2: geo-11 드라이버(ShaderFixes\\Geo11)를 게임 폴더에 배치", "  UF2: geo-11 driver (ShaderFixes\\Geo11) placed in the game folder" },
             { "  UF2: HUD 프로필 ", "  UF2: HUD profile " },
             { "  UF2: d3dx.ini force_stereo=2, get_resolution_from, 3dvision2sbs include 끔", "  UF2: d3dx.ini force_stereo=2, get_resolution_from, 3dvision2sbs include off" },
+            { "  UF2: NVIDIA가 아닌 GPU(", "  UF2: non-NVIDIA GPU (" },
+            { ") - overlay.ini / help.ini include 끔 (켜면 첫 프레임에 GPU 장치가 사라져 게임이 종료됨)", ") - overlay.ini / help.ini include off (with them on, the GPU device is lost on the first frame and the game closes)" },
             { "Unreal Engine 4 (Universal Fix 2 패키지)", "Unreal Engine 4 (Universal Fix 2 package)" },
             { "     UE4 게임은 Universal Fix 2 패키지를 Binaries\\Win64에 설치합니다. AA/AO 개선·전체화면·VSync·HUD 프로필 같은 게임별 설정은 설치 뒤 [UE4 설정...] 창에서 바꿉니다.", "     UE4 games get the Universal Fix 2 package in Binaries\\Win64. Per-game settings such as AA/AO improvements, fullscreen, VSync and HUD profile are changed afterwards in the [UE4 settings...] window." },
         };
