@@ -124,8 +124,8 @@ geo-11 게임은 **단축키** 탭에서 확인하고 바꿉니다. 자체 래�
 | Ctrl+F3 / Ctrl+F4 | Separation − / + |
 | Ctrl+F5 / Ctrl+F6 | Convergence − / + |
 | Ctrl+F7 | 현재 값 저장 |
-| L1+R1 + 십자키 (게임패드) | 위 / 아래 = Separation + / −, 오른쪽 / 왼쪽 = Convergence + / − (geo-11) |
-| (자동) | 조절 키나 패드 조합을 놓으면 값을 자동 저장 (geo-11) |
+| L1+R1 + 십자키 (게임패드) | 위 / 아래 = Separation + / −, 오른쪽 / 왼쪽 = Convergence + / − (geo-11, OGL3D) |
+| (자동) | 조절 키나 패드 조합을 놓으면 값을 자동 저장 (geo-11, OGL3D) |
 | Ctrl+F1 | 값 표시 |
 | Ctrl+F2 | 자동 Convergence (OGL3D, VK3D) |
 | Ctrl+T | 3D 켜기/끄기 |

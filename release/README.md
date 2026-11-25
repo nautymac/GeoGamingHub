@@ -133,8 +133,8 @@ geo-11 games: see and change them on the **Hotkeys** tab. The own wrappers read 
 | Ctrl+F3 / Ctrl+F4 | Separation − / + |
 | Ctrl+F5 / Ctrl+F6 | Convergence − / + |
 | Ctrl+F7 | save the current values |
-| L1+R1 + D-pad (controller) | up / down = Separation + / −, right / left = Convergence + / − (geo-11) |
-| (auto) | releasing an adjustment key or the controller combo saves the values (geo-11) |
+| L1+R1 + D-pad (controller) | up / down = Separation + / −, right / left = Convergence + / − (geo-11, OGL3D) |
+| (auto) | releasing an adjustment key or the controller combo saves the values (geo-11, OGL3D) |
 | Ctrl+F1 | show values |
 | Ctrl+F2 | auto convergence (OGL3D, VK3D) |
 | Ctrl+T | 3D on / off |
