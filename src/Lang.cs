@@ -643,6 +643,11 @@ namespace GeoGamingHub
             { "  게임별 픽스: ", "  Game fix: " },
             { "개 파일 설치 (dgVoodoo2 ", " files installed (dgVoodoo2 " },
             { "  DX9 안전 설정: ", "  DX9 safe settings: " },
+            // Unity per-game edits (data\unityfixes)
+            { "  게임별 Unity 보정: ", "  Unity game fix: " },
+            { "에서 ", ": " },
+            { "줄 끔", " lines commented out" },
+            { "  게임별 Unity 보정: 이미 적용되어 있음", "  Unity game fix: already applied" },
             // Unreal Engine 4 settings window (replaces the console config tool)
             { "AA/AO 개선 설치 (모션 블러·비네트·렌즈 플레어 끄기, 게임 AA 설정은 그대로)", "Install the AA/AO improvements (motion blur, vignette and lens flare off, game AA settings kept)" },
             { "게임의 설정 폴더(%LOCALAPPDATA%\\<프로젝트>\\Saved\\Config\\WindowsNoEditor)의 Engine.ini와 Scalability.ini 끝에 패키지의 권장 설정을 붙이고 원본은 *_backup.ini로 보관합니다. 게임을 한 번도 실행하지 않아 그 폴더가 없으면 건너뛰고 로그에 남깁니다.", "Appends the package's recommended settings to Engine.ini and Scalability.ini in the game's config folder (%LOCALAPPDATA%\\<Project>\\Saved\\Config\\WindowsNoEditor) and keeps the originals as *_backup.ini. If the game has never run and the folder does not exist, this is skipped and noted in the log." },

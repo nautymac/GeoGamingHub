@@ -1,0 +1,7 @@
+# Heaven Dust 2 (Unity 2021.3.35f1), Intel Arc 140V, geo-11 0.6.109 DirectMode SBS.
+# With these lines active the game crashes on its first frame (0xC0000005 in d3d11.dll
+# CContext::TID3D11DeviceContext_SetConstantBuffers_<1,5>, i.e. CSSetConstantBuffers, called from geo-11).
+# Only running the inverse-matrix compute shaders crashes; the rest of Unity_2019_1.ini (light, shadow and
+# parallax regex patches) stays on. Without the inverse matrix, cb13 stays zero and the "FOV from VS is NOT
+# present" branches add no correction.
+^\s*run\s*=\s*CustomShader_InvViewProj

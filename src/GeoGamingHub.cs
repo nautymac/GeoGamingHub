@@ -3095,6 +3095,8 @@ namespace GeoGamingHub
                     foreach (var l in o.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries)) Log("  UnitySwitch: " + l);
                 }
                 else if (rbUnity.Checked) Log(Lang.T("  UnitySwitch.ps1 없음 - Unity 버전 include 줄은 바꾸지 않았습니다."));
+                // per-game edits of Unity_*.ini (after UnitySwitch: a full install has just copied the package's files again)
+                if (rbUnity.Checked) foreach (var l in UnityFixOps.Apply(DataPath("unityfixes"), Path.GetFileName(gameExe), dir)) Log(l);
 
                 string sr = Path.Combine(dir, "SRWeave.ini");
                 if (useSr && File.Exists(sr))
