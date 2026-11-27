@@ -646,6 +646,11 @@ namespace GeoGamingHub
             { "  게임별 픽스: ", "  Game fix: " },
             { "개 파일 설치 (dgVoodoo2 ", " files installed (dgVoodoo2 " },
             { "  DX9 안전 설정: ", "  DX9 safe settings: " },
+            // Unity per-game edits (data\unityfixes)
+            { "  게임별 Unity 보정: ", "  Unity game fix: " },
+            { "에서 ", ": " },
+            { "줄 끔", " lines commented out" },
+            { "  게임별 Unity 보정: 이미 적용되어 있음", "  Unity game fix: already applied" },
             // Unreal Engine 4 settings window (replaces the console config tool)
             { "AA/AO 개선 설치 (모션 블러·비네트·렌즈 플레어 끄기, 게임 AA 설정은 그대로)", "Install the AA/AO improvements (motion blur, vignette and lens flare off, game AA settings kept)" },
             { "게임의 설정 폴더(%LOCALAPPDATA%\\<프로젝트>\\Saved\\Config\\WindowsNoEditor)의 Engine.ini와 Scalability.ini 끝에 패키지의 권장 설정을 붙이고 원본은 *_backup.ini로 보관합니다. 게임을 한 번도 실행하지 않아 그 폴더가 없으면 건너뛰고 로그에 남깁니다.", "Appends the package's recommended settings to Engine.ini and Scalability.ini in the game's config folder (%LOCALAPPDATA%\\<Project>\\Saved\\Config\\WindowsNoEditor) and keeps the originals as *_backup.ini. If the game has never run and the folder does not exist, this is skipped and noted in the log." },
@@ -688,6 +693,8 @@ namespace GeoGamingHub
             { "  UF2: geo-11 드라이버(ShaderFixes\\Geo11)를 게임 폴더에 배치", "  UF2: geo-11 driver (ShaderFixes\\Geo11) placed in the game folder" },
             { "  UF2: HUD 프로필 ", "  UF2: HUD profile " },
             { "  UF2: d3dx.ini force_stereo=2, get_resolution_from, 3dvision2sbs include 끔", "  UF2: d3dx.ini force_stereo=2, get_resolution_from, 3dvision2sbs include off" },
+            { "  UF2: NVIDIA가 아닌 GPU(", "  UF2: non-NVIDIA GPU (" },
+            { ") - overlay.ini / help.ini include 끔 (켜면 첫 프레임에 GPU 장치가 사라져 게임이 종료됨)", ") - overlay.ini / help.ini include off (with them on, the GPU device is lost on the first frame and the game closes)" },
             { "Unreal Engine 4 (Universal Fix 2 패키지)", "Unreal Engine 4 (Universal Fix 2 package)" },
             { "     UE4 게임은 Universal Fix 2 패키지를 Binaries\\Win64에 설치합니다. AA/AO 개선·전체화면·VSync·HUD 프로필 같은 게임별 설정은 설치 뒤 [UE4 설정...] 창에서 바꿉니다.", "     UE4 games get the Universal Fix 2 package in Binaries\\Win64. Per-game settings such as AA/AO improvements, fullscreen, VSync and HUD profile are changed afterwards in the [UE4 settings...] window." },
         };

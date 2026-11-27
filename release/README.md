@@ -1,4 +1,4 @@
-# Geo Gaming Hub v0.1.4
+# Geo Gaming Hub v0.1.6
 
 **English** · [한국어](README.ko.md)
 
@@ -154,6 +154,7 @@ banned. Installing is at your own account risk.
 
 - **DX12_3D**: DLSS does not reach the right eye (grey image): use the game's render scale or FSR / XeSS. No auto convergence yet.
 - **Unreal Engine 4 (geo-11)**: DLSS can crash the game with a GPU error (0x887A0006 HUNG; seen in Lies of P). The app warns about games with DLSS, and when it finds DLSS on in the game's settings it offers to turn it off at [Finish] or in **UE4 settings**.
+- **Unreal Engine 4 (geo-11) on AMD GPUs**: UF2's `overlay.ini` and `help.ini` make the driver lose the GPU device on the first frame (0x887A0020 / 0x887A0005; seen in Samurai Bringer on a Radeon RX 7600M XT). On any non-NVIDIA GPU (Intel not tried) the app turns these two includes off in `d3dx.ini`, so UF2's in-game overlay and help screen are not there.
 - The **DXVK route** is experimental; games that work with geo-11 are better on geo-11.
 - Games that block third-party DLLs load none of these methods.
 - **Burnout Paradise Remastered** (geo-11, 32-bit): the game's webcam code (licence photo, Mugshots) sometimes runs on two threads at once

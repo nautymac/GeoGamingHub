@@ -9,21 +9,106 @@
 //   - HUD profile: ShaderFixes\AUTOHUDUICONFIGS\<exe> -> ShaderFixes\AutoDepthUIHUD.ini (z_HUDUIProfileInstaller.cmd).
 // Not reproduced (their files are missing in this package, so the tool itself cannot do them either): aim-key
 // convergence scale, HUD-fix disable / shader hunting, "reset to default". The original tool stays reachable.
+//   - Non-NVIDIA GPU: the [Include] lines ShaderFixes\overlay.ini and ShaderFixes\help.ini are commented out (see
+//     OverlayIncludesUnsafe).
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
 
 namespace GeoGamingHub
 {
+    // Vendor of the GPU a game will run on, read through DXGI (the same list the game's D3D11 device picks from).
+    static class Gpu
+    {
+        public const uint Nvidia = 0x10DE, Amd = 0x1002, Intel = 0x8086;
+
+        [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
+        struct DXGI_ADAPTER_DESC1
+        {
+            [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 128)] public string Description;
+            public uint VendorId, DeviceId, SubSysId, Revision;
+            public UIntPtr DedicatedVideoMemory, DedicatedSystemMemory, SharedSystemMemory;
+            public uint LuidLow; public int LuidHigh;
+            public uint Flags;
+        }
+
+        // only the vtable order matters: the placeholder methods are never called
+        [ComImport, Guid("29038f61-3839-4626-91fd-086879011a05"), InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
+        interface IDXGIAdapter1
+        {
+            void SetPrivateData(); void SetPrivateDataInterface(); void GetPrivateData(); void GetParent();   // IDXGIObject
+            void EnumOutputs(); void GetDesc(); void CheckInterfaceSupport();                                    // IDXGIAdapter
+            [PreserveSig] int GetDesc1(out DXGI_ADAPTER_DESC1 desc);                                             // IDXGIAdapter1
+        }
+
+        [ComImport, Guid("770aae78-f26f-4dba-a829-253c83d1b387"), InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
+        interface IDXGIFactory1
+        {
+            void SetPrivateData(); void SetPrivateDataInterface(); void GetPrivateData(); void GetParent();   // IDXGIObject
+            void EnumAdapters(); void MakeWindowAssociation(); void GetWindowAssociation(); void CreateSwapChain(); void CreateSoftwareAdapter();   // IDXGIFactory
+            [PreserveSig] int EnumAdapters1(uint index, out IDXGIAdapter1 adapter);                               // IDXGIFactory1
+        }
+
+        [DllImport("dxgi.dll")]
+        static extern int CreateDXGIFactory1([In] ref Guid riid, [MarshalAs(UnmanagedType.Interface)] out IDXGIFactory1 factory);
+
+        // the hardware adapter with the most dedicated video memory: the discrete GPU on a laptop with an iGPU,
+        // which is what UE4 / most games create their device on. Returns 0 if DXGI can't be read.
+        public static uint GameVendor(out string name)
+        {
+            name = null;
+            uint vendor = 0; ulong best = 0;
+            try
+            {
+                Guid iid = typeof(IDXGIFactory1).GUID;
+                IDXGIFactory1 f;
+                if (CreateDXGIFactory1(ref iid, out f) < 0 || f == null) return 0;
+                try
+                {
+                    for (uint i = 0; i < 16; i++)
+                    {
+                        IDXGIAdapter1 a;
+                        if (f.EnumAdapters1(i, out a) < 0 || a == null) break;   // DXGI_ERROR_NOT_FOUND ends the list
+                        try
+                        {
+                            DXGI_ADAPTER_DESC1 d;
+                            if (a.GetDesc1(out d) < 0 || (d.Flags & 2) != 0) continue;   // DXGI_ADAPTER_FLAG_SOFTWARE (Basic Render Driver)
+                            ulong mem = d.DedicatedVideoMemory.ToUInt64();
+                            if (vendor == 0 || mem > best) { vendor = d.VendorId; best = mem; name = d.Description; }
+                        }
+                        finally { Marshal.ReleaseComObject(a); }
+                    }
+                }
+                finally { Marshal.ReleaseComObject(f); }
+            }
+            catch (Exception) { return 0; }
+            return vendor;
+        }
+    }
+
     static class Ue4Ops
     {
         static readonly Encoding Enc = Encoding.Default;
+
+        // UF2's on-screen text overlays. Their geometry shaders (up to ~1.4 MB once geo-11's direct mode patches them)
+        // make the AMD driver lose the D3D11 device on the first frame (DXGI 887A0005 / 887A0020); geo-11's ImGui
+        // overlay then can't build its font atlas and the game dies in d3d11.dll ("Font Atlas not built" assert).
+        // Each one alone is enough. Seen on Samurai Bringer, RX 7600M XT, Adrenalin 26.6.1; fine on NVIDIA.
+        public static readonly string[] OverlayIncludes = { "ShaderFixes\\overlay.ini", "ShaderFixes\\help.ini" };
+
+        // true when the game will run on a GPU that isn't NVIDIA (unknown counts as safe: nothing is changed)
+        public static bool OverlayIncludesUnsafe(out string gpu)
+        {
+            uint v = Gpu.GameVendor(out gpu);
+            return v != 0 && v != Gpu.Nvidia;
+        }
 
         // VSync tokens the UF2 tool writes into the NVIDIA profile line
         public static readonly string[] VsyncTokens = { "0x60925292", "0x47814940", "0x08416747", "0x18888888", "0x32610244", "0x71271021", "0x13245256" };
