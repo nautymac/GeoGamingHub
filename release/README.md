@@ -1,4 +1,4 @@
-# Geo Gaming Hub v0.1.6
+# Geo Gaming Hub v0.1.7
 
 **English** · [한국어](README.ko.md)
 
@@ -155,6 +155,7 @@ banned. Installing is at your own account risk.
 - **DX12_3D**: DLSS does not reach the right eye (grey image): use the game's render scale or FSR / XeSS. No auto convergence yet.
 - **Unreal Engine 4 (geo-11)**: DLSS can crash the game with a GPU error (0x887A0006 HUNG; seen in Lies of P). The app warns about games with DLSS, and when it finds DLSS on in the game's settings it offers to turn it off at [Finish] or in **UE4 settings**.
 - **Unreal Engine 4 (geo-11) on AMD GPUs**: UF2's `overlay.ini` and `help.ini` make the driver lose the GPU device on the first frame (0x887A0020 / 0x887A0005; seen in Samurai Bringer on a Radeon RX 7600M XT). On any non-NVIDIA GPU (Intel not tried) the app turns these two includes off in `d3dx.ini`, so UF2's in-game overlay and help screen are not there.
+- **Heaven Dust 2** (geo-11 Unity, Intel Arc): the Unity fix (`Unity_2019_1.ini`) crashes the game, on the first frame or once a game is started from the menu (seen on an Arc 140V). The app installs the game with that fix turned off (`data\unityfixes`), so some lights and shadows may sit at a slightly different depth in the two eyes.
 - The **DXVK route** is experimental; games that work with geo-11 are better on geo-11.
 - Games that block third-party DLLs load none of these methods.
 - **Burnout Paradise Remastered** (geo-11, 32-bit): the game's webcam code (licence photo, Mugshots) sometimes runs on two threads at once
