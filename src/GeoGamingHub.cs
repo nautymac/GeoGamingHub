@@ -21,8 +21,8 @@ using System.Windows.Forms;
 
 [assembly: AssemblyTitle("Geo Gaming Hub")]
 [assembly: AssemblyProduct("Geo Gaming Hub")]
-[assembly: AssemblyVersion("0.1.7.0")]
-[assembly: AssemblyFileVersion("0.1.7.0")]
+[assembly: AssemblyVersion("0.1.8.0")]
+[assembly: AssemblyFileVersion("0.1.8.0")]
 
 namespace GeoGamingHub
 {
@@ -679,7 +679,7 @@ namespace GeoGamingHub
     sealed class MainForm : Form
     {
         public const string AppName = "Geo Gaming Hub";
-        // "0.1.7" from [assembly: AssemblyVersion] above: one place to bump. The window title shows "Geo Gaming Hub v0.1.7".
+        // "0.1.8" from [assembly: AssemblyVersion] above: one place to bump. The window title shows "Geo Gaming Hub v0.1.8".
         public static readonly string AppVersion = typeof(MainForm).Assembly.GetName().Version.ToString(3);
         public static readonly string AppTitle = AppName + " v" + AppVersion;
         // ---- data ----
@@ -1868,7 +1868,7 @@ namespace GeoGamingHub
             rbFull.CheckedChanged += (s, e) => { if (rbFull.Checked && chkSr != null && !chkSr.Checked) chkSr.Checked = true; };
             rbSbsOnly.CheckedChanged += (s, e) => { if (rbSbsOnly.Checked && chkSr != null && chkSr.Checked) chkSr.Checked = false; };
             pnlScope.Controls.Add(scopeCol);
-            pnlScope.Controls.Add(Note(Lang.T("SBS만 설치: geo-11과 픽스만 넣고 SR 위빙(dxgi.dll, SRWeave.ini)은 넣지 않습니다. 3D TV나 일반(Non-SR) 모니터에서 좌우(SBS) 화면으로 봅니다. 출력 모드(상하 등)는 다음 단계에서 바꿀 수 있습니다. 'SR 위빙만 추가'는 게임 폴더에 이미 geo-11/3DMigoto 픽스(d3d11.dll)가 있을 때만 나타나며, dxgi.dll + SRWeave.ini만 넣고 d3dx.ini / ShaderFixes는 건드리지 않습니다.")));
+            pnlScope.Controls.Add(Note(Lang.T("SBS만 설치: geo-11과 픽스를 넣고 SR 위빙은 하지 않습니다. 3D TV나 일반(Non-SR) 모니터에서 좌우(SBS) 화면으로 봅니다. SRWeave(dxgi.dll)는 위빙을 끈 채(weave=0) 같이 넣습니다 - 없으면 게임이 해상도를 바꿀 때 꺼지는 게임이 있습니다(배틀프론트 2). DX9 게임과, 게임 폴더에 다른 dxgi.dll(ReShade)이 있을 때는 넣지 않습니다. 출력 모드(상하 등)는 다음 단계에서 바꿀 수 있습니다. 'SR 위빙만 추가'는 게임 폴더에 이미 geo-11/3DMigoto 픽스(d3d11.dll)가 있을 때만 나타나며, dxgi.dll + SRWeave.ini만 넣고 d3dx.ini / ShaderFixes는 건드리지 않습니다.")));
             p.Controls.Add(pnlScope);
 
             // community fix for this game (HelixMod and the like), merged into the hub's geo-11 install at [완료]
@@ -2475,6 +2475,9 @@ namespace GeoGamingHub
             // TriDef 3D only renders Direct3D 9 / 11: not for OpenGL, Vulkan or DirectX 12-only games
             bool tri = !otherInstall && (triReg != null || (triProfile != null && steamGame && !gl && !vk && !dx12));
             if (tri) { gl = vk = dx12 = dx9 = false; notes.Remove(Lang.T("Unity 아님 (일반 geo-11)")); }
+            // a community fix for this exe (shipped in Packages\Fixes or imported) is a geo-11 fix: it decides the kind
+            var fixInfo = rbUe4.Checked ? null : FixOps.Load(exePath);
+            if (fixInfo != null) gl = vk = dx12 = tri = false;
             if (triProfile != null) notes.Add(Lang.T("TriDef 프로필: ") + triProfile + (TriOps.Installed() ? "" : Lang.T(" (TriDef 3D 설치 필수)")));
             if (triReg != null) notes.Add(Lang.T("TriDef 등록됨: ") + triReg);
             if (cbTriProfile != null)
@@ -2496,10 +2499,18 @@ namespace GeoGamingHub
                 string vr = Dx9Ops.Vram(gameDir);
                 if (vr != null && cbDx9Vram.Items.Contains(vr)) cbDx9Vram.SelectedItem = vr;
             }
-            lblKindDetect.Text = Lang.T("자동 감지: ") + (tri ? Lang.T("TriDef 프로필 있음 → TriDef 3D (TriDef 3D 설치 필수)") : gl ? Lang.T("OpenGL (opengl32.dll) → OGL3D") : vk ? Lang.T("Vulkan (vulkan-1.dll) → VK3D") : dx12 ? Lang.T("DirectX 12 (d3d12.dll) → DX12_3D") : rbUe4.Checked ? Lang.T("Unreal Engine 4 (Binaries\\Win64\\*-Win64-Shipping.exe 구조)") : uv != null ? "Unity " + uv : dx9 ? Lang.T("DirectX 9 (d3d9.dll) → dgVoodoo2 + 일반 geo-11") : Lang.T("Unity 아님 (일반 geo-11)") + (api != null ? " / " + api : "")) + Lang.T(" - 다르면 아래에서 바꾸세요.");
+            string kindText = tri ? Lang.T("TriDef 프로필 있음 → TriDef 3D (TriDef 3D 설치 필수)") : gl ? Lang.T("OpenGL (opengl32.dll) → OGL3D") : vk ? Lang.T("Vulkan (vulkan-1.dll) → VK3D") : dx12 ? Lang.T("DirectX 12 (d3d12.dll) → DX12_3D") : rbUe4.Checked ? Lang.T("Unreal Engine 4 (Binaries\\Win64\\*-Win64-Shipping.exe 구조)") : uv != null ? "Unity " + uv : dx9 ? Lang.T("DirectX 9 (d3d9.dll) → dgVoodoo2 + 일반 geo-11") : Lang.T("Unity 아님 (일반 geo-11)") + (api != null ? " / " + api : "");
+            if (fixInfo != null)
+                kindText = (fixInfo.Bundled ? Lang.T("허브에 이 게임의 커뮤니티 픽스 있음") : Lang.T("불러온 커뮤니티 픽스 있음")) + " (" + fixInfo.Name + ") → " +
+                           Lang.T("geo-11 + 픽스") + (uv != null ? " / Unity " + uv : dx9 ? " / DirectX 9 (dgVoodoo2)" : api != null ? " / " + api : "");
+            lblKindDetect.Text = Lang.T("자동 감지: ") + kindText + Lang.T(" - 다르면 아래에서 바꾸세요.");
             bool hasFix = File.Exists(Path.Combine(gameDir, "d3d11.dll"));
             rbSrOnly.Visible = hasFix;
-            if (hasFix) { notes.Add(Lang.T("기존 d3d11.dll(geo-11/3DMigoto) 있음 → 'SR 위빙만 추가' 권장")); rbSrOnly.Checked = true; LoadExisting(gameDir); }
+            // this app's own SBS-only install: geo-11 + SRWeave's dxgi.dll with weaving off -> SBS only again
+            string gDxgi = Path.Combine(gameDir, "dxgi.dll"), gSr = Path.Combine(gameDir, "SRWeave.ini");
+            bool sbsInstall = hasFix && File.Exists(gDxgi) && Util.IsSrWeave(gDxgi, Path.Combine(SrcDir(), "dxgi.dll")) && File.Exists(gSr) && (Ini.Get(gSr, "weave") ?? "").Trim() == "0";
+            if (sbsInstall) { notes.Add(Lang.T("기존 SBS 설치 (geo-11, SR 위빙 꺼짐)")); rbSbsOnly.Checked = true; LoadExisting(gameDir); }
+            else if (hasFix) { notes.Add(Lang.T("기존 d3d11.dll(geo-11/3DMigoto) 있음 → 'SR 위빙만 추가' 권장")); rbSrOnly.Checked = true; LoadExisting(gameDir); }
             else
             {
                 rbFull.Checked = true;
@@ -2535,7 +2546,6 @@ namespace GeoGamingHub
                 if (v != null) notes.Add(Lang.T("OGL3D 설치됨 ") + v);
                 else if (File.Exists(Path.Combine(gameDir, GlOps.Dll))) notes.Add(Lang.T("다른 opengl32.dll 있음 → 설치 시 opengl32.dll.geo11sr_bak으로 보관"));
             }
-            var fixInfo = FixOps.Load(exePath);
             if (fixInfo != null) notes.Add(Lang.T("커뮤니티 픽스 있음: ") + fixInfo.Name + (fixInfo.Bundled ? Lang.T(" (배포에 포함)") : ""));
             lblDetect.Text = string.Join("  |  ", notes);
             UpdateEnabled();
@@ -2977,8 +2987,17 @@ namespace GeoGamingHub
             {
                 string dir = gameDir, src = SrcDir(), ourDll = Path.Combine(src, "dxgi.dll");
                 if (!File.Exists(ourDll)) throw new Exception(Lang.T("패키지가 없습니다: ") + src + Lang.T("\n이 설치기 폴더 옆에 패키지 폴더가 있어야 합니다."));
-                // SBS only = the full install without the SR weaving files
+                // SBS only = the full install without SR weaving. SRWeave's dxgi.dll still goes in, with weaving off
+                // (weave=0): with geo-11 alone, Star Wars Battlefront II quit (DXGI_ERROR_INVALID_CALL) as soon as it resized
+                // its swap chain after the first frames (going to its fullscreen resolution); with the dxgi.dll proxy in place
+                // the same resize goes through (it did with SR weaving all along). Not for DX9 (dgVoodoo: Dragon Age crashed
+                // inside SRWeave there), and another tool's dxgi.dll (ReShade) - in the folder or backed up by an earlier SR
+                // install - stays / comes back as before.
                 bool useSr = chkSr.Checked && !rbSbsOnly.Checked, full = rbFull.Checked || rbSbsOnly.Checked;
+                string dxgiPath = Path.Combine(dir, "dxgi.dll");
+                bool srPass = !useSr && full && !IsDx9Selected && !(File.Exists(dxgiPath) && !Util.IsSrWeave(dxgiPath, ourDll))
+                              && !File.Exists(Path.Combine(dir, "dxgi.dll.reshade_bak"));
+                bool srDll = useSr || srPass;
                 Log("----------------------------------------");
                 Log(Lang.T("적용: ") + (rbUnity.Checked ? "Unity" : IsUe4Selected ? "UE4 UF2" : IsDx9Selected ? "DX9 dgVoodoo2 " + cbDx9Ver.SelectedItem + " + " + Lang.T("일반 geo-11") : Lang.T("일반 geo-11")) + " / " + (rb64.Checked ? "x64" : "x32") + " / " + (rbSbsOnly.Checked ? Lang.T("SBS만 설치") : full ? Lang.T("전체 설치") : Lang.T("SR만 추가")) + " / SR " + (useSr ? Lang.T("사용") : Lang.T("사용 안 함")));
                 Log(Lang.T("  원본: ") + src);
@@ -2987,8 +3006,8 @@ namespace GeoGamingHub
                 if (full)
                 {
                     Util.CopyDir(src, dir, n => n.Equals("SRWeave.log", StringComparison.OrdinalIgnoreCase)
-                        || (!useSr && (n.Equals("dxgi.dll", StringComparison.OrdinalIgnoreCase) || n.Equals("SRWeave.ini", StringComparison.OrdinalIgnoreCase))));
-                    if (!useSr) { string sd = Path.Combine(dir, "ShaderFixes", "SRWeave"); if (Directory.Exists(sd)) Directory.Delete(sd, true); }
+                        || (!srDll && (n.Equals("dxgi.dll", StringComparison.OrdinalIgnoreCase) || n.Equals("SRWeave.ini", StringComparison.OrdinalIgnoreCase))));
+                    if (!srDll) { string sd = Path.Combine(dir, "ShaderFixes", "SRWeave"); if (Directory.Exists(sd)) Directory.Delete(sd, true); }
                     int fixedBins = Util.FixShaderCacheTimes(Path.Combine(dir, "ShaderFixes"));
                     Log(Lang.T("  패키지 파일 복사 완료") + (fixedBins > 0 ? Lang.T(" (셰이더 캐시 시각 보정 ") + fixedBins + ")" : ""));
                     if (IsUe4Selected) Ue4PostInstall(dir);
@@ -3041,7 +3060,7 @@ namespace GeoGamingHub
                     }
                 }
                 if (IsUe4Selected) foreach (var l in Launchers.ApplyDx11(gameExe, this)) Log(l);   // UF2: the game must start with -dx11
-                if (!useSr) RemoveSrFiles(dir, ourDll, true);
+                if (!srDll) RemoveSrFiles(dir, ourDll, true);
 
                 string dm = Path.Combine(dir, "d3dxdm.ini");
                 if (File.Exists(dm))
@@ -3108,6 +3127,11 @@ namespace GeoGamingHub
                     Ini.Set(sr, "lens", chkLens.Checked ? "1" : "0", "SRWeave");
                     Log("  SRWeave.ini: swap_eyes=" + (chkSwap.Checked ? 1 : 0) + " lens=" + (chkLens.Checked ? 1 : 0));
                 }
+                else if (srPass && File.Exists(sr))
+                {
+                    Ini.Set(sr, "weave", "0", "SRWeave");
+                    Log(Lang.T("  SRWeave.ini: weave=0 (SBS만 설치 - 위빙은 끄고 dxgi.dll만 둠: 게임이 해상도를 바꿀 때 꺼지는 것을 막음)"));
+                }
 
                 // compiled game-shader caches: only worth clearing when the fix files were replaced (full install);
                 // clearing them on every re-apply just makes the next game start slow
@@ -3120,7 +3144,8 @@ namespace GeoGamingHub
                 Status(Lang.T("설정 완료: ") + Path.GetFileName(gameExe) + "  (" + dir + ")");
                 bool dlss = IsUe4Selected && (ue4Dlss || dlssOn != null);
                 if (dlss) Log(Lang.T("  주의: DLSS가 있는 게임입니다. DLSS를 켜면 GPU 오류로 꺼질 수 있으니 게임 옵션에서 꺼 두세요."));
-                MessageBox.Show(this, Lang.T("설정을 적용했습니다.\n\n게임을 SR 패널에서 패널 해상도로 전체화면 또는 테두리 없는 창으로 실행하세요.\n자세한 내용은 [로그] 탭에 있습니다.")
+                MessageBox.Show(this, (useSr ? Lang.T("설정을 적용했습니다.\n\n게임을 SR 패널에서 패널 해상도로 전체화면 또는 테두리 없는 창으로 실행하세요.\n자세한 내용은 [로그] 탭에 있습니다.")
+                                             : Lang.T("설정을 적용했습니다.\n\n게임을 실행하면 좌우(SBS) 화면으로 나옵니다. 3D TV나 모니터의 3D 모드를 SBS로 맞추세요.\n자세한 내용은 [로그] 탭에 있습니다."))
                     + (dlss ? Lang.T("\n\n주의: 이 게임에는 DLSS가 있습니다. DLSS를 켜면 게임이 GPU 오류(0x887A0006 HUNG)로 꺼질 수 있으니 3D로 플레이할 때는 게임 옵션에서 DLSS를 꺼 두세요.") : ""),
                     AppName, MessageBoxButtons.OK, dlss ? MessageBoxIcon.Warning : MessageBoxIcon.Information);
             }
