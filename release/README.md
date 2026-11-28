@@ -1,4 +1,4 @@
-# Geo Gaming Hub v0.1.7
+# Geo Gaming Hub v0.1.8
 
 **English** · [한국어](README.ko.md)
 
@@ -87,7 +87,9 @@ Keep `Packages` next to `GeoGamingHub.exe`. Unzip everything first; don't run it
    the window). You can also start from an installed game on the **Candidates** tab.
 2. Go through the four steps **3D Method** → **Install** → **Display** → **Stereo values** with [Next], then click
    [Finish]. The 3D method is detected from the exe; change it if it is wrong. Without an SR display, pick **SBS only**
-   (3D TV, non-SR monitor) on the Install step.
+   (3D TV, non-SR monitor) on the Install step. SBS only still puts SRWeave's `dxgi.dll` in, with weaving off
+   (`weave=0` in `SRWeave.ini`): with geo-11 alone some games quit when they change resolution (STAR WARS Battlefront II
+   going to its fullscreen resolution). Not for DirectX 9 games, and not when the folder has another `dxgi.dll` (ReShade).
 3. Start the game. Adjust and save the values in-game with the hotkeys.
 4. Uninstall: select the game on **Games**, then **[Uninstall 3D fix]** (deletes every file and restores the kept
    originals) or **[Remove SR weaving only]** (3D stays as SBS).
@@ -95,6 +97,9 @@ Keep `Packages` next to `GeoGamingHub.exe`. Unzip everything first; don't run it
 A different DLL of the same name already in the game folder is kept as `.geo11sr_bak` and restored on uninstall.
 
 ### Community fixes (geo-11 games)
+
+A game with a fix in `Packages\Fixes` (or one you imported) is detected on the 3D Method step: it shows "The hub has a
+community fix for this game" and picks geo-11 + the fix, ahead of the other guesses (DirectX 12, TriDef, ...).
 
 If there is a geo-11 / 3DMigoto fix made **for that game** (HelixMod and the like), import it on the **Install** step under
 **Community fix** with **[Import fix (archive)...]** (zip, rar, 7z) or **[From folder...]**, then click [Finish]. Archives
